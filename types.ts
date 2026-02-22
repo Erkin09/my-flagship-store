@@ -24,7 +24,7 @@ export interface Installment {
 
 export interface Sale {
   id: string;
-  deviceId: string;
+  deviceId?: string;
   customerName?: string;
   customerPhone?: string;
   salePrice: number;
@@ -41,10 +41,12 @@ export interface AppState {
   theme: 'light' | 'dark';
   cashBalance: number;
   exchangeRate: number;
-  customIphoneModels: string[];
-  customSamsungModels: string[];
-  aiAdvice: string;
-  syncId?: string;
-  lastSynced?: string;
-  autoSync?: boolean;
+  buyRate: number;
+  sellRate: number;
+  customModels: { [key in Brand]: string[] };
+  syncSettings?: {
+    githubToken?: string;
+    repoName?: string;
+    lastSync?: string;
+  };
 }

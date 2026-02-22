@@ -1,585 +1,1223 @@
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Device, Sale, AppState, Brand, Storage } from './types';
-import { translations, DEFAULT_IPHONE_MODELS, DEFAULT_SAMSUNG_MODELS, STORAGE_OPTIONS } from './constants';
+import { translations, IPHONE_MODELS, SAMSUNG_MODELS, STORAGE_OPTIONS } from './constants';
 import { 
-  LayoutDashboard, Smartphone, ShoppingCart, Users, BarChart3, Settings, 
-  Plus, Search, Moon, Sun, Globe, TrendingUp, RotateCcw, User, Calendar, 
-  Store, DollarSign, Wallet, Coins, Box, Hash, CalendarDays, Tag, ChevronRight,
-  BrainCircuit, Sparkles, RefreshCw, Trash2, ArrowLeftRight, CheckCircle2, Info,
-  Check, X, Cloud, CloudUpload, CloudDownload, Copy, Key, Zap, Download, Laptop, Undo2
+  LayoutDashboard, 
+  Smartphone, 
+  ShoppingCart, 
+  Users, 
+  BarChart3, 
+  Settings, 
+  Plus, 
+  Search,
+  Moon,
+  Sun,
+  Globe,
+  TrendingUp,
+  RotateCcw,
+  User,
+  Calendar,
+  Store,
+  DollarSign,
+  ArrowRightLeft,
+  ChevronRight,
+  Wallet,
+  Coins,
+  Box,
+  Hash,
+  Info,
+  CalendarDays,
+  Tag,
+  RefreshCw,
+  Github,
+  Key,
+  Database,
+  Menu,
+  X,
+  Download
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { GoogleGenAI } from "@google/genai";
+import { motion, AnimatePresence } from 'motion/react';
 
+// --- Utility Functions ---
 const generateId = () => Math.random().toString(36).substr(2, 9);
-const CLOUD_STORAGE_URL = 'https://jsonblob.com/api/jsonBlob';
+const formatDate = (date: string, lang: string) => 
+  new Date(date).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'short' });
+
+// --- Components ---
 
 const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
-  <button
+  <motion.button
+    whileHover={{ x: 4 }}
+    whileTap={{ scale: 0.98 }}
     onClick={onClick}
     className={`flex items-center space-x-3 w-full p-3 rounded-xl transition-all duration-300 ${
       active 
         ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/20' 
-        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/40'
+        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-100'
     }`}
   >
-    <Icon size={18} />
-    <span className={`text-sm ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
-  </button>
+    <Icon size={18} className={active ? 'opacity-100' : 'opacity-60'} />
+    <span className={`text-sm tracking-tight ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
+    {active && <ChevronRight size={14} className="ml-auto opacity-40" />}
+  </motion.button>
 );
 
-const Card = ({ title, subtitle, icon: Icon, colorClass = "bg-brand-50 text-brand-600", trend, isPrimary }: any) => (
-  <div className={`${isPrimary ? 'bg-brand-600 text-white shadow-2xl shadow-brand-500/20' : 'bg-white dark:bg-slate-800/50 text-slate-900 dark:text-slate-50'} backdrop-blur-sm p-5 rounded-[2rem] border ${isPrimary ? 'border-brand-500' : 'border-slate-100 dark:border-slate-800/50'} group transition-all hover:shadow-xl hover:-translate-y-1 relative overflow-hidden flex flex-col justify-between h-full min-h-[140px]`}>
-    {isPrimary && <div className="absolute -right-4 -bottom-4 opacity-10 rotate-12 text-white"><Icon size={80} /></div>}
-    <div className="flex justify-between items-start mb-2 relative z-10">
-      <div className={`p-2 rounded-2xl ${isPrimary ? 'bg-white/20 text-white' : colorClass}`}>
-        <Icon size={18} />
+const Card = ({ title, subtitle, icon: Icon, colorClass = "bg-brand-50 text-brand-600", trend }: any) => (
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    whileHover={{ y: -5 }}
+    className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none transition-all duration-300 group"
+  >
+    <div className="flex justify-between items-start mb-4">
+      <div className={`p-3 ${colorClass.split(' ')[0]} dark:bg-opacity-10 rounded-2xl ${colorClass.split(' ')[1]} transition-transform duration-300 group-hover:scale-110`}>
+        <Icon size={20} />
       </div>
       {trend && (
-        <span className={`text-[9px] font-black ${isPrimary ? 'text-white bg-white/20' : 'text-brand-600 bg-brand-50 dark:bg-brand-900/20'} px-2.5 py-1 rounded-full whitespace-nowrap uppercase tracking-tighter`}>
+        <span className="text-[10px] font-semibold px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg tracking-wide">
           {trend}
         </span>
       )}
     </div>
-    <div className="relative z-10 text-left">
-      <h3 className={`text-[9px] font-bold ${isPrimary ? 'text-white/60' : 'text-slate-400 dark:text-slate-500'} uppercase tracking-widest mb-0.5`}>{title}</h3>
-      <p className="text-xl lg:text-2xl font-black tracking-tighter leading-none truncate">{subtitle}</p>
+    <div>
+      <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-widest">{title}</h3>
+      <p className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">{subtitle}</p>
     </div>
+  </motion.div>
+);
+
+const InputWrapper = ({ label, children, icon: Icon }: any) => (
+  <div className="space-y-1.5 flex-1">
+    <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-2 ml-1">
+      {Icon && <Icon size={12} className="text-brand-500 opacity-60" />}
+      {label}
+    </label>
+    {children}
   </div>
 );
 
+// --- Main App ---
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales' | 'debtors' | 'analytics' | 'settings'>('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('flagship_hub_v19');
-    if (saved) return JSON.parse(saved);
-    return { 
-      devices: [], 
-      sales: [], 
-      language: 'ru', 
-      theme: 'dark', 
+    const saved = localStorage.getItem('flagship_hub_v7');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Ensure exchangeRate is set to a reasonable UZS value if it was 1 or missing
+      if (!parsed.exchangeRate || parsed.exchangeRate === 1) {
+        parsed.exchangeRate = 12210;
+      }
+      if (!parsed.buyRate) parsed.buyRate = parsed.exchangeRate - 50;
+      if (!parsed.sellRate) parsed.sellRate = parsed.exchangeRate + 50;
+      return parsed;
+    }
+    return {
+      devices: [],
+      sales: [],
+      language: 'ru',
+      theme: 'dark',
       cashBalance: 0,
-      exchangeRate: 12850,
-      customIphoneModels: DEFAULT_IPHONE_MODELS,
-      customSamsungModels: DEFAULT_SAMSUNG_MODELS,
-      aiAdvice: '',
-      autoSync: false
+      exchangeRate: 12210,
+      buyRate: 12160,
+      sellRate: 12260,
+      customModels: { iPhone: [], Samsung: [] },
+      syncSettings: {
+        githubToken: '',
+        repoName: '',
+        lastSync: ''
+      }
     };
   });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddDebtorModal, setShowAddDebtorModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState<Device | null>(null);
   const [isInstallmentMode, setIsInstallmentMode] = useState(false);
+  
   const [modalSelectedBrand, setModalSelectedBrand] = useState<Brand>('iPhone');
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncError, setSyncError] = useState(false);
-  const [newModelName, setNewModelName] = useState('');
-  const [newModelBrand, setNewModelBrand] = useState<Brand>('iPhone');
-  const [syncKeyInput, setSyncKeyInput] = useState('');
-  const [activePaymentId, setActivePaymentId] = useState<string | null>(null);
-  const [paymentValue, setPaymentValue] = useState<string>('');
 
-  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const fetchRate = async () => {
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/USD');
+      const data = await res.json();
+      if (data && data.rates && data.rates.UZS) {
+        const newRate = Math.round(data.rates.UZS);
+        setState(prev => {
+          if (Math.abs(prev.exchangeRate - newRate) > 1 || prev.exchangeRate === 1) {
+            return { 
+              ...prev, 
+              exchangeRate: newRate,
+              buyRate: newRate - 40,
+              sellRate: newRate + 40
+            };
+          }
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch exchange rate:', error);
+    }
+  };
+
+  // Fetch Exchange Rate on mount
+  useEffect(() => {
+    fetchRate();
+    const interval = setInterval(fetchRate, 3600000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('flagship_hub_v19', JSON.stringify(state));
-    document.documentElement.classList.toggle('dark', state.theme === 'dark');
-    if (state.autoSync && state.syncId) {
-      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
-      syncTimeoutRef.current = setTimeout(() => backgroundSaveToCloud(), 5000);
+    localStorage.setItem('flagship_hub_v7', JSON.stringify(state));
+    if (state.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   }, [state]);
 
   const t = translations[state.language];
 
-  const downloadProject = async () => {
-    // @ts-ignore
-    const zip = new JSZip();
-    const fileList = [
-      { name: 'index.html', path: '/index.html' },
-      { name: 'index.tsx', path: '/index.tsx' },
-      { name: 'App.tsx', path: '/App.tsx' },
-      { name: 'types.ts', path: '/types.ts' },
-      { name: 'constants.tsx', path: '/constants.tsx' },
-      { name: 'package.json', path: '/package.json' },
-      { name: 'vite.config.ts', path: '/vite.config.ts' },
-      { name: 'metadata.json', path: '/metadata.json' },
-    ];
+  // Sync to GitHub Logic
+  const syncToGithub = async () => {
+    if (!state.syncSettings?.githubToken || !state.syncSettings?.repoName) {
+      alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
+      return;
+    }
 
     try {
-      for (const f of fileList) {
-        const response = await fetch(f.path);
-        const content = await response.text();
-        zip.file(f.name, content);
+      const { githubToken, repoName } = state.syncSettings;
+      const fileName = 'flagship_data.json';
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+      
+      // 1. Try to get the file SHA if it exists
+      let sha = '';
+      try {
+        const getRes = await fetch(`https://api.github.com/repos/${repoName}/contents/${fileName}`, {
+          headers: { 'Authorization': `token ${githubToken}` }
+        });
+        if (getRes.ok) {
+          const data = await getRes.json();
+          sha = data.sha;
+        }
+      } catch (e) { /* File might not exist */ }
+
+      // 2. Create or Update the file
+      const res = await fetch(`https://api.github.com/repos/${repoName}/contents/${fileName}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Sync data ${new Date().toISOString()}`,
+          content,
+          sha: sha || undefined
+        })
+      });
+
+      if (res.ok) {
+        setState(prev => ({
+          ...prev,
+          syncSettings: { ...prev.syncSettings, lastSync: new Date().toISOString() }
+        }));
+        alert(state.language === 'ru' ? 'Синхронизация успешна' : 'Sync successful');
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.message}`);
       }
-      const blob = await zip.generateAsync({ type: "blob" });
-      // @ts-ignore
-      saveAs(blob, "flagship-hub-source.zip");
-      alert(state.language === 'ru' ? "Проект успешно скачан! Распакуйте архив на ПК." : "Project downloaded successfully!");
-    } catch (e) {
-      alert("Error building zip: " + e);
+    } catch (error) {
+      console.error(error);
+      alert('Sync failed');
     }
   };
 
-  const backgroundSaveToCloud = async () => {
-    if (!state.syncId) return;
-    setIsSyncing(true);
-    try {
-      await fetch(`${CLOUD_STORAGE_URL}/${state.syncId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
-      });
-      setState(prev => ({ ...prev, lastSynced: new Date().toISOString() }));
-    } catch (e) { setSyncError(true); } finally { setIsSyncing(false); }
-  };
+  const restoreFromGithub = async () => {
+    if (!state.syncSettings?.githubToken || !state.syncSettings?.repoName) {
+      alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
+      return;
+    }
 
-  const saveToCloud = async () => {
-    setIsSyncing(true);
-    try {
-      const url = state.syncId ? `${CLOUD_STORAGE_URL}/${state.syncId}` : CLOUD_STORAGE_URL;
-      const response = await fetch(url, {
-        method: state.syncId ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
-      });
-      if (response.ok) {
-        if (!state.syncId) {
-          const blobUrl = response.headers.get('Location');
-          const newId = blobUrl?.split('/').pop();
-          if (newId) setState(prev => ({ ...prev, syncId: newId, lastSynced: new Date().toISOString() }));
-        } else {
-          setState(prev => ({ ...prev, lastSynced: new Date().toISOString() }));
-        }
-        alert(state.language === 'ru' ? 'Синхронизация успешна!' : 'Sync Successful!');
-      }
-    } catch (e) { setSyncError(true); } finally { setIsSyncing(false); }
-  };
+    if (!confirm(state.language === 'ru' ? 'Это перезапишет текущие данные. Продолжить?' : 'This will overwrite current data. Continue?')) {
+      return;
+    }
 
-  const loadFromCloud = async () => {
-    const key = syncKeyInput || state.syncId;
-    if (!key) return;
-    setIsSyncing(true);
     try {
-      const res = await fetch(`${CLOUD_STORAGE_URL}/${key}`);
+      const { githubToken, repoName } = state.syncSettings;
+      const fileName = 'flagship_data.json';
+      
+      const res = await fetch(`https://api.github.com/repos/${repoName}/contents/${fileName}`, {
+        headers: { 'Authorization': `token ${githubToken}` }
+      });
+
       if (res.ok) {
         const data = await res.json();
-        setState({ ...data, syncId: key, lastSynced: new Date().toISOString() });
-        setSyncKeyInput('');
-        alert(state.language === 'ru' ? 'Данные загружены!' : 'Data Loaded!');
+        const decodedContent = decodeURIComponent(escape(atob(data.content)));
+        const restoredState = JSON.parse(decodedContent);
+        
+        // Merge sync settings to keep current token/repo
+        setState({
+          ...restoredState,
+          syncSettings: state.syncSettings
+        });
+        
+        alert(state.language === 'ru' ? 'Данные восстановлены' : 'Data restored');
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.message}`);
       }
-    } catch (e) { setSyncError(true); } finally { setIsSyncing(false); }
+    } catch (error) {
+      console.error(error);
+      alert('Restore failed');
+    }
   };
 
+  // Logic Helpers
   const devicesInStock = state.devices.filter(d => d.status === 'In Stock');
   const stockValue = devicesInStock.reduce((acc, d) => acc + d.purchasePrice, 0);
-  const activeSales = state.sales.filter(s => s.status === 'Completed');
-  const debtorsList = activeSales.filter(s => s.isInstallment && s.installmentPlan && (s.installmentPlan.paidAmount < s.salePrice - 0.01));
+  
+  const debtorsList = useMemo(() => {
+    return state.sales.filter(s => 
+      s.isInstallment === true && 
+      s.status === 'Completed' &&
+      s.installmentPlan && 
+      Math.round(s.installmentPlan.paidAmount) < Math.round(s.salePrice)
+    );
+  }, [state.sales]);
+
   const totalDebt = debtorsList.reduce((acc, s) => acc + (s.salePrice - (s.installmentPlan?.paidAmount || 0)), 0);
   const totalAssets = stockValue + totalDebt + state.cashBalance;
 
+  const totalProfit = state.sales
+    .filter(s => s.status === 'Completed')
+    .reduce((acc, s) => {
+      const device = state.devices.find(d => d.id === s.deviceId);
+      return acc + (s.salePrice - (device?.purchasePrice || 0));
+    }, 0);
+
+  // Analytics helper with current year filter
   const chartData = useMemo(() => {
-    const year = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
     const months = state.language === 'ru' 
       ? ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
       : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    return months.map((name, i) => {
-      const monthSales = state.sales.filter(s => {
+    
+    return months.map((m, i) => {
+      const monthlySales = state.sales.filter(s => {
         const d = new Date(s.date);
-        return d.getFullYear() === year && d.getMonth() === i && s.status === 'Completed';
+        return d.getFullYear() === currentYear && d.getMonth() === i && s.status === 'Completed';
       });
-      const profit = monthSales.reduce((acc, s) => {
+      const profit = monthlySales.reduce((acc, s) => {
         const dev = state.devices.find(d => d.id === s.deviceId);
         return acc + (s.salePrice - (dev?.purchasePrice || 0));
       }, 0);
-      return { name, profit, sales: monthSales.length };
+      return { name: m, profit, sales: monthlySales.length };
     });
   }, [state.sales, state.devices, state.language]);
 
-  const generateAIAdvice = async () => {
-    setIsAiLoading(true);
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Shop analytics: Total Assets $${totalAssets}, Stock $${stockValue}, Debtors $${totalDebt}, Cash $${state.cashBalance}. Total devices in stock: ${devicesInStock.length}. Give 4 short business growth tips in ${state.language === 'ru' ? 'Russian' : 'English'}.`;
-      const response = await ai.models.generateContent({ model: 'gemini-3-flash-preview', contents: prompt });
-      setState(prev => ({ ...prev, aiAdvice: response.text || 'Error generating advice' }));
-    } catch (e) { 
-      console.error(e);
-      setState(prev => ({ ...prev, aiAdvice: 'Не удалось связаться с ИИ. Проверьте ключ API.' }));
-    } finally { setIsAiLoading(false); }
-  };
+  const dailyProfitData = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const day = i + 1;
+      const dailySales = state.sales.filter(s => {
+        const d = new Date(s.date);
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === day && s.status === 'Completed';
+      });
+      const profit = dailySales.reduce((acc, s) => {
+        const dev = state.devices.find(d => d.id === s.deviceId);
+        return acc + (s.salePrice - (dev?.purchasePrice || 0));
+      }, 0);
+      return { name: day.toString(), profit };
+    });
+  }, [state.sales, state.devices]);
 
-  const addDevice = (e: any) => {
+  // Handlers
+  const addDevice = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const dev: Device = {
+    const formData = new FormData(e.currentTarget);
+    const newDevice: Device = {
       id: generateId(),
-      brand: fd.get('brand') as Brand,
-      model: fd.get('model') as string,
-      storage: fd.get('storage') as Storage,
-      imei: fd.get('imei') as string,
-      purchasePrice: Number(fd.get('purchasePrice')),
-      purchasedFrom: fd.get('purchasedFrom') as string || 'Unknown',
-      purchaseDate: new Date().toISOString(),
+      brand: formData.get('brand') as Brand,
+      model: formData.get('model') as string,
+      storage: formData.get('storage') as Storage,
+      imei: formData.get('imei') as string,
+      purchasePrice: Number(formData.get('purchasePrice')),
+      purchasedFrom: formData.get('purchasedFrom') as string,
+      purchaseDate: formData.get('purchaseDate') as string || new Date().toISOString().split('T')[0],
       status: 'In Stock',
       dateAdded: new Date().toISOString()
     };
-    setState(prev => ({ ...prev, devices: [dev, ...prev.devices] }));
+    setState(prev => ({ ...prev, devices: [newDevice, ...prev.devices] }));
     setShowAddModal(false);
   };
 
-  const sellDevice = (e: any) => {
+  const sellDevice = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!showSellModal) return;
-    const fd = new FormData(e.currentTarget);
-    const isInst = fd.get('isInstallment') === 'on';
-    const sPrice = Number(fd.get('salePrice'));
-    const pAmount = isInst ? Number(fd.get('paidAmount')) : sPrice;
+    const formData = new FormData(e.currentTarget);
+    const isInstallment = formData.get('isInstallment') === 'on';
+    const salePrice = Number(formData.get('salePrice'));
+    const paidAmount = isInstallment ? Number(formData.get('paidAmount') || 0) : salePrice;
 
     const sale: Sale = {
       id: generateId(),
       deviceId: showSellModal.id,
-      customerName: fd.get('customerName') as string || "Guest",
-      customerPhone: fd.get('customerPhone') as string || "N/A",
-      salePrice: sPrice,
+      customerName: isInstallment ? formData.get('customerName') as string : "Guest",
+      customerPhone: isInstallment ? formData.get('customerPhone') as string : "N/A",
+      salePrice: salePrice,
       date: new Date().toISOString(),
-      isInstallment: isInst,
+      isInstallment,
       status: 'Completed',
-      ...(isInst ? { installmentPlan: { months: Number(fd.get('months')) as any, paidAmount: pAmount, dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() } } : {})
+      ...(isInstallment ? {
+        installmentPlan: {
+          months: Number(formData.get('months')) as any,
+          paidAmount: paidAmount,
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      } : {})
     };
 
     setState(prev => ({
       ...prev,
       sales: [sale, ...prev.sales],
       devices: prev.devices.map(d => d.id === showSellModal.id ? { ...d, status: 'Sold' } : d),
-      cashBalance: prev.cashBalance + pAmount
+      cashBalance: prev.cashBalance + paidAmount
     }));
     setShowSellModal(null);
     setIsInstallmentMode(false);
   };
 
   const returnSale = (saleId: string) => {
-    if (!confirm(state.language === 'ru' ? "Вернуть товар на склад?" : "Return item to stock?")) return;
-    setState(prev => {
-      const sale = prev.sales.find(s => s.id === saleId);
-      if (!sale) return prev;
-      const refundAmount = sale.isInstallment ? (sale.installmentPlan?.paidAmount || 0) : sale.salePrice;
-      return {
-        ...prev,
-        sales: prev.sales.map(s => s.id === saleId ? { ...s, status: 'Returned' } : s),
-        devices: prev.devices.map(d => d.id === sale.deviceId ? { ...d, status: 'In Stock' } : d),
-        cashBalance: prev.cashBalance - refundAmount
-      };
-    });
+    if(!confirm(state.language === 'ru' ? 'Вы уверены?' : 'Are you sure?')) return;
+    const sale = state.sales.find(s => s.id === saleId);
+    if (!sale) return;
+    setState(prev => ({
+      ...prev,
+      sales: prev.sales.map(s => s.id === saleId ? { ...s, status: 'Returned' } : s),
+      devices: prev.devices.map(d => d.id === sale.deviceId ? { ...d, status: 'In Stock' } : d),
+      cashBalance: prev.cashBalance - (sale.isInstallment ? (sale.installmentPlan?.paidAmount || 0) : sale.salePrice)
+    }));
   };
 
-  const handleAddPayment = (saleId: string, amount: number) => {
-    if (isNaN(amount) || amount <= 0) return;
-    setState(prev => {
-      const updatedSales = prev.sales.map(s => {
+  const updateInstallment = (saleId: string, amount: number) => {
+    setState(prev => ({
+      ...prev,
+      sales: prev.sales.map(s => {
         if (s.id === saleId && s.installmentPlan) {
-          return { ...s, installmentPlan: { ...s.installmentPlan, paidAmount: s.installmentPlan.paidAmount + amount } };
+          return {
+            ...s,
+            installmentPlan: { ...s.installmentPlan, paidAmount: s.installmentPlan.paidAmount + amount }
+          };
         }
         return s;
-      });
-      return { ...prev, sales: updatedSales, cashBalance: prev.cashBalance + amount };
-    });
-    setActivePaymentId(null);
-    setPaymentValue('');
+      }),
+      cashBalance: prev.cashBalance + amount
+    }));
   };
 
-  const addNewModel = () => {
-    if (!newModelName.trim()) return;
-    const key = newModelBrand === 'iPhone' ? 'customIphoneModels' : 'customSamsungModels';
-    if (state[key].includes(newModelName)) { alert("Уже есть!"); return; }
-    setState(prev => ({ ...prev, [key]: [...prev[key], newModelName.trim()].sort() }));
-    setNewModelName('');
-    alert("Модель добавлена!");
+  const addDebtor = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const salePrice = Number(formData.get('salePrice'));
+    const paidAmount = Number(formData.get('paidAmount') || 0);
+
+    const sale: Sale = {
+      id: generateId(),
+      customerName: formData.get('customerName') as string,
+      customerPhone: formData.get('customerPhone') as string,
+      salePrice: salePrice,
+      date: new Date().toISOString(),
+      isInstallment: true,
+      status: 'Completed',
+      installmentPlan: {
+        months: Number(formData.get('months')) as any,
+        paidAmount: paidAmount,
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    };
+
+    setState(prev => ({
+      ...prev,
+      sales: [sale, ...prev.sales],
+      cashBalance: prev.cashBalance + paidAmount
+    }));
+    setShowAddDebtorModal(false);
   };
+
+  const filteredDevices = devicesInStock.filter(d => 
+    d.imei.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    d.model.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-[#0B0F19] transition-colors duration-500 font-sans">
-      <aside className="w-64 border-r border-slate-200/50 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-6 hidden lg:flex flex-col sticky top-0 h-screen">
-        <div className="flex items-center space-x-3 mb-10 px-2">
-          <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
-            <Smartphone size={20} />
+    <div className="flex min-h-screen bg-[#F9FAFB] dark:bg-[#0B0F19] text-slate-700 dark:text-slate-300 transition-colors duration-500 font-sans selection:bg-brand-500/30">
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-r border-slate-100 dark:border-slate-800 flex flex-col p-4 space-y-1 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="flex items-center justify-between px-3 py-8 mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+              <Smartphone size={18} />
+            </div>
+            <span className="text-base font-semibold tracking-tight uppercase text-slate-900 dark:text-white">Fhub</span>
           </div>
-          <span className="text-lg font-bold tracking-tight dark:text-white uppercase">Flagship<span className="text-brand-500">Hub</span></span>
+          <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-slate-600">
+            <X size={20} />
+          </button>
         </div>
-        <nav className="space-y-2 flex-1">
-          <SidebarItem icon={LayoutDashboard} label={t.dashboard} active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-          <SidebarItem icon={Box} label={t.inventory} active={activeTab === 'inventory'} onClick={() => setActiveTab('inventory')} />
-          <SidebarItem icon={ShoppingCart} label={t.sales} active={activeTab === 'sales'} onClick={() => setActiveTab('sales')} />
-          <SidebarItem icon={Users} label={t.debtors} active={activeTab === 'debtors'} onClick={() => setActiveTab('debtors')} />
-          <SidebarItem icon={BarChart3} label={t.analytics} active={activeTab === 'analytics'} onClick={() => setActiveTab('analytics')} />
-        </nav>
-        <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
-          <SidebarItem icon={Settings} label={t.settings} active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+        
+        <SidebarItem icon={LayoutDashboard} label={t.dashboard} active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }} />
+        <SidebarItem icon={Smartphone} label={t.inventory} active={activeTab === 'inventory'} onClick={() => { setActiveTab('inventory'); setIsSidebarOpen(false); }} />
+        <SidebarItem icon={ShoppingCart} label={t.sales} active={activeTab === 'sales'} onClick={() => { setActiveTab('sales'); setIsSidebarOpen(false); }} />
+        <SidebarItem icon={Users} label={t.debtors} active={activeTab === 'debtors'} onClick={() => { setActiveTab('debtors'); setIsSidebarOpen(false); }} />
+        <SidebarItem icon={BarChart3} label={t.analytics} active={activeTab === 'analytics'} onClick={() => { setActiveTab('analytics'); setIsSidebarOpen(false); }} />
+        
+        <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+          <SidebarItem icon={Settings} label={t.settings} active={activeTab === 'settings'} onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} />
         </div>
       </aside>
 
-      <main className="flex-1 p-4 lg:p-12 overflow-x-hidden">
-        <header className="flex flex-wrap justify-between items-center mb-10 gap-4">
-          <div className="text-left">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white uppercase">{t[activeTab]}</h1>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{new Date().toLocaleDateString(state.language === 'ru' ? 'ru-RU' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      {/* Main Content */}
+      <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-x-hidden">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
+          <div className="flex items-center justify-between w-full md:w-auto">
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm active:scale-95 transition-all"
+              >
+                <Menu size={20} />
+              </button>
+              <div>
+                <h1 className="text-lg md:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 leading-none">{t[activeTab]}</h1>
+                <div className="flex items-center space-x-2 text-slate-400 text-[9px] font-semibold uppercase tracking-widest mt-1">
+                  <Calendar size={10} className="text-brand-500 opacity-60" />
+                  <span>{new Date().toLocaleDateString(state.language === 'ru' ? 'ru-RU' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2 md:hidden">
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setState(s => ({ ...s, theme: s.theme === 'light' ? 'dark' : 'light' }))}
+                className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 shadow-sm"
+              >
+                {state.theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+              </motion.button>
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setState(s => ({ ...s, language: s.language === 'ru' ? 'en' : 'ru' }))}
+                className="px-2 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold text-[10px] uppercase shadow-sm"
+              >
+                {state.language}
+              </motion.button>
+            </div>
           </div>
-          <div className="flex items-center space-x-3">
-             <div className="hidden sm:flex items-center space-x-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700">
-               <Globe className="text-brand-500" size={14} />
-               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">$1 ≈ {state.exchangeRate.toLocaleString()} UZS</span>
-             </div>
-             <button onClick={() => setState(s => ({ ...s, theme: s.theme === 'dark' ? 'light' : 'dark' }))} className="p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-brand-500 transition-all">
-               {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-             </button>
-             <button onClick={() => setState(s => ({ ...s, language: s.language === 'ru' ? 'en' : 'ru' }))} className="px-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300">
-               {state.language}
-             </button>
+          
+          <div className="flex items-center space-x-2 w-full md:w-auto justify-start md:justify-end overflow-x-auto scrollbar-hide py-1 no-scrollbar">
+            <div className="flex items-center space-x-3 px-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm shrink-0">
+              <div className="flex flex-col">
+                <span className="text-[7px] font-bold text-slate-400 uppercase leading-none mb-1">{t.buyRate}</span>
+                <span className="text-[10px] font-bold text-emerald-600 leading-none">{state.buyRate.toLocaleString()}</span>
+              </div>
+              <div className="w-px h-5 bg-slate-100 dark:bg-slate-700" />
+              <div className="flex flex-col">
+                <span className="text-[7px] font-bold text-slate-400 uppercase leading-none mb-1">{t.sellRate}</span>
+                <span className="text-[10px] font-bold text-rose-600 leading-none">{state.sellRate.toLocaleString()}</span>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center space-x-2">
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setState(s => ({ ...s, theme: s.theme === 'light' ? 'dark' : 'light' }))}
+                className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 shadow-sm transition-all"
+              >
+                {state.theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              </motion.button>
+              <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setState(s => ({ ...s, language: s.language === 'ru' ? 'en' : 'ru' }))}
+                className="px-3 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-50 dark:text-slate-400 flex items-center space-x-1.5 transition-all font-semibold text-[10px] tracking-widest uppercase shadow-sm"
+              >
+                <Globe size={14} className="text-brand-500 opacity-60" />
+                <span>{state.language}</span>
+              </motion.button>
+            </div>
           </div>
         </header>
 
+        {/* Dashboard */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card title={t.totalAssets} subtitle={`$${totalAssets.toLocaleString()}`} icon={Coins} isPrimary />
-              <Card title={t.stockValue} subtitle={`$${stockValue.toLocaleString()}`} icon={Box} colorClass="bg-blue-50 text-blue-600 dark:bg-blue-900/20" trend={`${devicesInStock.length} шт`} />
-              <Card title={t.cash} subtitle={`$${state.cashBalance.toLocaleString()}`} icon={Wallet} colorClass="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20" trend="Касса" />
-              <Card title={t.debtors} subtitle={`$${totalDebt.toLocaleString()}`} icon={Users} colorClass="bg-rose-50 text-rose-600 dark:bg-rose-900/20" trend="Долги" />
+               <div className="md:col-span-2 bg-brand-600 p-8 rounded-[2rem] text-white relative overflow-hidden shadow-sm">
+                  <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
+                  <div className="relative z-10 flex flex-col h-full justify-between">
+                     <div className="flex justify-between items-start">
+                        <div className="p-2.5 bg-white/10 rounded-xl">
+                           <Coins size={22} />
+                        </div>
+                        <span className="text-[9px] font-semibold uppercase tracking-widest bg-white/10 px-2.5 py-1 rounded-full">{t.totalAssets}</span>
+                     </div>
+                     <div className="mt-8">
+                        <p className="text-4xl font-semibold tracking-tight">${totalAssets.toLocaleString()}</p>
+                     </div>
+                  </div>
+               </div>
+               <Card title={t.cash} subtitle={`$${state.cashBalance.toLocaleString()}`} icon={Wallet} colorClass="bg-emerald-50 text-emerald-600" />
+               <Card title={t.debtors} subtitle={`$${totalDebt.toLocaleString()}`} icon={Users} colorClass="bg-rose-50 text-rose-600" />
             </div>
-            <div className="bg-white dark:bg-slate-800/40 p-8 rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
-               <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 text-left">{t.monthlyPerformance}</h3>
-               <div className="h-[300px] w-full">
-                 <ResponsiveContainer width="100%" height="100%">
-                   <AreaChart data={chartData}>
-                     <defs>
-                       <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.4}/><stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/></linearGradient>
-                     </defs>
-                     <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} />
-                     <XAxis dataKey="name" fontSize={10} tickLine={false} axisLine={false} tick={{fill: '#94a3b8'}} />
-                     <Tooltip contentStyle={{ borderRadius: '24px', border: 'none', backgroundColor: state.theme === 'dark' ? '#1e293b' : '#fff' }} />
-                     <Area type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={4} fill="url(#grad1)" />
-                   </AreaChart>
-                 </ResponsiveContainer>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card title={t.stockValue} subtitle={`$${stockValue.toLocaleString()}`} icon={Box} colorClass="bg-blue-50 text-blue-600" />
+              <Card title={t.totalSales} subtitle={state.sales.filter(s => s.status === 'Completed').length.toString()} icon={ShoppingCart} colorClass="bg-amber-50 text-amber-600" />
+              <Card title={t.profit} subtitle={`$${totalProfit.toLocaleString()}`} icon={TrendingUp} colorClass="bg-purple-50 text-purple-600" />
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+               <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-6">{t.monthlyPerformance}</h3>
+               <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.15}/>
+                          <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.05} />
+                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} tick={{dy: 10}} />
+                      <YAxis hide />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '12px', fontSize: '11px', color: '#fff' }}
+                        itemStyle={{ color: '#38bdf8', fontWeight: 'semibold' }}
+                      />
+                      <Area type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfit)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                </div>
             </div>
           </div>
         )}
 
+        {/* Inventory View */}
         {activeTab === 'inventory' && (
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-left">
-              <div className="relative w-full md:w-96">
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+              <div className="relative w-full md:w-80 group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input type="text" placeholder={t.search} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 rounded-2xl outline-none text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700" />
+                <input 
+                  type="text" 
+                  placeholder={t.search}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border-none rounded-xl shadow-sm text-sm font-medium outline-none focus:ring-1 ring-brand-500/20"
+                />
               </div>
-              <button onClick={() => setShowAddModal(true)} className="px-6 py-4 bg-brand-600 text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest shadow-lg flex items-center justify-center space-x-2 active:scale-95 transition-all"><Plus size={16} /> <span>{t.addDevice}</span></button>
+              <div className="flex space-x-2 items-center">
+                 <div className="px-4 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">{t.stockValue}</p>
+                    <p className="text-lg font-semibold text-brand-600 tracking-tight leading-none">${stockValue.toLocaleString()}</p>
+                 </div>
+                 <button 
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center space-x-2 bg-slate-900 dark:bg-brand-600 text-white px-4 py-2.5 rounded-xl hover:bg-brand-700 transition-all font-semibold uppercase text-[10px] tracking-widest"
+                >
+                  <Plus size={14} />
+                  <span>{t.addDevice}</span>
+                </button>
+              </div>
             </div>
-            <div className="bg-white dark:bg-slate-800/40 rounded-[2.5rem] overflow-x-auto border border-slate-200/50 dark:border-slate-800/50 shadow-sm text-left">
-              <table className="w-full text-left min-w-[600px] text-slate-900 dark:text-slate-100">
-                <thead><tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-400"><th className="px-8 py-6">{t.model}</th><th className="px-8 py-6">{t.storage}</th><th className="px-8 py-6">{t.imei}</th><th className="px-8 py-6">{t.price}</th><th className="px-8 py-6 text-right">{t.actions}</th></tr></thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                  {devicesInStock.filter(d => d.model.toLowerCase().includes(searchQuery.toLowerCase()) || d.imei.includes(searchQuery)).map(device => (
-                    <tr key={device.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                      <td className="px-8 py-6 font-bold">{device.model}</td>
-                      <td className="px-8 py-6 font-black uppercase tracking-tight text-[10px]">{device.storage}</td>
-                      <td className="px-8 py-6 text-xs text-slate-500 font-mono">{device.imei}</td>
-                      <td className="px-8 py-6 font-black">${device.purchasePrice}</td>
-                      <td className="px-8 py-6 text-right"><button onClick={() => setShowSellModal(device)} className="px-5 py-2.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 hover:bg-brand-600 hover:text-white rounded-xl text-[10px] font-black uppercase transition-all shadow-sm">{t.sell}</button></td>
+
+            <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
+               <div className="overflow-x-auto scrollbar-hide">
+                 <table className="w-full text-left min-w-[600px]">
+                   <thead>
+                     <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/60">
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.model}</th>
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.storage}</th>
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.imei}</th>
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.supplier}</th>
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                    {filteredDevices.map(device => (
+                      <tr key={device.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all group">
+                        <td className="px-6 py-4">
+                           <div className="flex items-center space-x-3">
+                              <span className={`w-1.5 h-1.5 rounded-full ${device.brand === 'iPhone' ? 'bg-indigo-400' : 'bg-brand-500'}`}></span>
+                              <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 tracking-tight leading-none">{device.model}</p>
+                           </div>
+                        </td>
+                        <td className="px-6 py-4">
+                           <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-[9px] font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400">{device.storage}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                           <code className="text-[10px] font-medium text-slate-400">{device.imei}</code>
+                        </td>
+                        <td className="px-6 py-4">
+                           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{device.purchasedFrom}</p>
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-sm text-slate-900 dark:text-slate-100">${device.purchasePrice.toLocaleString()}</td>
+                         <td className="px-6 py-4 text-right">
+                            <button 
+                              onClick={() => setShowSellModal(device)}
+                              className="px-4 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-500 dark:text-slate-400 rounded-lg font-semibold text-[9px] uppercase tracking-widest transition-all"
+                            >
+                              {t.sell}
+                            </button>
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+                 {filteredDevices.length === 0 && (
+                   <div className="py-20 text-center text-slate-400/60">
+                     <Smartphone size={40} className="mx-auto mb-3 opacity-10" />
+                     <p className="text-[10px] font-semibold uppercase tracking-widest italic">Inventory clear</p>
+                   </div>
+                 )}
+               </div>
             </div>
           </div>
         )}
 
-        {activeTab === 'sales' && (
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-800/40 rounded-[2.5rem] overflow-x-auto border border-slate-200/50 dark:border-slate-800/50 shadow-sm text-left">
-              <table className="w-full text-left min-w-[800px] text-slate-900 dark:text-slate-100">
-                <thead><tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-400"><th className="px-8 py-6">{t.date}</th><th className="px-8 py-6">{t.model}</th><th className="px-8 py-6">{t.customer}</th><th className="px-8 py-6">{t.sellingPrice}</th><th className="px-8 py-6">{t.status}</th><th className="px-8 py-6 text-right">{t.actions}</th></tr></thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                  {state.sales.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(sale => {
-                    const dev = state.devices.find(d => d.id === sale.deviceId);
-                    return (
-                      <tr key={sale.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                        <td className="px-8 py-6 text-xs text-slate-400">{new Date(sale.date).toLocaleDateString()}</td>
-                        <td className="px-8 py-6 font-bold">{dev?.model || 'Deleted Device'}</td>
-                        <td className="px-8 py-6 text-sm">{sale.customerName}</td>
-                        <td className="px-8 py-6 font-black">${sale.salePrice}</td>
-                        <td className="px-8 py-6"><span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${sale.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/20'}`}>{sale.status === 'Completed' ? t.completed : t.returned}</span></td>
-                        <td className="px-8 py-6 text-right">{sale.status === 'Completed' && (<button onClick={() => returnSale(sale.id)} className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all"><Undo2 size={18} /></button>)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-8">{t.monthlyProfit}</h3>
+                   <div className="h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                         <AreaChart data={chartData}>
+                            <defs>
+                              <linearGradient id="colorProfitAnalytic" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.2}/>
+                                <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.05} />
+                            <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                            <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                            <Tooltip 
+                              contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '12px', fontSize: '11px', color: '#fff' }}
+                            />
+                            <Area type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfitAnalytic)" />
+                         </AreaChart>
+                      </ResponsiveContainer>
+                   </div>
+                </div>
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-8">{t.dailyProfit}</h3>
+                   <div className="h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                         <BarChart data={dailyProfitData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.05} />
+                            <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                            <YAxis hide />
+                            <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
+                            <Bar dataKey="profit" fill="#10b981" radius={[6, 6, 0, 0]} barSize={12} />
+                         </BarChart>
+                      </ResponsiveContainer>
+                   </div>
+                </div>
+             </div>
           </div>
+        )}
+
+        {/* Settings, Sales, Debtors remain similarly refined in App.tsx logic... */}
+        {/* ... (Existing tabs logic but with refined typography classes applied) ... */}
+        
+        {activeTab === 'sales' && (
+           <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm animate-in fade-in duration-500">
+             <div className="overflow-x-auto scrollbar-hide">
+               <table className="w-full text-left min-w-[700px]">
+                 <thead>
+                   <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/60">
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.date}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.model}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.customer}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.sellingPrice}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.status}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
+                   </tr>
+                 </thead>
+                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                   {state.sales.map(sale => {
+                     const device = state.devices.find(d => d.id === sale.deviceId);
+                     return (
+                       <tr key={sale.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
+                         <td className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase">{formatDate(sale.date, state.language)}</td>
+                         <td className="px-6 py-4">
+                           <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 tracking-tight">{device?.model || '?'}</p>
+                           <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">{device?.storage} • {device?.imei.slice(-4)}</p>
+                         </td>
+                         <td className="px-6 py-4">
+                           <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{sale.customerName || "—"}</p>
+                           <p className="text-[9px] font-medium text-slate-400">{sale.customerPhone || "—"}</p>
+                         </td>
+                                                                              <td className="px-6 py-4 font-semibold text-xs text-slate-400">${device?.purchasePrice.toLocaleString() || '0'}</td>
+                                                                              <td className="px-6 py-4 font-semibold text-base text-brand-600">${sale.salePrice.toLocaleString()}</td>
+                          <td className="px-6 py-4">
+                           <span className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-widest ${
+                             sale.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/20'
+                           }`}>
+                             {sale.status === 'Completed' ? (sale.isInstallment ? 'In Debt' : 'Paid') : 'Returned'}
+                           </span>
+                         </td>
+                         <td className="px-6 py-4 text-right">
+                           {sale.status === 'Completed' && (
+                             <button onClick={() => returnSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90">
+                               <RotateCcw size={14} />
+                             </button>
+                           )}
+                         </td>
+                       </tr>
+                     );
+                   })}
+                 </tbody>
+               </table>
+             </div>
+           </div>
         )}
 
         {activeTab === 'debtors' && (
-          <div className="grid grid-cols-1 gap-4 text-left">
-             {debtorsList.length > 0 ? debtorsList.map(debtor => {
-                const dev = state.devices.find(d => d.id === debtor.deviceId);
-                const remaining = debtor.salePrice - (debtor.installmentPlan?.paidAmount || 0);
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex justify-end">
+              <button 
+                onClick={() => setShowAddDebtorModal(true)}
+                className="flex items-center space-x-2 bg-slate-900 dark:bg-brand-600 text-white px-4 py-2.5 rounded-xl hover:bg-brand-700 transition-all font-semibold uppercase text-[10px] tracking-widest"
+              >
+                <Plus size={14} />
+                <span>{t.addDebtor || (state.language === 'ru' ? 'Добавить должника' : 'Add Debtor')}</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {debtorsList.map(sale => {
+                const device = state.devices.find(d => d.id === sale.deviceId);
+                const remaining = Math.round(sale.salePrice - (sale.installmentPlan?.paidAmount || 0));
+                const progress = ((sale.installmentPlan?.paidAmount || 0) / sale.salePrice) * 100;
                 return (
-                  <div key={debtor.id} className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center shadow-md gap-6">
-                     <div className="flex items-center space-x-6">
-                        <div className="w-14 h-14 bg-brand-50 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center text-brand-600"><User size={28} /></div>
-                        <div><h4 className="font-black text-xl tracking-tighter leading-none mb-1">{debtor.customerName}</h4><p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{dev?.model} • {debtor.customerPhone}</p></div>
-                     </div>
-                     <div className="flex items-center gap-6">
-                        <div className="text-right"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t.remaining}</p><p className="text-2xl font-black text-rose-500 tracking-tighter">${remaining.toLocaleString()}</p></div>
-                        <button onClick={() => { setActivePaymentId(debtor.id); setPaymentValue(remaining.toFixed(2)); }} className="px-8 py-4 bg-brand-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg">{t.pay}</button>
-                     </div>
+                  <div key={sale.id} className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 relative shadow-sm">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-bold text-sm text-slate-500">
+                        {sale.customerName?.charAt(0)}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-sm leading-tight text-slate-900 dark:text-slate-100">{sale.customerName}</h4>
+                        <p className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">{sale.customerPhone}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4 mb-6">
+                      <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400">
+                        <span className="uppercase tracking-wider">{device?.model || (state.language === 'ru' ? 'Прочее' : 'Other')}</span>
+                        <span className="text-slate-900 dark:text-slate-100 font-bold tracking-tight">${remaining.toLocaleString()}</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-brand-500 h-full rounded-full transition-all duration-1000" style={{ width: `${progress}%` }} />
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <input type="number" id={`pay-${sale.id}`} placeholder="0.00" className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-xs font-semibold focus:ring-1 ring-brand-500/20" />
+                      <button onClick={() => {
+                          const input = document.getElementById(`pay-${sale.id}`) as HTMLInputElement;
+                          updateInstallment(sale.id, Number(input.value));
+                          input.value = '';
+                        }} className="px-4 py-2 bg-brand-600 text-white font-semibold text-[9px] uppercase tracking-widest rounded-xl hover:bg-brand-700 transition-all active:scale-95">
+                        Receive
+                      </button>
+                    </div>
                   </div>
                 );
-             }) : <div className="p-20 text-center opacity-30 font-black uppercase tracking-widest">Должников нет</div>}
-          </div>
-        )}
-
-        {activeTab === 'analytics' && (
-          <div className="space-y-8 text-left">
-            <div className="bg-white dark:bg-slate-800/60 p-10 rounded-[3rem] border border-brand-500/20 relative overflow-hidden shadow-lg group">
-               <div className="flex flex-col sm:flex-row justify-between items-start mb-6 relative z-10 gap-6">
-                 <div><h3 className="text-2xl font-black flex items-center space-x-3 tracking-tighter"><BrainCircuit className="text-brand-500" size={28} /><span>{t.aiInsights}</span></h3><p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-2">Gemini 3 Flash Pro</p></div>
-                 <button onClick={generateAIAdvice} disabled={isAiLoading} className="px-8 py-4 bg-brand-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center space-x-2 disabled:opacity-50 shadow-xl shadow-brand-500/30 hover:bg-brand-700 transition-all text-white">{isAiLoading ? <RefreshCw className="animate-spin" size={16} /> : <Sparkles size={16} />}<span>{t.generateAI}</span></button>
-               </div>
-               <div className="min-h-[120px] text-slate-600 dark:text-slate-200 leading-relaxed italic whitespace-pre-wrap font-medium text-lg">{state.aiAdvice || "Нажмите кнопку выше для анализа данных..."}</div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-               <div className="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm"><h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-10 text-left">Прибыль ($)</h3><div className="h-[300px]"><ResponsiveContainer><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} /><XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} /><Bar dataKey="profit" fill="#8b5cf6" radius={[10, 10, 0, 0]} /></BarChart></ResponsiveContainer></div></div>
-               <div className="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm"><h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-10 text-left">Продажи (шт)</h3><div className="h-[300px]"><ResponsiveContainer><BarChart data={chartData}><CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} /><XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} /><Bar dataKey="sales" fill="#10b981" radius={[10, 10, 0, 0]} /></BarChart></ResponsiveContainer></div></div>
+              })}
             </div>
           </div>
         )}
 
         {activeTab === 'settings' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left pb-20 text-slate-900 dark:text-white">
-             {/* Download Project */}
-             <div className="bg-slate-900 p-10 rounded-[3rem] border border-slate-700 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8 lg:col-span-2 group relative overflow-hidden">
-                <div className="text-left relative z-10 flex-1">
-                   <div className="flex items-center space-x-4 mb-4"><div className="p-3 bg-brand-500/20 text-brand-400 rounded-2xl"><Laptop size={28} /></div><h3 className="text-2xl font-black text-white uppercase tracking-tighter">Сохранить проект на ПК</h3></div>
-                   <p className="text-slate-400 text-sm max-w-xl">Скачайте исходный код для локального запуска или хостинга.</p>
+          <div className="max-w-4xl space-y-6 animate-in fade-in duration-500 pb-20">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Cash & Exchange Rate Card */}
+                <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
+                  <div>
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
+                      <Coins className="mr-2 text-brand-500 opacity-70" size={16} />
+                      {t.updateCash}
+                    </h3>
+                    <div className="flex space-x-2">
+                          <input type="number" placeholder="0.00" className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" value={state.cashBalance} onChange={(e) => setState(s => ({...s, cashBalance: Number(e.target.value)}))} id="manual-cash-input" />
+                          <motion.button 
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => {
+                             const val = Number((document.getElementById('manual-cash-input') as HTMLInputElement).value);
+                             setState(s => ({...s, cashBalance: val}));
+                            }} 
+                            className="px-6 py-3 bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-brand-500/20 whitespace-nowrap"
+                          >Update</motion.button>
+                    </div>
+                  </div>
+                  <div className="space-y-6">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center justify-between">
+                      <div className="flex items-center">
+                        <DollarSign className="mr-2 text-brand-500 opacity-70" size={16} />
+                        {t.exchangeRate} (UZS)
+                      </div>
+                      <motion.button 
+                        whileTap={{ rotate: 180 }}
+                        onClick={fetchRate}
+                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        <RefreshCw size={14} className="text-brand-500" />
+                      </motion.button>
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t.buyRate}</label>
+                        <div className="flex space-x-2">
+                          <input type="number" step="1" className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" value={state.buyRate} onChange={(e) => setState(s => ({...s, buyRate: Number(e.target.value)}))} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t.sellRate}</label>
+                        <div className="flex space-x-2">
+                          <input type="number" step="1" className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" value={state.sellRate} onChange={(e) => setState(s => ({...s, sellRate: Number(e.target.value)}))} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <button onClick={downloadProject} className="w-full lg:w-auto px-10 py-6 bg-brand-600 text-white rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-2xl shadow-brand-500/40 hover:bg-brand-500 transition-all flex items-center justify-center space-x-3"><Download size={20} /><span>Скачать .zip</span></button>
-             </div>
 
-             {/* Cloud Sync */}
-             <div className="bg-brand-600 text-white p-10 rounded-[3rem] shadow-2xl lg:col-span-2 flex flex-col lg:flex-row justify-between gap-10 border border-brand-400/20 relative overflow-hidden group">
-                <div className="flex-1 space-y-4 relative z-10">
-                   <div className="flex items-center space-x-4"><div className="p-3 bg-white/20 rounded-2xl"><CloudUpload size={24} /></div><h3 className="text-2xl font-black uppercase tracking-tighter">Облачная база</h3></div>
-                   <p className="text-white/70 text-sm">Синхронизируйте данные между устройствами через облако.</p>
-                   <div className="flex items-center space-x-3 p-4 bg-white/10 rounded-[1.5rem] cursor-pointer" onClick={() => setState(s => ({...s, autoSync: !s.autoSync}))}>
-                      <div className={`w-12 h-6 rounded-full relative transition-colors ${state.autoSync ? 'bg-emerald-400' : 'bg-white/20'}`}><div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${state.autoSync ? 'left-7' : 'left-1'}`}></div></div>
-                      <span className="text-xs font-black uppercase">Авто-сохранение</span>
+                {/* Models Management Card */}
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
+                   <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center">
+                     <Database className="mr-2 text-brand-500 opacity-70" size={16} />
+                     {t.models}
+                   </h3>
+                   <div className="space-y-4">
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex space-x-2">
+                          <select id="new-model-brand" className="px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent">
+                            <option value="iPhone">iPhone</option>
+                            <option value="Samsung">Samsung</option>
+                          </select>
+                          <input type="text" id="new-model-name" placeholder="Model Name" className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" />
+                        </div>
+                        <motion.button 
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                           const brand = (document.getElementById('new-model-brand') as HTMLSelectElement).value as Brand;
+                           const name = (document.getElementById('new-model-name') as HTMLInputElement).value;
+                           if (!name) return;
+                           setState(s => ({
+                             ...s,
+                             customModels: {
+                               ...s.customModels,
+                               [brand]: [...s.customModels[brand], name]
+                             }
+                           }));
+                           (document.getElementById('new-model-name') as HTMLInputElement).value = '';
+                          }} 
+                          className="w-full py-3 bg-slate-900 dark:bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg"
+                        >Add Model</motion.button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1">
+                        {Object.entries(state.customModels).map(([brand, models]) => 
+                          models.map(m => (
+                            <motion.span 
+                              initial={{ scale: 0.8, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              key={`${brand}-${m}`} 
+                              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl text-[10px] font-bold flex items-center gap-2 border border-slate-200/50 dark:border-slate-700"
+                            >
+                              <span className="opacity-50">{brand}:</span> {m}
+                              <button onClick={() => {
+                                setState(s => ({
+                                  ...s,
+                                  customModels: {
+                                    ...s.customModels,
+                                    [brand as Brand]: s.customModels[brand as Brand].filter(mod => mod !== m)
+                                  }
+                                }));
+                              }} className="text-rose-500 hover:text-rose-700 ml-1">×</button>
+                            </motion.span>
+                          ))
+                        )}
+                      </div>
                    </div>
-                   {state.syncId && <div className="space-y-1"><label className="text-[10px] font-black opacity-50 uppercase tracking-widest">Облачный ключ:</label><div className="flex items-center space-x-2"><code className="bg-black/20 px-4 py-2 rounded-xl text-sm flex-1">{state.syncId}</code><button onClick={() => {navigator.clipboard.writeText(state.syncId!); alert("Copied!");}} className="p-2 bg-white/10 rounded-lg"><Copy size={16} /></button></div></div>}
                 </div>
-                <div className="flex-1 bg-white/5 p-6 rounded-[2.5rem] border border-white/10 space-y-4 relative z-10">
-                   <p className="font-bold text-sm">Вход по ключу:</p>
-                   <div className="flex space-x-2"><input type="text" placeholder="Введите ключ..." value={syncKeyInput} onChange={(e) => setSyncKeyInput(e.target.value)} className="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white outline-none text-sm" /><button onClick={loadFromCloud} disabled={isSyncing} className="p-3 bg-brand-500 rounded-xl"><CloudDownload size={20} /></button></div>
-                   <div className="grid grid-cols-2 gap-2 pt-2"><button onClick={saveToCloud} disabled={isSyncing} className="py-3 bg-white/10 rounded-xl font-black uppercase text-[10px] tracking-widest">Выгрузить</button><button onClick={loadFromCloud} disabled={isSyncing || !state.syncId} className="py-3 bg-white/10 rounded-xl font-black uppercase text-[10px] tracking-widest">Обновить</button></div>
-                </div>
-             </div>
 
-             {/* Cash Management - FIXED BUTTON OVERFLOW */}
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between h-full">
-                <div><h3 className="text-xl font-black mb-1 uppercase tracking-tight">Учет кассы</h3><p className="text-slate-400 text-xs mb-6">Установить текущий баланс денег в наличии.</p></div>
-                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-1.5 rounded-3xl border border-slate-200 dark:border-slate-700">
-                   <input 
-                      id="set-cash" 
-                      type="number" 
-                      defaultValue={state.cashBalance} 
-                      className="min-w-0 flex-1 bg-transparent px-4 py-3 outline-none font-black text-xl lg:text-2xl text-slate-900 dark:text-white" 
-                   />
-                   <button 
-                      onClick={() => {setState(s => ({...s, cashBalance: Number((document.getElementById('set-cash') as any).value)})); alert("Касса обновлена!");}} 
-                      className="shrink-0 px-6 py-3 bg-brand-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
-                   >
-                     OK
-                   </button>
+                {/* Synchronization & API Card */}
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 md:col-span-2">
+                   <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center">
+                     <RefreshCw className="mr-2 text-brand-500 opacity-70" size={16} />
+                     {t.sync} & {t.api}
+                   </h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                          <Key size={12} className="text-brand-500" /> {t.githubToken}
+                        </label>
+                        <input 
+                          type="password" 
+                          placeholder="ghp_..." 
+                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
+                          value={state.syncSettings?.githubToken || ''}
+                          onChange={(e) => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, githubToken: e.target.value } }))}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                          <Github size={12} className="text-brand-500" /> {t.repoName}
+                        </label>
+                        <input 
+                          type="text" 
+                          placeholder="username/repo" 
+                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
+                          value={state.syncSettings?.repoName || ''}
+                          onChange={(e) => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, repoName: e.target.value } }))}
+                        />
+                      </div>
+                   </div>
+                   <div className="flex flex-col md:flex-row items-center justify-between pt-4 gap-4">
+                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                        {t.lastSync}: <span className="text-slate-900 dark:text-slate-100">{state.syncSettings?.lastSync ? new Date(state.syncSettings.lastSync).toLocaleString() : 'Never'}</span>
+                      </div>
+                      <div className="grid grid-cols-2 md:flex md:flex-row gap-3 w-full md:w-auto">
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={restoreFromGithub}
+                          className="flex items-center justify-center space-x-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 px-4 py-4 rounded-2xl hover:bg-slate-200 transition-all font-semibold uppercase text-[10px] tracking-widest"
+                        >
+                          <Download size={14} />
+                          <span>{t.restore || (state.language === 'ru' ? 'Восстановить' : 'Restore')}</span>
+                        </motion.button>
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={syncToGithub}
+                          className="flex items-center justify-center space-x-2 bg-brand-600 text-white px-4 py-4 rounded-2xl hover:bg-brand-700 transition-all font-semibold uppercase text-[10px] tracking-widest shadow-lg shadow-brand-500/20"
+                        >
+                          <RefreshCw size={14} />
+                          <span>{t.syncNow}</span>
+                        </motion.button>
+                      </div>
+                   </div>
                 </div>
-             </div>
 
-             {/* Add New Model */}
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-sm h-full">
-                <h3 className="text-xl font-black mb-1 uppercase tracking-tight">Справочник моделей</h3>
-                <p className="text-slate-400 text-xs mb-6">Добавить новую модель в список выбора.</p>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => setNewModelBrand('iPhone')} className={`py-3 rounded-2xl font-bold uppercase text-[9px] border-2 transition-all ${newModelBrand === 'iPhone' ? 'bg-brand-600 text-white border-brand-600 shadow-lg' : 'bg-slate-50 dark:bg-slate-900 text-slate-400 border-transparent'}`}>iPhone</button>
-                    <button onClick={() => setNewModelBrand('Samsung')} className={`py-3 rounded-2xl font-bold uppercase text-[9px] border-2 transition-all ${newModelBrand === 'Samsung' ? 'bg-brand-600 text-white border-brand-600 shadow-lg' : 'bg-slate-50 dark:bg-slate-900 text-slate-400 border-transparent'}`}>Samsung</button>
-                  </div>
-                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-1.5 rounded-3xl border border-slate-200 dark:border-slate-700">
-                    <input 
-                      value={newModelName} 
-                      onChange={(e) => setNewModelName(e.target.value)} 
-                      placeholder="Напр. iPhone 17 Pro" 
-                      className="min-w-0 flex-1 bg-transparent px-4 py-2 outline-none font-bold text-sm text-slate-900 dark:text-white placeholder:text-slate-400" 
-                    />
-                    <button onClick={addNewModel} className="shrink-0 px-5 py-3 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Добавить</button>
-                  </div>
-                </div>
+
              </div>
           </div>
         )}
       </main>
 
-      {/* Modals remain same but integrated */}
-      {activePaymentId && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-6 z-[100] animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl text-left">
-            <h3 className="text-2xl font-black mb-6 uppercase tracking-tighter dark:text-white">Принять оплату</h3>
-            <input type="number" value={paymentValue} onChange={(e) => setPaymentValue(e.target.value)} className="w-full p-5 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none font-black text-3xl text-brand-600 mb-6" />
-            <div className="flex gap-4"><button onClick={() => setActivePaymentId(null)} className="flex-1 py-4 font-bold uppercase text-[10px] text-slate-400">Отмена</button><button onClick={() => handleAddPayment(activePaymentId, Number(paymentValue))} className="flex-[2] py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg">Оплатить</button></div>
+      {/* REFINED ADD MODAL */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-8 flex items-center gap-3">
+               <div className="p-2.5 bg-brand-50 dark:bg-brand-900/30 rounded-xl text-brand-600">
+                  <Plus size={18} />
+               </div>
+               {t.addDevice}
+            </h2>
+            
+            <form onSubmit={addDevice} className="space-y-6">
+              {/* Group A: Model Specs */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 px-1">
+                   <Tag size={12} className="text-brand-500 opacity-60" />
+                   <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Specifications</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <InputWrapper label={t.brand}>
+                      <select name="brand" required value={modalSelectedBrand} onChange={(e) => setModalSelectedBrand(e.target.value as Brand)} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none border-none text-sm font-medium">
+                        <option value="iPhone">iPhone</option>
+                        <option value="Samsung">Samsung</option>
+                      </select>
+                   </InputWrapper>
+                   <InputWrapper label={t.storage}>
+                      <select name="storage" required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none border-none text-sm font-medium">
+                        {STORAGE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                   </InputWrapper>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <InputWrapper label={t.model}>
+                      <input list="modal-models-list" name="model" required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" placeholder="Model" />
+                      <datalist id="modal-models-list">
+                        {(modalSelectedBrand === 'iPhone' ? IPHONE_MODELS : SAMSUNG_MODELS).map(m => <option key={m} value={m} />)}
+                        {state.customModels[modalSelectedBrand].map(m => <option key={m} value={m} />)}
+                      </datalist>
+                   </InputWrapper>
+                   <InputWrapper label={t.imei} icon={Hash}>
+                      <input name="imei" required placeholder="IMEI" className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                   </InputWrapper>
+                </div>
+              </div>
+
+              {/* Group B: Logistics */}
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center gap-2 px-1">
+                   <CalendarDays size={12} className="text-brand-500 opacity-60" />
+                   <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sourcing</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <InputWrapper label={t.purchasedFrom} icon={Store}>
+                      <input name="purchasedFrom" required placeholder="Source" className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                   </InputWrapper>
+                   <InputWrapper label={t.purchaseDate}>
+                      <input name="purchaseDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-[11px] font-bold" />
+                   </InputWrapper>
+                </div>
+                <InputWrapper label={t.purchasePrice} icon={DollarSign}>
+                   <input name="purchasePrice" type="number" required placeholder="0.00" className="w-full p-4 bg-brand-500/5 dark:bg-brand-500/10 rounded-2xl outline-none text-xl font-bold text-brand-600 focus:ring-1 ring-brand-500/20" />
+                </InputWrapper>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-3 font-semibold text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-600">Cancel</button>
+                <button type="submit" className="flex-[2] py-4 bg-slate-900 dark:bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg">Save Record</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
-      {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-6 z-[100] animate-in fade-in duration-300 text-left">
-           <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[3rem] p-10 shadow-2xl overflow-y-auto max-h-[90vh]">
-              <h2 className="text-2xl font-black mb-8 dark:text-white uppercase tracking-tighter">{t.addDevice}</h2>
-              <form onSubmit={addDevice} className="space-y-6">
-                 <div className="grid grid-cols-2 gap-5">
-                    <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.brand}</label><select name="brand" value={modalSelectedBrand} onChange={(e) => setModalSelectedBrand(e.target.value as Brand)} className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none font-bold text-slate-900 dark:text-white"><option value="iPhone">iPhone</option><option value="Samsung">Samsung</option></select></div>
-                    <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.storage}</label><select name="storage" defaultValue="256Gb" className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none font-bold text-slate-900 dark:text-white">{STORAGE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
-                 </div>
-                 <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.model}</label><input list="models" name="model" required placeholder="Напр. iPhone 15 Pro Max" className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none font-bold text-slate-900 dark:text-white" /><datalist id="models">{(modalSelectedBrand === 'iPhone' ? state.customIphoneModels : state.customSamsungModels).map(m => <option key={m} value={m} />)}</datalist></div>
-                 <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.imei}</label><input name="imei" required placeholder="IMEI..." className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none font-bold text-slate-900 dark:text-white" /></div>
-                 <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.purchasePrice} ($)</label><input name="purchasePrice" type="number" required className="w-full p-5 bg-brand-500/5 rounded-3xl border-4 border-brand-500/20 outline-none font-black text-3xl text-brand-600" /></div>
-                 <button type="submit" className="w-full py-5 bg-brand-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-brand-500/30 hover:bg-brand-700 transition-all">Сохранить</button>
-              </form>
-           </div>
+      {/* SELL MODAL remains refined as per logic ... */}
+      {showSellModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-1 uppercase tracking-tight">{t.sell}</h2>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-8 italic">{showSellModal.model} • IMEI {showSellModal.imei.slice(-4)}</p>
+            
+            <form onSubmit={sellDevice} className="space-y-6">
+              <div className="p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl space-y-5 border border-slate-100 dark:border-slate-800/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                     <Users size={16} className="text-brand-500 opacity-60" />
+                     <span className="font-bold text-[10px] uppercase tracking-widest italic">{t.installment}</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="isInstallment" className="sr-only peer" onChange={(e) => setIsInstallmentMode(e.target.checked)} />
+                    <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:start-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
+                  </label>
+                </div>
+                
+                {isInstallmentMode && (
+                   <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top duration-300">
+                      <InputWrapper label={t.customer + " Name"}>
+                        <input name="customerName" required className="w-full p-3 bg-white dark:bg-slate-800 rounded-xl outline-none font-semibold text-sm" />
+                      </InputWrapper>
+                      <InputWrapper label="Phone">
+                        <input name="customerPhone" required className="w-full p-3 bg-white dark:bg-slate-800 rounded-xl outline-none font-semibold text-sm" />
+                      </InputWrapper>
+                      <InputWrapper label={t.months}>
+                        <select name="months" className="w-full p-3 bg-white dark:bg-slate-800 rounded-xl outline-none font-semibold text-sm">
+                          <option value="1">1 Month</option>
+                          <option value="2">2 Months</option>
+                          <option value="3">3 Months</option>
+                        </select>
+                      </InputWrapper>
+                      <InputWrapper label={t.downPayment}>
+                        <input name="paidAmount" type="number" placeholder="0.00" className="w-full p-3 bg-white dark:bg-slate-800 rounded-xl outline-none font-semibold text-sm" />
+                      </InputWrapper>
+                   </div>
+                )}
+              </div>
+
+              <InputWrapper label={t.sellingPrice}>
+                <div className="relative">
+                   <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-600" size={20} />
+                   <input name="salePrice" type="number" defaultValue={showSellModal.purchasePrice + 80} required className="w-full pl-10 pr-6 py-5 bg-brand-500/5 dark:bg-brand-500/10 border-2 border-brand-500 text-brand-600 dark:text-brand-400 text-2xl font-semibold rounded-2xl outline-none italic" />
+                </div>
+              </InputWrapper>
+
+              <div className="flex space-x-3 pt-4">
+                <button type="button" onClick={() => { setShowSellModal(null); setIsInstallmentMode(false); }} className="flex-1 py-3 font-semibold text-[10px] uppercase tracking-widest text-slate-400">Cancel</button>
+                <button type="submit" className="flex-[2] py-4 bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl shadow-lg active:scale-95 transition-all">Sell Device</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
-      {showSellModal && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-6 z-[100] animate-in zoom-in duration-300 text-left">
-           <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[3rem] p-10 shadow-2xl overflow-y-auto max-h-[90vh]">
-              <h2 className="text-2xl font-black mb-1 dark:text-white uppercase tracking-tighter">{t.sell}</h2>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-8">{showSellModal.model} • {showSellModal.imei}</p>
-              <form onSubmit={sellDevice} className="space-y-6">
-                 <div className="flex items-center justify-between p-5 bg-slate-100 dark:bg-slate-900 rounded-3xl mb-6 shadow-inner border border-slate-200 dark:border-slate-700">
-                    <div className="flex items-center space-x-3"><CalendarDays className="text-brand-500" size={20} /><span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t.installment}</span></div>
-                    <input type="checkbox" name="isInstallment" className="w-7 h-7 rounded-xl accent-brand-600 cursor-pointer shadow-sm" onChange={(e) => setIsInstallmentMode(e.target.checked)} />
-                 </div>
-                 {isInstallmentMode && (
-                   <div className="space-y-4 animate-in slide-in-from-top duration-500">
-                      <div className="grid grid-cols-2 gap-4"><input name="customerName" placeholder="ФИО Клиента" required className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none text-sm font-bold text-slate-900 dark:text-white" /><input name="customerPhone" placeholder="Телефон" required className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none text-sm font-bold text-slate-900 dark:text-white" /></div>
-                      <div className="grid grid-cols-2 gap-4"><select name="months" className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none text-sm font-bold text-slate-900 dark:text-white"><option value="1">1 Месяц</option><option value="2">2 Месяца</option><option value="3">3 Месяца</option></select><input name="paidAmount" type="number" placeholder="Взнос $" className="w-full p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl outline-none text-sm font-bold text-slate-900 dark:text-white" /></div>
-                   </div>
-                 )}
-                 <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t.sellingPrice} ($)</label><input name="salePrice" type="number" defaultValue={showSellModal.purchasePrice + 100} className="w-full p-6 bg-brand-500/5 rounded-3xl border-4 border-brand-500 outline-none font-black text-5xl text-brand-600" /></div>
-                 <div className="flex space-x-4 pt-4"><button type="button" onClick={() => setShowSellModal(null)} className="flex-1 py-4 text-slate-400 font-bold uppercase text-[10px]">Отмена</button><button type="submit" className="flex-[2] py-4 bg-brand-600 text-white rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl shadow-brand-500/30 hover:bg-brand-700 transition-all">Продать</button></div>
-              </form>
-           </div>
+      {/* ADD DEBTOR MODAL */}
+      {showAddDebtorModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-8 flex items-center gap-3">
+               <div className="p-2.5 bg-brand-50 dark:bg-brand-900/30 rounded-xl text-brand-600">
+                  <Users size={18} />
+               </div>
+               {t.addDebtor || (state.language === 'ru' ? 'Добавить должника' : 'Add Debtor')}
+            </h2>
+            
+            <form onSubmit={addDebtor} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <InputWrapper label={t.customer + " Name"}>
+                  <input name="customerName" required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none font-semibold text-sm" />
+                </InputWrapper>
+                <InputWrapper label="Phone">
+                  <input name="customerPhone" required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none font-semibold text-sm" />
+                </InputWrapper>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <InputWrapper label={t.months}>
+                  <select name="months" className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none font-semibold text-sm">
+                    <option value="1">1 Month</option>
+                    <option value="2">2 Months</option>
+                    <option value="3">3 Months</option>
+                  </select>
+                </InputWrapper>
+                <InputWrapper label={t.downPayment}>
+                  <input name="paidAmount" type="number" placeholder="0.00" className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none font-semibold text-sm" />
+                </InputWrapper>
+              </div>
+
+              <InputWrapper label={t.sellingPrice}>
+                <div className="relative">
+                   <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-600" size={20} />
+                   <input name="salePrice" type="number" required placeholder="0.00" className="w-full pl-10 pr-6 py-5 bg-brand-500/5 dark:bg-brand-500/10 border-2 border-brand-500 text-brand-600 dark:text-brand-400 text-2xl font-semibold rounded-2xl outline-none italic" />
+                </div>
+              </InputWrapper>
+
+              <div className="flex space-x-3 pt-4">
+                <button type="button" onClick={() => setShowAddDebtorModal(false)} className="flex-1 py-3 font-semibold text-[10px] uppercase tracking-widest text-slate-400">Cancel</button>
+                <button type="submit" className="flex-[2] py-4 bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl shadow-lg active:scale-95 transition-all">Save Debtor</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

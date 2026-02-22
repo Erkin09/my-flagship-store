@@ -1,25 +1,22 @@
 
 export const STORAGE_OPTIONS = ['64Gb', '128Gb', '256Gb', '512Gb', '1Tb'];
 
-export const DEFAULT_IPHONE_MODELS = [
+export const IPHONE_MODELS = [
   'iPhone X', 'iPhone XR', 'iPhone XS', 'iPhone XS Max',
   'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 Pro Max',
   'iPhone 12', 'iPhone 12 Mini', 'iPhone 12 Pro', 'iPhone 12 Pro Max',
   'iPhone 13', 'iPhone 13 Mini', 'iPhone 13 Pro', 'iPhone 13 Pro Max',
   'iPhone 14', 'iPhone 14 Plus', 'iPhone 14 Pro', 'iPhone 14 Pro Max',
   'iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max',
-  'iPhone 16', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max'
+  'iPhone 16', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max',
+  'iPhone 17', 'iPhone 17 Plus', 'iPhone 17 Pro', 'iPhone 17 Pro Max'
 ];
 
-export const DEFAULT_SAMSUNG_MODELS = [
-  'Galaxy S10', 'Galaxy S10+', 'Galaxy S10 5G', 'Galaxy S10e',
-  'Galaxy S20', 'Galaxy S20+', 'Galaxy S20 Ultra', 'Galaxy S20 FE',
-  'Galaxy S21', 'Galaxy S21+', 'Galaxy S21 Ultra', 'Galaxy S21 FE',
-  'Galaxy S22', 'Galaxy S22+', 'Galaxy S22 Ultra',
-  'Galaxy S23', 'Galaxy S23+', 'Galaxy S23 Ultra', 'Galaxy S23 FE',
-  'Galaxy S24', 'Galaxy S24+', 'Galaxy S24 Ultra',
-  'Galaxy S25', 'Galaxy S25+', 'Galaxy S25 Ultra',
-  'Galaxy S26', 'Galaxy S26+', 'Galaxy S26 Ultra'
+export const SAMSUNG_MODELS = [
+  'Galaxy S10', 'Galaxy S10+', 'Galaxy S20', 'Galaxy S20 Ultra',
+  'Galaxy S21', 'Galaxy S21 Ultra', 'Galaxy S22', 'Galaxy S22 Ultra',
+  'Galaxy S23', 'Galaxy S23 Ultra', 'Galaxy S24', 'Galaxy S24 Ultra',
+  'Galaxy S25', 'Galaxy S25 Ultra'
 ];
 
 export const translations = {
@@ -39,7 +36,7 @@ export const translations = {
     actions: 'Actions',
     sell: 'Sell Now',
     cancel: 'Cancel',
-    return: 'Return Item',
+    return: 'Return',
     profit: 'Profit',
     totalSales: 'Total Sales',
     inStock: 'In Stock',
@@ -57,20 +54,28 @@ export const translations = {
     purchasedFrom: 'Purchased From',
     purchaseDate: 'Purchase Date',
     yearlyProfit: 'Yearly Profit Overview',
+    monthlyProfit: 'Monthly Profit',
+    dailyProfit: 'Daily Profit',
     monthlyPerformance: 'Monthly Performance',
     downPayment: 'Down Payment',
     totalAssets: 'Total Assets',
     stockValue: 'Stock Value',
     cash: 'Cash',
     updateCash: 'Update Cash Balance',
-    exchangeRate: 'USD Rate',
-    aiInsights: 'AI Business Advisor',
-    generateAI: 'Analyze with AI',
-    addModel: 'Add New Model',
-    manageModels: 'Manage Inventory List',
-    pay: 'Pay',
-    returned: 'Returned',
-    completed: 'Completed'
+    exchangeRate: 'Exchange Rate',
+    buyRate: 'Buy Rate',
+    sellRate: 'Sell Rate',
+    sync: 'Synchronization',
+    api: 'API Settings',
+    supplier: 'Supplier',
+    addModel: 'Add Model',
+    githubToken: 'GitHub Token',
+    repoName: 'Repository (user/repo)',
+    syncNow: 'Sync Now',
+    lastSync: 'Last Sync',
+    models: 'Models Management',
+    addDebtor: 'Add Debtor',
+    restore: 'Restore'
   },
   ru: {
     dashboard: 'Главная',
@@ -88,7 +93,7 @@ export const translations = {
     actions: 'Действия',
     sell: 'Продать сейчас',
     cancel: 'Отмена',
-    return: 'Возврат товара',
+    return: 'Возврат',
     profit: 'Прибыль',
     totalSales: 'Всего продаж',
     inStock: 'В наличии',
@@ -106,19 +111,27 @@ export const translations = {
     purchasedFrom: 'У кого куплено',
     purchaseDate: 'Дата покупки',
     yearlyProfit: 'Годовая прибыль',
+    monthlyProfit: 'Прибыль по месяцам',
+    dailyProfit: 'Прибыль по дням',
     monthlyPerformance: 'Ежемесячные показатели',
     downPayment: 'Первоначальный взнос',
     totalAssets: 'Итог (Активы)',
     stockValue: 'Сумма склада',
     cash: 'Касса',
     updateCash: 'Изменить остаток в кассе',
-    exchangeRate: 'Курс Доллара (UZS)',
-    aiInsights: 'ИИ-Советник',
-    generateAI: 'Анализировать через ИИ',
+    exchangeRate: 'Курс валют',
+    buyRate: 'Покупка',
+    sellRate: 'Продажа',
+    sync: 'Синхронизация',
+    api: 'API Настройки',
+    supplier: 'Поставщик',
     addModel: 'Добавить модель',
-    manageModels: 'Управление линейкой товаров',
-    pay: 'Оплатить',
-    returned: 'Возвращено',
-    completed: 'Завершено'
+    githubToken: 'GitHub Токен',
+    repoName: 'Репозиторий (user/repo)',
+    syncNow: 'Синхронизировать',
+    lastSync: 'Посл. синхронизация',
+    models: 'Управление моделями',
+    addDebtor: 'Добавить должника',
+    restore: 'Восстановить'
   }
 };
