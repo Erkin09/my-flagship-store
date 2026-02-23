@@ -1,18 +1,5 @@
 {
-  "devices": [
-    {
-      "id": "4fk37owcv",
-      "brand": "iPhone",
-      "model": "iPhone XS Max",
-      "storage": "64Gb",
-      "imei": "67576575",
-      "purchasePrice": 300,
-      "purchasedFrom": "шаг",
-      "purchaseDate": "2026-02-23",
-      "status": "In Stock",
-      "dateAdded": "2026-02-23T13:45:53.435Z"
-    }
-  ],
+  "devices": [],
   "sales": [],
   "language": "ru",
   "theme": "dark",
@@ -27,7 +14,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-23T13:45:29.728Z",
+    "lastSync": "2026-02-23T13:46:09.947Z",
     "autoSync": true
   }
 }
