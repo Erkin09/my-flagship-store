@@ -35,6 +35,7 @@ import {
   Database,
   Menu,
   X,
+  CheckCircle,
   Download
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
@@ -311,6 +312,56 @@ const App: React.FC = () => {
     } catch (error) {
       console.error(error);
       alert('Restore failed');
+    }
+  };
+
+  const testGithubConnection = async () => {
+    if (!state.syncSettings?.githubToken || !state.syncSettings?.repoName) {
+      alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
+      return;
+    }
+
+    const trimmedRepo = state.syncSettings.repoName.trim();
+    const trimmedToken = state.syncSettings.githubToken.trim();
+
+    if (!trimmedRepo.includes('/')) {
+      alert(state.language === 'ru' 
+        ? 'Ошибка: Название репозитория должно быть в формате "пользователь/репозиторий" (например: Erkin09/MyInventoryApp)' 
+        : 'Error: Repository name must be in "user/repo" format (e.g., Erkin09/MyInventoryApp)');
+      return;
+    }
+
+    try {
+      const res = await fetch(`https://api.github.com/repos/${trimmedRepo}`, {
+        headers: { 'Authorization': `Bearer ${trimmedToken}` }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const permissions = data.permissions;
+        if (permissions?.push) {
+          alert(state.language === 'ru' 
+            ? `✅ Соединение успешно!\nРепозиторий: ${data.full_name}\nДоступ на запись: Есть` 
+            : `✅ Connection successful!\nRepo: ${data.full_name}\nWrite access: Yes`);
+        } else {
+          alert(state.language === 'ru' 
+            ? `⚠️ Соединение есть, но НЕТ ПРАВ на запись.\nПроверьте галочку "repo" в настройках токена.` 
+            : `⚠️ Connected, but NO WRITE ACCESS.\nCheck "repo" scope in token settings.`);
+        }
+      } else {
+        if (res.status === 404) {
+          alert(state.language === 'ru' 
+            ? '❌ Ошибка 404: Репозиторий не найден.\nПроверьте название и убедитесь, что у токена есть доступ к приватным репозиториям.' 
+            : '❌ Error 404: Repository not found.\nCheck the name and ensure the token has access to private repos.');
+        } else if (res.status === 401) {
+          alert(state.language === 'ru' ? '❌ Ошибка 401: Неверный токен.' : '❌ Error 401: Invalid token.');
+        } else {
+          const err = await res.json();
+          alert(`GitHub Error: ${err.message}`);
+        }
+      }
+    } catch (e) {
+      alert('Network error');
     }
   };
 
@@ -1094,6 +1145,15 @@ const App: React.FC = () => {
                           </button>
                        </div>
                       <div className="grid grid-cols-2 md:flex md:flex-row gap-3 w-full md:w-auto">
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={testGithubConnection}
+                          className="flex items-center justify-center space-x-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-4 rounded-2xl hover:bg-emerald-100 transition-all font-semibold uppercase text-[10px] tracking-widest border border-emerald-100 dark:border-emerald-800/50"
+                        >
+                          <CheckCircle size={14} />
+                          <span>{state.language === 'ru' ? 'Проверить связь' : 'Test Link'}</span>
+                        </motion.button>
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
