@@ -206,7 +206,17 @@ const App: React.FC = () => {
     try {
       const { githubToken, repoName } = state.syncSettings;
       const fileName = 'flagship_data.json';
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+      
+      // Create a clean copy of the state without the token to avoid GitHub's secret scanning
+      const stateToSync = {
+        ...state,
+        syncSettings: {
+          ...state.syncSettings,
+          githubToken: '' // Clear the token in the synced file
+        }
+      };
+      
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(stateToSync, null, 2))));
       
       const trimmedRepo = repoName.trim();
       const trimmedToken = githubToken.trim();
@@ -603,7 +613,7 @@ const App: React.FC = () => {
         <div className="mt-auto p-4 border-t border-slate-100 dark:border-slate-800/60">
           <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
             <span>Flagship Hub</span>
-            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.2</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.4</span>
           </div>
         </div>
       </aside>
