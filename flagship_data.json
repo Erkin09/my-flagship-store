@@ -14,6 +14,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-23T11:27:54.237Z"
+    "lastSync": "",
+    "autoSync": true
   }
 }
