@@ -552,7 +552,7 @@ const App: React.FC = () => {
         <div className="mt-auto p-4 border-t border-slate-100 dark:border-slate-800/60">
           <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
             <span>Flagship Hub</span>
-            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.1</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.2</span>
           </div>
         </div>
       </aside>
