@@ -1,0 +1,19 @@
+{
+  "devices": [],
+  "sales": [],
+  "language": "ru",
+  "theme": "dark",
+  "cashBalance": 0,
+  "exchangeRate": 12212,
+  "buyRate": 12172,
+  "sellRate": 12252,
+  "customModels": {
+    "iPhone": [],
+    "Samsung": []
+  },
+  "syncSettings": {
+    "githubToken": "",
+    "repoName": "Erkin09/my-flagship-store",
+    "lastSync": ""
+  }
+}
