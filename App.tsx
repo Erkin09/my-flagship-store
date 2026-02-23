@@ -107,7 +107,6 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('flagship_hub_v7');
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Ensure exchangeRate is set to a reasonable UZS value if it was 1 or missing
       if (!parsed.exchangeRate || parsed.exchangeRate === 1) {
         parsed.exchangeRate = 12210;
       }
@@ -115,6 +114,20 @@ const App: React.FC = () => {
       if (!parsed.sellRate) parsed.sellRate = parsed.exchangeRate + 50;
       return parsed;
     }
+    
+    // Try to recover from older versions if v7 is empty
+    const legacyKeys = ['flagship_hub_v6', 'flagship_hub_v5', 'flagship_hub_v4', 'flagship_hub_v3', 'flagship_hub_v2', 'flagship_hub'];
+    for (const key of legacyKeys) {
+      const legacyData = localStorage.getItem(key);
+      if (legacyData) {
+        try {
+          const parsed = JSON.parse(legacyData);
+          console.log(`Recovered data from ${key}`);
+          return { ...parsed, language: parsed.language || 'ru', theme: parsed.theme || 'dark' };
+        } catch (e) { continue; }
+      }
+    }
+
     return {
       devices: [],
       sales: [],
@@ -194,11 +207,14 @@ const App: React.FC = () => {
       const fileName = 'flagship_data.json';
       const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
       
+      const trimmedRepo = repoName.trim();
+      const trimmedToken = githubToken.trim();
+
       // 1. Try to get the file SHA if it exists
       let sha = '';
       try {
-        const getRes = await fetch(`https://api.github.com/repos/${repoName}/contents/${fileName}`, {
-          headers: { 'Authorization': `token ${githubToken}` }
+        const getRes = await fetch(`https://api.github.com/repos/${trimmedRepo}/contents/${fileName}`, {
+          headers: { 'Authorization': `Bearer ${trimmedToken}` }
         });
         if (getRes.ok) {
           const data = await getRes.json();
@@ -207,10 +223,10 @@ const App: React.FC = () => {
       } catch (e) { /* File might not exist */ }
 
       // 2. Create or Update the file
-      const res = await fetch(`https://api.github.com/repos/${repoName}/contents/${fileName}`, {
+      const res = await fetch(`https://api.github.com/repos/${trimmedRepo}/contents/${fileName}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `token ${githubToken}`,
+          'Authorization': `Bearer ${trimmedToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -250,8 +266,8 @@ const App: React.FC = () => {
       const { githubToken, repoName } = state.syncSettings;
       const fileName = 'flagship_data.json';
       
-      const res = await fetch(`https://api.github.com/repos/${repoName}/contents/${fileName}`, {
-        headers: { 'Authorization': `token ${githubToken}` }
+      const res = await fetch(`https://api.github.com/repos/${repoName.trim()}/contents/${fileName}`, {
+        headers: { 'Authorization': `Bearer ${githubToken.trim()}` }
       });
 
       if (res.ok) {
@@ -423,6 +439,19 @@ const App: React.FC = () => {
     }));
   };
 
+  const deleteDevice = (id: string) => {
+    try {
+      setState(prev => ({
+        ...prev,
+        devices: prev.devices.filter(d => d.id !== id)
+      }));
+      // Small toast-like alert for feedback since we removed confirm
+      console.log("Device deleted:", id);
+    } catch (err) {
+      alert("Error deleting device");
+    }
+  };
+
   const addDebtor = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -497,6 +526,12 @@ const App: React.FC = () => {
         
         <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
           <SidebarItem icon={Settings} label={t.settings} active={activeTab === 'settings'} onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} />
+        </div>
+        <div className="mt-auto p-4 border-t border-slate-100 dark:border-slate-800/60">
+          <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
+            <span>Flagship Hub</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.1</span>
+          </div>
         </div>
       </aside>
 
@@ -685,13 +720,25 @@ const App: React.FC = () => {
                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{device.purchasedFrom}</p>
                         </td>
                         <td className="px-6 py-4 font-semibold text-sm text-slate-900 dark:text-slate-100">${device.purchasePrice.toLocaleString()}</td>
-                         <td className="px-6 py-4 text-right">
-                            <button 
-                              onClick={() => setShowSellModal(device)}
-                              className="px-4 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-500 dark:text-slate-400 rounded-lg font-semibold text-[9px] uppercase tracking-widest transition-all"
-                            >
-                              {t.sell}
-                            </button>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end items-center space-x-3">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteDevice(device.id);
+                                }}
+                                className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-xl transition-all active:scale-90"
+                                title={state.language === 'ru' ? 'Удалить' : 'Delete'}
+                              >
+                                <X size={18} />
+                              </button>
+                              <button 
+                                onClick={() => setShowSellModal(device)}
+                                className="px-5 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-500 dark:text-slate-400 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95"
+                              >
+                                {t.sell}
+                              </button>
+                            </div>
                          </td>
                        </tr>
                      ))}
