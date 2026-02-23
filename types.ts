@@ -48,5 +48,6 @@ export interface AppState {
     githubToken?: string;
     repoName?: string;
     lastSync?: string;
+    autoSync?: boolean;
   };
 }

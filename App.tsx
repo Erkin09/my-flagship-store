@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { GoogleGenAI } from "@google/genai";
 import { Device, Sale, AppState, Brand, Storage } from './types';
 import { translations, IPHONE_MODELS, SAMSUNG_MODELS, STORAGE_OPTIONS } from './constants';
 import { 
@@ -148,6 +149,8 @@ const App: React.FC = () => {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [aiReport, setAiReport] = useState<string | null>(null);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddDebtorModal, setShowAddDebtorModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState<Device | null>(null);
@@ -182,6 +185,12 @@ const App: React.FC = () => {
   useEffect(() => {
     fetchRate();
     const interval = setInterval(fetchRate, 3600000);
+    
+    // Auto-Restore on mount if enabled
+    if (state.syncSettings?.autoSync && state.syncSettings?.githubToken && state.syncSettings?.repoName) {
+      restoreFromGithub(true);
+    }
+
     return () => clearInterval(interval);
   }, []);
 
@@ -196,10 +205,21 @@ const App: React.FC = () => {
 
   const t = translations[state.language];
 
+  // Auto-Sync Logic
+  useEffect(() => {
+    if (!state.syncSettings?.autoSync || !state.syncSettings?.githubToken || !state.syncSettings?.repoName) return;
+
+    const timeout = setTimeout(() => {
+      syncToGithub(true); // Silent sync
+    }, 5000); // Debounce 5 seconds
+
+    return () => clearTimeout(timeout);
+  }, [state.devices, state.sales, state.cashBalance, state.customModels]);
+
   // Sync to GitHub Logic
-  const syncToGithub = async () => {
+  const syncToGithub = async (silent = false) => {
     if (!state.syncSettings?.githubToken || !state.syncSettings?.repoName) {
-      alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
+      if (!silent) alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
       return;
     }
 
@@ -222,22 +242,24 @@ const App: React.FC = () => {
       const trimmedToken = githubToken.trim();
 
       // 0. Check if repository exists and token is valid
-      const repoCheck = await fetch(`https://api.github.com/repos/${trimmedRepo}`, {
-        headers: { 'Authorization': `Bearer ${trimmedToken}` }
-      });
+      if (!silent) {
+        const repoCheck = await fetch(`https://api.github.com/repos/${trimmedRepo}`, {
+          headers: { 'Authorization': `Bearer ${trimmedToken}` }
+        });
 
-      if (!repoCheck.ok) {
-        if (repoCheck.status === 404) {
-          alert(state.language === 'ru' 
-            ? 'Ошибка: Репозиторий не найден. Проверьте:\n1. Название (Erkin09/MyInventoryApp)\n2. Права токена (должна быть галочка "repo")' 
-            : 'Error: Repository not found. Check:\n1. Name (Erkin09/MyInventoryApp)\n2. Token permissions (must have "repo" scope)');
-        } else if (repoCheck.status === 401) {
-          alert(state.language === 'ru' ? 'Ошибка: Неверный токен (Unauthorized)' : 'Error: Invalid token (Unauthorized)');
-        } else {
-          const err = await repoCheck.json();
-          alert(`GitHub Error: ${err.message}`);
+        if (!repoCheck.ok) {
+          if (repoCheck.status === 404) {
+            alert(state.language === 'ru' 
+              ? 'Ошибка: Репозиторий не найден. Проверьте:\n1. Название (Erkin09/MyInventoryApp)\n2. Права токена (должна быть галочка "repo")' 
+              : 'Error: Repository not found. Check:\n1. Name (Erkin09/MyInventoryApp)\n2. Token permissions (must have "repo" scope)');
+          } else if (repoCheck.status === 401) {
+            alert(state.language === 'ru' ? 'Ошибка: Неверный токен (Unauthorized)' : 'Error: Invalid token (Unauthorized)');
+          } else {
+            const err = await repoCheck.json();
+            alert(`GitHub Error: ${err.message}`);
+          }
+          return;
         }
-        return;
       }
 
       // 1. Try to get the file SHA if it exists
@@ -271,24 +293,26 @@ const App: React.FC = () => {
           ...prev,
           syncSettings: { ...prev.syncSettings, lastSync: new Date().toISOString() }
         }));
-        alert(state.language === 'ru' ? 'Синхронизация успешна' : 'Sync successful');
+        if (!silent) alert(state.language === 'ru' ? 'Синхронизация успешна' : 'Sync successful');
       } else {
-        const err = await res.json();
-        alert(`Error: ${err.message}`);
+        if (!silent) {
+          const err = await res.json();
+          alert(`Error: ${err.message}`);
+        }
       }
     } catch (error) {
       console.error(error);
-      alert('Sync failed');
+      if (!silent) alert('Sync failed');
     }
   };
 
-  const restoreFromGithub = async () => {
+  const restoreFromGithub = async (silent = false) => {
     if (!state.syncSettings?.githubToken || !state.syncSettings?.repoName) {
-      alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
+      if (!silent) alert(state.language === 'ru' ? 'Заполните настройки GitHub' : 'Fill GitHub settings');
       return;
     }
 
-    if (!confirm(state.language === 'ru' ? 'Это перезапишет текущие данные. Продолжить?' : 'This will overwrite current data. Continue?')) {
+    if (!silent && !confirm(state.language === 'ru' ? 'Это перезапишет текущие данные. Продолжить?' : 'This will overwrite current data. Continue?')) {
       return;
     }
 
@@ -314,14 +338,16 @@ const App: React.FC = () => {
           syncSettings: state.syncSettings
         });
         
-        alert(state.language === 'ru' ? 'Данные восстановлены' : 'Data restored');
+        if (!silent) alert(state.language === 'ru' ? 'Данные восстановлены' : 'Data restored');
       } else {
-        const err = await res.json();
-        alert(`Error: ${err.message}`);
+        if (!silent) {
+          const err = await res.json();
+          alert(`Error: ${err.message}`);
+        }
       }
     } catch (error) {
       console.error(error);
-      alert('Restore failed');
+      if (!silent) alert('Restore failed');
     }
   };
 
@@ -372,6 +398,72 @@ const App: React.FC = () => {
       }
     } catch (e) {
       alert('Network error');
+    }
+  };
+
+  const generateAiAnalytics = async () => {
+    setIsGeneratingAi(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      
+      // Prepare rich data for AI
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+      
+      const recentSales = state.sales.filter(s => new Date(s.date) >= thirtyDaysAgo);
+      const totalRevenue = recentSales.reduce((sum, s) => sum + s.salePrice, 0);
+      
+      const inventorySummary = state.devices
+        .filter(d => d.status === 'In Stock')
+        .map(d => `${d.brand} ${d.model} (${d.storage}) - Закупка: $${d.purchasePrice}`)
+        .join('\n');
+        
+      const salesHistory = recentSales.map(s => {
+        const device = state.devices.find(d => d.id === s.deviceId);
+        const profit = s.salePrice - (device?.purchasePrice || 0);
+        return `- ${s.date}: ${device?.model} (${device?.storage}). Продажа: $${s.salePrice}, Профит: $${profit}. Статус: ${s.status}`;
+      }).join('\n');
+      
+      const prompt = `
+        Ты — ведущий бизнес-консультант по рынку Б/У смартфонов (iPhone и Samsung S-серии).
+        Твоя задача: провести глубокий аудит оборота и прибыльности магазина "Flagship Hub" за последние 30 дней.
+        
+        ДАННЫЕ ДЛЯ АНАЛИЗА:
+        - Общий оборот за 30 дней: $${totalRevenue.toLocaleString()}
+        - Количество сделок за период: ${recentSales.length}
+        
+        ДЕТАЛЬНАЯ ИСТОРИЯ ПРОДАЖ (ТРЕНДЫ):
+        ${salesHistory || 'Продаж за последние 30 дней не зафиксировано.'}
+        
+        ТЕКУЩИЕ ОСТАТКИ НА СКЛАДЕ (ЗАМОРОЖЕННЫЙ КАПИТАЛ):
+        ${inventorySummary || 'Склад пуст.'}
+        
+        ЗАДАЧА:
+        1. ТРЕНДЫ: Какие модели продаются быстрее всего и приносят больше маржи?
+        2. ОБОРОТ: Оцени скорость оборачиваемости капитала. Где деньги "зависли"?
+        3. СТРАТЕГИЯ ЗАКУПОК: Основываясь на продажах, что СРОЧНО нужно докупить (например, iPhone 13 или S23 Ultra), а что стало "неликвидом"?
+        4. ФИНАНСОВЫЙ СОВЕТ: Как увеличить чистую прибыль на следующей неделе, исходя из текущего спроса?
+        
+        ТРЕБОВАНИЯ:
+        - Ответ СТРОГО на русском.
+        - Используй цифры из предоставленных данных для аргументации.
+        - Формат: Профессиональный Markdown отчет.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+        config: {
+          systemInstruction: "Ты — финансовый аналитик в сфере ритейла электроники. Ты анализируешь цифры продаж и остатков, чтобы давать советы по оптимизации оборотного капитала и увеличению ROI. Ответы всегда на русском.",
+        }
+      });
+
+      setAiReport(response.text || 'No report generated');
+    } catch (error) {
+      console.error(error);
+      setAiReport(state.language === 'ru' ? 'Ошибка генерации отчета. Проверьте подключение.' : 'Failed to generate report. Check connection.');
+    } finally {
+      setIsGeneratingAi(false);
     }
   };
 
@@ -595,6 +687,12 @@ const App: React.FC = () => {
               <Smartphone size={18} />
             </div>
             <span className="text-base font-semibold tracking-tight uppercase text-slate-900 dark:text-white">Fhub</span>
+            {state.syncSettings?.autoSync && (
+              <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg text-[8px] font-bold animate-pulse">
+                <RefreshCw size={8} className="animate-spin-slow" />
+                CLOUD
+              </div>
+            )}
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-slate-600">
             <X size={20} />
@@ -613,7 +711,7 @@ const App: React.FC = () => {
         <div className="mt-auto p-4 border-t border-slate-100 dark:border-slate-800/60">
           <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
             <span>Flagship Hub</span>
-            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.4</span>
+            <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-brand-500">v1.2.5</span>
           </div>
         </div>
       </aside>
@@ -879,6 +977,38 @@ const App: React.FC = () => {
                    </div>
                 </div>
              </div>
+
+             <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-8">
+                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                     <TrendingUp size={14} className="text-brand-500" />
+                     {state.language === 'ru' ? 'ИИ Аналитика и Советы' : 'AI Analytics & Insights'}
+                   </h3>
+                   <motion.button 
+                     whileHover={{ scale: 1.02 }}
+                     whileTap={{ scale: 0.98 }}
+                     onClick={generateAiAnalytics}
+                     disabled={isGeneratingAi}
+                     className="flex items-center space-x-2 bg-brand-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest disabled:opacity-50"
+                   >
+                     {isGeneratingAi ? <RefreshCw size={12} className="animate-spin" /> : <Plus size={12} />}
+                     <span>{state.language === 'ru' ? 'Сгенерировать отчет' : 'Generate Report'}</span>
+                   </motion.button>
+                </div>
+                
+                {aiReport ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <div className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
+                      {aiReport}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-12 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl">
+                    <TrendingUp size={32} className="mx-auto mb-4 text-slate-200 dark:text-slate-700" />
+                    <p className="text-xs font-medium text-slate-400">{state.language === 'ru' ? 'Нажмите кнопку выше, чтобы получить советы от ИИ' : 'Click the button above to get AI insights'}</p>
+                  </div>
+                )}
+             </div>
           </div>
         )}
 
@@ -1135,6 +1265,23 @@ const App: React.FC = () => {
                           value={state.syncSettings?.repoName || ''}
                           onChange={(e) => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, repoName: e.target.value } }))}
                         />
+                      </div>
+                      <div className="md:col-span-2 flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-xl ${state.syncSettings?.autoSync ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'}`}>
+                            <RefreshCw size={16} className={state.syncSettings?.autoSync ? 'animate-spin-slow' : ''} />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Авто-синхронизация' : 'Auto-Sync'}</p>
+                            <p className="text-[10px] text-slate-400 font-medium">{state.language === 'ru' ? 'Автоматически сохранять изменения в облако' : 'Automatically save changes to cloud'}</p>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, autoSync: !s.syncSettings?.autoSync } }))}
+                          className={`w-12 h-6 rounded-full transition-all relative ${state.syncSettings?.autoSync ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                        >
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.syncSettings?.autoSync ? 'left-7' : 'left-1'}`} />
+                        </button>
                       </div>
                    </div>
                    <div className="flex flex-col md:flex-row items-center justify-between pt-4 gap-4">
