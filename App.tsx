@@ -210,6 +210,25 @@ const App: React.FC = () => {
       const trimmedRepo = repoName.trim();
       const trimmedToken = githubToken.trim();
 
+      // 0. Check if repository exists and token is valid
+      const repoCheck = await fetch(`https://api.github.com/repos/${trimmedRepo}`, {
+        headers: { 'Authorization': `Bearer ${trimmedToken}` }
+      });
+
+      if (!repoCheck.ok) {
+        if (repoCheck.status === 404) {
+          alert(state.language === 'ru' 
+            ? 'Ошибка: Репозиторий не найден. Проверьте:\n1. Название (Erkin09/MyInventoryApp)\n2. Права токена (должна быть галочка "repo")' 
+            : 'Error: Repository not found. Check:\n1. Name (Erkin09/MyInventoryApp)\n2. Token permissions (must have "repo" scope)');
+        } else if (repoCheck.status === 401) {
+          alert(state.language === 'ru' ? 'Ошибка: Неверный токен (Unauthorized)' : 'Error: Invalid token (Unauthorized)');
+        } else {
+          const err = await repoCheck.json();
+          alert(`GitHub Error: ${err.message}`);
+        }
+        return;
+      }
+
       // 1. Try to get the file SHA if it exists
       let sha = '';
       try {
@@ -266,8 +285,11 @@ const App: React.FC = () => {
       const { githubToken, repoName } = state.syncSettings;
       const fileName = 'flagship_data.json';
       
-      const res = await fetch(`https://api.github.com/repos/${repoName.trim()}/contents/${fileName}`, {
-        headers: { 'Authorization': `Bearer ${githubToken.trim()}` }
+      const trimmedRepo = repoName.trim();
+      const trimmedToken = githubToken.trim();
+
+      const res = await fetch(`https://api.github.com/repos/${trimmedRepo}/contents/${fileName}`, {
+        headers: { 'Authorization': `Bearer ${trimmedToken}` }
       });
 
       if (res.ok) {
