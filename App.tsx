@@ -1057,7 +1057,7 @@ const App: React.FC = () => {
                         </label>
                         <input 
                           type="password" 
-                          placeholder="ghp_..." 
+                          placeholder="Ваш GitHub Токен (начинается с ghp_)" 
                           className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
                           value={state.syncSettings?.githubToken || ''}
                           onChange={(e) => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, githubToken: e.target.value } }))}
@@ -1069,7 +1069,7 @@ const App: React.FC = () => {
                         </label>
                         <input 
                           type="text" 
-                          placeholder="username/repo" 
+                          placeholder="username/repository" 
                           className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
                           value={state.syncSettings?.repoName || ''}
                           onChange={(e) => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, repoName: e.target.value } }))}
@@ -1077,9 +1077,22 @@ const App: React.FC = () => {
                       </div>
                    </div>
                    <div className="flex flex-col md:flex-row items-center justify-between pt-4 gap-4">
-                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800">
-                        {t.lastSync}: <span className="text-slate-900 dark:text-slate-100">{state.syncSettings?.lastSync ? new Date(state.syncSettings.lastSync).toLocaleString() : 'Never'}</span>
-                      </div>
+                       <div className="flex flex-col gap-1">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                            {t.lastSync}: <span className="text-slate-900 dark:text-slate-100">{state.syncSettings?.lastSync ? new Date(state.syncSettings.lastSync).toLocaleString() : 'Never'}</span>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              if(confirm(state.language === 'ru' ? 'Очистить все данные в браузере? Это не удалит данные в GitHub.' : 'Clear all local data? This will not delete data on GitHub.')) {
+                                localStorage.clear();
+                                window.location.reload();
+                              }
+                            }}
+                            className="text-[9px] font-bold text-rose-500 uppercase tracking-widest hover:underline ml-1"
+                          >
+                            {state.language === 'ru' ? 'Очистить локальную память' : 'Clear local storage'}
+                          </button>
+                       </div>
                       <div className="grid grid-cols-2 md:flex md:flex-row gap-3 w-full md:w-auto">
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
