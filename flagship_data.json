@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "vpb68exr5",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "0000000000",
+      "purchasePrice": 435,
+      "purchasedFrom": "Husan",
+      "purchaseDate": "2026-02-24",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T07:42:19.472Z"
+    },
+    {
       "id": "34d5zfpgy",
       "brand": "iPhone",
       "model": "iPhone 15 Pro Max",
@@ -439,7 +451,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T06:20:16.347Z",
+    "lastSync": "2026-02-24T06:27:33.187Z",
     "autoSync": true
   }
 }
