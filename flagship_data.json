@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "cejgvi1g4",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "355600721596839",
+      "purchasePrice": 435,
+      "purchasedFrom": "Husan",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T05:57:56.178Z"
+    },
+    {
       "id": "8wbtr1jgk",
       "brand": "iPhone",
       "model": "iPhone 13 Pro",
@@ -331,7 +343,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:55:15.006Z",
+    "lastSync": "2026-02-24T05:56:50.889Z",
     "autoSync": true
   }
 }
