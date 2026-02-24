@@ -13,18 +13,6 @@
       "dateAdded": "2026-02-24T05:46:25.405Z"
     },
     {
-      "id": "tdd7kmuvt",
-      "brand": "iPhone",
-      "model": "iPhone 11 Pro",
-      "storage": "256Gb",
-      "imei": "353248103175319",
-      "purchasePrice": 290,
-      "purchasedFrom": "Abror",
-      "purchaseDate": "2026-02-24",
-      "status": "In Stock",
-      "dateAdded": "2026-02-24T05:30:35.066Z"
-    },
-    {
       "id": "xz6safq2f",
       "brand": "Samsung",
       "model": "Galaxy S10 5G",
@@ -247,7 +235,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:43:35.231Z",
+    "lastSync": "2026-02-24T05:46:31.669Z",
     "autoSync": true
   }
 }
