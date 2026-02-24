@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "ebpmzbb4y",
+      "brand": "iPhone",
+      "model": "iPhone 15 Pro Max",
+      "storage": "512Gb",
+      "imei": "359732430573688",
+      "purchasePrice": 860,
+      "purchasedFrom": "Hilol",
+      "purchaseDate": "2026-02-24",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T06:16:27.740Z"
+    },
+    {
       "id": "dtx0eo6rp",
       "brand": "iPhone",
       "model": "iPhone 12 Pro Max",
@@ -415,7 +427,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T06:07:53.424Z",
+    "lastSync": "2026-02-24T06:09:35.825Z",
     "autoSync": true
   }
 }
