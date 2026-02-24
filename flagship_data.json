@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "148p4r5o3",
+      "brand": "Samsung",
+      "model": "Galaxy S23",
+      "storage": "256Gb",
+      "imei": "351357517990031",
+      "purchasePrice": 355,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T05:14:23.838Z"
+    },
+    {
       "id": "4lcndbsyh",
       "brand": "Samsung",
       "model": "Galaxy S23",
@@ -162,7 +174,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:11:18.508Z",
+    "lastSync": "2026-02-24T05:12:34.906Z",
     "autoSync": true
   }
 }
