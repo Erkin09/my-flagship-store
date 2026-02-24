@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "6ksd0k3nt",
+      "brand": "iPhone",
+      "model": "iPhone 11 Pro",
+      "storage": "64Gb",
+      "imei": "353248173175319",
+      "purchasePrice": 290,
+      "purchasedFrom": "Abror",
+      "purchaseDate": "2026-02-24",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T05:49:13.413Z"
+    },
+    {
       "id": "dobzd1ran",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -247,7 +259,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:46:52.457Z",
+    "lastSync": "2026-02-24T05:47:56.558Z",
     "autoSync": true
   }
 }
