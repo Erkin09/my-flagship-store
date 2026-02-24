@@ -9,7 +9,7 @@
       "purchasePrice": 520,
       "purchasedFrom": "?",
       "purchaseDate": "2026-02-24",
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-02-24T07:42:49.326Z"
     },
     {
@@ -375,6 +375,16 @@
   ],
   "sales": [
     {
+      "id": "em00r86eo",
+      "deviceId": "qaubv7t5y",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 600,
+      "date": "2026-02-24T07:57:22.226Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
+    {
       "id": "vh1h69whp",
       "customerName": "Malika 14 Promax",
       "customerPhone": "933130039",
@@ -447,7 +457,7 @@
   ],
   "language": "ru",
   "theme": "dark",
-  "cashBalance": 4750,
+  "cashBalance": 5350,
   "exchangeRate": 12225,
   "buyRate": 12185,
   "sellRate": 12265,
@@ -463,7 +473,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:37:35.842Z",
+    "lastSync": "2026-02-24T07:42:55.369Z",
     "autoSync": true
   }
 }
