@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "jmgs2cm4f",
+      "brand": "iPhone",
+      "model": "iPhone 14 Pro",
+      "storage": "256Gb",
+      "imei": "350666976029235",
+      "purchasePrice": 560,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T06:02:33.115Z"
+    },
+    {
       "id": "xs8wuqysf",
       "brand": "iPhone",
       "model": "iPhone 14 Pro",
@@ -367,7 +379,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T06:00:01.869Z",
+    "lastSync": "2026-02-24T06:01:12.831Z",
     "autoSync": true
   }
 }
