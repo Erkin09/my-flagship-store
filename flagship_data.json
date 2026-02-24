@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "tpk8o1wbp",
+      "brand": "iPhone",
+      "model": "iPhone 13",
+      "storage": "256Gb",
+      "imei": "357140957383873",
+      "purchasePrice": 380,
+      "purchasedFrom": "Hilol",
+      "purchaseDate": "2026-02-24",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T05:51:35.106Z"
+    },
+    {
       "id": "bumfl1sei",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -271,7 +283,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:49:19.506Z",
+    "lastSync": "2026-02-24T05:50:54.533Z",
     "autoSync": true
   }
 }
