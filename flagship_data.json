@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "bumfl1sei",
+      "brand": "iPhone",
+      "model": "iPhone 11",
+      "storage": "128Gb",
+      "imei": "353970103681877",
+      "purchasePrice": 250,
+      "purchasedFrom": "Husan",
+      "purchaseDate": "2025-12-29",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T05:50:48.099Z"
+    },
+    {
       "id": "6ksd0k3nt",
       "brand": "iPhone",
       "model": "iPhone 11 Pro",
@@ -259,7 +271,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:47:56.558Z",
+    "lastSync": "2026-02-24T05:49:19.506Z",
     "autoSync": true
   }
 }
