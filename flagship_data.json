@@ -2,6 +2,20 @@
   "devices": [],
   "sales": [
     {
+      "id": "vh1h69whp",
+      "customerName": "Malika 14 Promax",
+      "customerPhone": "933130039",
+      "salePrice": 41,
+      "date": "2026-02-24T04:53:07.393Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-03-26T04:53:07.393Z"
+      }
+    },
+    {
       "id": "kbrlbphd8",
       "customerName": "Sitora",
       "customerPhone": "914022252",
@@ -71,7 +85,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T04:51:23.596Z",
+    "lastSync": "2026-02-24T04:52:32.818Z",
     "autoSync": true
   }
 }
