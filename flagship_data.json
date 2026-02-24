@@ -204,13 +204,14 @@
     "Samsung": [
       "Galaxy S22+",
       "Galaxy S23+",
-      "Galaxy S21+"
+      "Galaxy S21+",
+      "Galaxy S10 5G"
     ]
   },
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:20:51.552Z",
+    "lastSync": "2026-02-24T05:21:22.169Z",
     "autoSync": true
   }
 }
