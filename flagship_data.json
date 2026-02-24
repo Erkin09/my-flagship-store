@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "34d5zfpgy",
+      "brand": "iPhone",
+      "model": "iPhone 15 Pro Max",
+      "storage": "256Gb",
+      "imei": "353134988627618",
+      "purchasePrice": 700,
+      "purchasedFrom": "Sunnat aka YH",
+      "purchaseDate": "2026-02-24",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T06:20:09.154Z"
+    },
+    {
       "id": "ebpmzbb4y",
       "brand": "iPhone",
       "model": "iPhone 15 Pro Max",
@@ -427,7 +439,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T06:09:35.825Z",
+    "lastSync": "2026-02-24T06:16:34.437Z",
     "autoSync": true
   }
 }
