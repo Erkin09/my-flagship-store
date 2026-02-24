@@ -9,7 +9,7 @@
       "purchasePrice": 520,
       "purchasedFrom": "?",
       "purchaseDate": "2026-02-24",
-      "status": "Sold",
+      "status": "In Stock",
       "dateAdded": "2026-02-24T07:42:49.326Z"
     },
     {
@@ -382,7 +382,7 @@
       "salePrice": 600,
       "date": "2026-02-24T07:57:22.226Z",
       "isInstallment": false,
-      "status": "Completed"
+      "status": "Returned"
     },
     {
       "id": "vh1h69whp",
@@ -457,7 +457,7 @@
   ],
   "language": "ru",
   "theme": "dark",
-  "cashBalance": 5350,
+  "cashBalance": 4750,
   "exchangeRate": 12225,
   "buyRate": 12185,
   "sellRate": 12265,
@@ -473,7 +473,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T07:42:55.369Z",
+    "lastSync": "2026-02-24T07:57:28.912Z",
     "autoSync": true
   }
 }
