@@ -1,6 +1,21 @@
 {
   "devices": [],
-  "sales": [],
+  "sales": [
+    {
+      "id": "f0tpmzyc3",
+      "customerName": "Muhammadali Musinov",
+      "customerPhone": "913340100",
+      "salePrice": 446,
+      "date": "2026-02-24T04:48:06.179Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-03-26T04:48:06.179Z"
+      }
+    }
+  ],
   "language": "ru",
   "theme": "dark",
   "cashBalance": 0,
@@ -14,7 +29,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-23T13:45:59.784Z",
+    "lastSync": "2026-02-23T13:46:32.626Z",
     "autoSync": true
   }
 }
