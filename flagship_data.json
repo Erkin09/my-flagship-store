@@ -2,6 +2,20 @@
   "devices": [],
   "sales": [
     {
+      "id": "sgrtbdeoy",
+      "customerName": "Asel Tinchlik",
+      "customerPhone": "935990428",
+      "salePrice": 150,
+      "date": "2026-02-24T04:49:15.541Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-03-26T04:49:15.541Z"
+      }
+    },
+    {
       "id": "f0tpmzyc3",
       "customerName": "Muhammadali Musinov",
       "customerPhone": "913340100",
@@ -29,7 +43,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-23T13:46:32.626Z",
+    "lastSync": "2026-02-24T04:48:14.149Z",
     "autoSync": true
   }
 }
