@@ -196,11 +196,13 @@
   "language": "ru",
   "theme": "dark",
   "cashBalance": 0,
-  "exchangeRate": 12212,
-  "buyRate": 12172,
-  "sellRate": 12252,
+  "exchangeRate": 12225,
+  "buyRate": 12185,
+  "sellRate": 12265,
   "customModels": {
-    "iPhone": [],
+    "iPhone": [
+      "Galaxy S10 5G"
+    ],
     "Samsung": [
       "Galaxy S22+",
       "Galaxy S23+",
@@ -210,7 +212,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:18:47.032Z",
+    "lastSync": "2026-02-24T05:19:49.805Z",
     "autoSync": true
   }
 }
