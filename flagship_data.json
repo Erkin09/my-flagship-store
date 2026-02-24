@@ -200,9 +200,7 @@
   "buyRate": 12185,
   "sellRate": 12265,
   "customModels": {
-    "iPhone": [
-      "Galaxy S10 5G"
-    ],
+    "iPhone": [],
     "Samsung": [
       "Galaxy S22+",
       "Galaxy S23+",
@@ -212,7 +210,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:19:49.805Z",
+    "lastSync": "2026-02-24T05:20:51.552Z",
     "autoSync": true
   }
 }
