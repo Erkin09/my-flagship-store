@@ -1,5 +1,18 @@
 {
-  "devices": [],
+  "devices": [
+    {
+      "id": "zbyr8js65",
+      "brand": "Samsung",
+      "model": "Galaxy S22 Ultra",
+      "storage": "256Gb",
+      "imei": "351562314387600",
+      "purchasePrice": 395,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T05:03:35.509Z"
+    }
+  ],
   "sales": [
     {
       "id": "vh1h69whp",
@@ -85,7 +98,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-23T13:46:24.493Z",
+    "lastSync": "2026-02-24T04:53:13.953Z",
     "autoSync": true
   }
 }
