@@ -94,13 +94,14 @@
   "customModels": {
     "iPhone": [],
     "Samsung": [
-      "Galaxy S22+"
+      "Galaxy S22+",
+      "Galaxy S23+"
     ]
   },
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T05:03:41.806Z",
+    "lastSync": "2026-02-24T05:04:42.629Z",
     "autoSync": true
   }
 }
