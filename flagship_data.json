@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "dtx0eo6rp",
+      "brand": "iPhone",
+      "model": "iPhone 12 Pro Max",
+      "storage": "128Gb",
+      "imei": "356723116275512",
+      "purchasePrice": 425,
+      "purchasedFrom": "Abror",
+      "purchaseDate": "2026-02-24",
+      "status": "In Stock",
+      "dateAdded": "2026-02-24T06:09:27.424Z"
+    },
+    {
       "id": "oxsmjkwx4",
       "brand": "iPhone",
       "model": "iPhone 12 Pro Max",
@@ -403,7 +415,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T06:04:17.868Z",
+    "lastSync": "2026-02-24T06:07:53.424Z",
     "autoSync": true
   }
 }
