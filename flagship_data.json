@@ -93,12 +93,14 @@
   "sellRate": 12252,
   "customModels": {
     "iPhone": [],
-    "Samsung": []
+    "Samsung": [
+      "Galaxy S22+"
+    ]
   },
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-02-24T04:53:13.953Z",
+    "lastSync": "2026-02-24T05:03:41.806Z",
     "autoSync": true
   }
 }
