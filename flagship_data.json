@@ -454,7 +454,7 @@
   ],
   "language": "ru",
   "theme": "dark",
-  "cashBalance": 0,
+  "cashBalance": 4826,
   "exchangeRate": 12202,
   "buyRate": 12177,
   "sellRate": 12227,
@@ -473,6 +473,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-02-25T10:37:47.468Z"
+    "lastSync": "2026-02-25T10:37:52.881Z"
   }
 }
