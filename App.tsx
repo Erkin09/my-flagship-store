@@ -36,6 +36,8 @@ import {
   Database,
   Menu,
   X,
+  Edit,
+  Trash2,
   CheckCircle,
   Download
 } from 'lucide-react';
@@ -107,14 +109,32 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('flagship_hub_v7');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (!parsed.exchangeRate || parsed.exchangeRate === 1) {
-        parsed.exchangeRate = 12210;
+    const defaults: AppState = {
+      devices: [],
+      sales: [],
+      language: 'ru',
+      theme: 'dark',
+      cashBalance: 0,
+      exchangeRate: 12195,
+      buyRate: 12170,
+      sellRate: 12220,
+      bankRate: 12150,
+      prevExchangeRate: 12195,
+      customModels: { iPhone: [], Samsung: [] },
+      syncSettings: {
+        githubToken: '',
+        repoName: '',
+        autoSync: false
       }
-      if (!parsed.buyRate) parsed.buyRate = parsed.exchangeRate - 50;
-      if (!parsed.sellRate) parsed.sellRate = parsed.exchangeRate + 50;
-      return parsed;
+    };
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return { ...defaults, ...parsed };
+      } catch (e) {
+        console.error("Failed to parse saved state", e);
+      }
     }
     
     // Try to recover from older versions if v7 is empty
@@ -124,28 +144,12 @@ const App: React.FC = () => {
       if (legacyData) {
         try {
           const parsed = JSON.parse(legacyData);
-          console.log(`Recovered data from ${key}`);
-          return { ...parsed, language: parsed.language || 'ru', theme: parsed.theme || 'dark' };
+          return { ...defaults, ...parsed };
         } catch (e) { continue; }
       }
     }
 
-    return {
-      devices: [],
-      sales: [],
-      language: 'ru',
-      theme: 'dark',
-      cashBalance: 0,
-      exchangeRate: 12210,
-      buyRate: 12160,
-      sellRate: 12260,
-      customModels: { iPhone: [], Samsung: [] },
-      syncSettings: {
-        githubToken: '',
-        repoName: '',
-        lastSync: ''
-      }
-    };
+    return defaults;
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,23 +158,50 @@ const App: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddDebtorModal, setShowAddDebtorModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState<Device | null>(null);
+  const [editingDevice, setEditingDevice] = useState<Device | null>(null);
   const [isInstallmentMode, setIsInstallmentMode] = useState(false);
   
   const [modalSelectedBrand, setModalSelectedBrand] = useState<Brand>('iPhone');
+  const [modalSelectedStorage, setModalSelectedStorage] = useState<Storage>('128Gb');
+  const [batteryHealth, setBatteryHealth] = useState(100);
+
+  useEffect(() => {
+    if (modalSelectedBrand === 'iPhone') {
+      setModalSelectedStorage('128Gb');
+    } else if (modalSelectedBrand === 'Samsung') {
+      setModalSelectedStorage('256Gb');
+    }
+  }, [modalSelectedBrand]);
 
   const fetchRate = async () => {
     try {
+      // Fetch Market Rate (using er-api as a base)
       const res = await fetch('https://open.er-api.com/v6/latest/USD');
       const data = await res.json();
+      
+      // Fetch Bank Rate (CBU Uzbekistan)
+      const cbuRes = await fetch('https://cbu.uz/ru/arkhiv-kursov-valyut/json/');
+      const cbuData = await cbuRes.json();
+      const usdBank = cbuData.find((item: any) => item.Ccy === 'USD');
+      const newBankRate = usdBank ? Math.round(Number(usdBank.Rate)) : 0;
+
       if (data && data.rates && data.rates.UZS) {
         const newRate = Math.round(data.rates.UZS);
         setState(prev => {
-          if (Math.abs(prev.exchangeRate - newRate) > 1 || prev.exchangeRate === 1) {
+          // We use the user's requested market offsets
+          // User said 12170 to 12220 (diff is 50, mid is 12195)
+          // So buy = mid - 25, sell = mid + 25
+          const buyOffset = 25;
+          const sellOffset = 25;
+
+          if (Math.abs(prev.exchangeRate - newRate) > 1 || prev.exchangeRate === 1 || prev.bankRate !== newBankRate) {
             return { 
               ...prev, 
+              prevExchangeRate: prev.exchangeRate,
               exchangeRate: newRate,
-              buyRate: newRate - 40,
-              sellRate: newRate + 40
+              buyRate: newRate - buyOffset,
+              sellRate: newRate + sellOffset,
+              bankRate: newBankRate || prev.bankRate
             };
           }
           return prev;
@@ -543,11 +574,34 @@ const App: React.FC = () => {
       purchasePrice: Number(formData.get('purchasePrice')),
       purchasedFrom: formData.get('purchasedFrom') as string,
       purchaseDate: formData.get('purchaseDate') as string || new Date().toISOString().split('T')[0],
+      batteryHealth: formData.get('brand') === 'iPhone' ? Number(formData.get('batteryHealth')) : undefined,
       status: 'In Stock',
       dateAdded: new Date().toISOString()
     };
     setState(prev => ({ ...prev, devices: [newDevice, ...prev.devices] }));
     setShowAddModal(false);
+  };
+
+  const updateDevice = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingDevice) return;
+    const formData = new FormData(e.currentTarget);
+    const updatedDevice: Device = {
+      ...editingDevice,
+      brand: formData.get('brand') as Brand,
+      model: formData.get('model') as string,
+      storage: formData.get('storage') as Storage,
+      imei: formData.get('imei') as string,
+      purchasePrice: Number(formData.get('purchasePrice')),
+      purchasedFrom: formData.get('purchasedFrom') as string,
+      purchaseDate: formData.get('purchaseDate') as string,
+      batteryHealth: formData.get('batteryHealth') ? Number(formData.get('batteryHealth')) : editingDevice.batteryHealth
+    };
+    setState(prev => ({
+      ...prev,
+      devices: prev.devices.map(d => d.id === editingDevice.id ? updatedDevice : d)
+    }));
+    setEditingDevice(null);
   };
 
   const sellDevice = (e: React.FormEvent<HTMLFormElement>) => {
@@ -587,15 +641,19 @@ const App: React.FC = () => {
   };
 
   const returnSale = (saleId: string) => {
-    if(!confirm(state.language === 'ru' ? 'Вы уверены?' : 'Are you sure?')) return;
-    const sale = state.sales.find(s => s.id === saleId);
-    if (!sale) return;
-    setState(prev => ({
-      ...prev,
-      sales: prev.sales.map(s => s.id === saleId ? { ...s, status: 'Returned' } : s),
-      devices: prev.devices.map(d => d.id === sale.deviceId ? { ...d, status: 'In Stock' } : d),
-      cashBalance: prev.cashBalance - (sale.isInstallment ? (sale.installmentPlan?.paidAmount || 0) : sale.salePrice)
-    }));
+    setState(prev => {
+      const sale = prev.sales.find(s => s.id === saleId);
+      if (!sale || sale.status !== 'Completed') return prev;
+      
+      const refundAmount = sale.isInstallment ? (sale.installmentPlan?.paidAmount || 0) : sale.salePrice;
+      
+      return {
+        ...prev,
+        sales: prev.sales.map(s => s.id === saleId ? { ...s, status: 'Returned' } : s),
+        devices: prev.devices.map(d => d.id === sale.deviceId ? { ...d, status: 'In Stock' } : d),
+        cashBalance: prev.cashBalance - refundAmount
+      };
+    });
   };
 
   const updateInstallment = (saleId: string, amount: number) => {
@@ -612,6 +670,24 @@ const App: React.FC = () => {
       }),
       cashBalance: prev.cashBalance + amount
     }));
+  };
+
+  const cancelSale = (saleId: string) => {
+    setState(prev => {
+      const sale = prev.sales.find(s => s.id === saleId);
+      if (!sale) return prev;
+
+      const refundAmount = sale.status === 'Completed' 
+        ? (sale.isInstallment ? (sale.installmentPlan?.paidAmount || 0) : sale.salePrice)
+        : 0;
+
+      return {
+        ...prev,
+        sales: prev.sales.filter(s => s.id !== saleId),
+        devices: prev.devices.map(d => d.id === sale.deviceId ? { ...d, status: 'In Stock' } : d),
+        cashBalance: prev.cashBalance - refundAmount
+      };
+    });
   };
 
   const deleteDevice = (id: string) => {
@@ -757,13 +833,24 @@ const App: React.FC = () => {
           <div className="flex items-center space-x-2 w-full md:w-auto justify-start md:justify-end overflow-x-auto scrollbar-hide py-1 no-scrollbar">
             <div className="flex items-center space-x-3 px-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm shrink-0">
               <div className="flex flex-col">
-                <span className="text-[7px] font-bold text-slate-400 uppercase leading-none mb-1">{t.buyRate}</span>
-                <span className="text-[10px] font-bold text-emerald-600 leading-none">{state.buyRate.toLocaleString()}</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[7px] font-bold text-slate-400 uppercase leading-none">{state.language === 'ru' ? 'Рынок' : 'Market'}</span>
+                  {state.exchangeRate > state.prevExchangeRate ? (
+                    <TrendingUp size={8} className="text-emerald-500" />
+                  ) : state.exchangeRate < state.prevExchangeRate ? (
+                    <TrendingUp size={8} className="text-rose-500 rotate-180" />
+                  ) : null}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-[10px] font-bold text-emerald-600 leading-none">{state.buyRate.toLocaleString()}</span>
+                  <span className="text-[8px] text-slate-300">/</span>
+                  <span className="text-[10px] font-bold text-rose-600 leading-none">{state.sellRate.toLocaleString()}</span>
+                </div>
               </div>
               <div className="w-px h-5 bg-slate-100 dark:bg-slate-700" />
               <div className="flex flex-col">
-                <span className="text-[7px] font-bold text-slate-400 uppercase leading-none mb-1">{t.sellRate}</span>
-                <span className="text-[10px] font-bold text-rose-600 leading-none">{state.sellRate.toLocaleString()}</span>
+                <span className="text-[7px] font-bold text-slate-400 uppercase leading-none mb-1">{state.language === 'ru' ? 'Банк' : 'Bank'}</span>
+                <span className="text-[10px] font-bold text-blue-600 leading-none">{(state.bankRate || 0).toLocaleString()}</span>
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-2">
@@ -809,7 +896,12 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card title={t.stockValue} subtitle={`$${stockValue.toLocaleString()}`} icon={Box} colorClass="bg-blue-50 text-blue-600" />
+              <Card 
+                title={state.language === 'ru' ? 'Склад' : 'Stock'} 
+                subtitle={`$${stockValue.toLocaleString()} (${devicesInStock.length} шт.)`} 
+                icon={Box} 
+                colorClass="bg-blue-50 text-blue-600" 
+              />
               <Card title={t.totalSales} subtitle={state.sales.filter(s => s.status === 'Completed').length.toString()} icon={ShoppingCart} colorClass="bg-amber-50 text-amber-600" />
               <Card title={t.profit} subtitle={`$${totalProfit.toLocaleString()}`} icon={TrendingUp} colorClass="bg-purple-50 text-purple-600" />
             </div>
@@ -860,7 +952,12 @@ const App: React.FC = () => {
                     <p className="text-lg font-semibold text-brand-600 tracking-tight leading-none">${stockValue.toLocaleString()}</p>
                  </div>
                  <button 
-                  onClick={() => setShowAddModal(true)}
+                  onClick={() => {
+                    setBatteryHealth(100);
+                    setModalSelectedBrand('iPhone');
+                    setModalSelectedStorage('128Gb');
+                    setShowAddModal(true);
+                  }}
                   className="flex items-center space-x-2 bg-slate-900 dark:bg-brand-600 text-white px-4 py-2.5 rounded-xl hover:bg-brand-700 transition-all font-semibold uppercase text-[10px] tracking-widest"
                 >
                   <Plus size={14} />
@@ -877,6 +974,7 @@ const App: React.FC = () => {
                         <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.model}</th>
                         <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.storage}</th>
                         <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.imei}</th>
+                        <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Дата прихода' : 'Arrival Date'}</th>
                         <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.supplier}</th>
                         <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
                         <th className="px-6 py-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
@@ -896,6 +994,12 @@ const App: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                            <code className="text-[10px] font-medium text-slate-400">{device.imei}</code>
+                           {device.batteryHealth && (
+                             <p className="text-[9px] font-bold text-emerald-500 mt-1">BH: {device.batteryHealth}%</p>
+                           )}
+                        </td>
+                        <td className="px-6 py-4 text-[10px] font-medium text-slate-400 uppercase">
+                           {formatDate(device.purchaseDate, state.language)}
                         </td>
                         <td className="px-6 py-4">
                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{device.purchasedFrom}</p>
@@ -903,6 +1007,16 @@ const App: React.FC = () => {
                         <td className="px-6 py-4 font-semibold text-sm text-slate-900 dark:text-slate-100">${device.purchasePrice.toLocaleString()}</td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex justify-end items-center space-x-3">
+                              <button 
+                                onClick={() => {
+                                  setBatteryHealth(device.batteryHealth || 100);
+                                  setEditingDevice(device);
+                                }}
+                                className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all active:scale-90"
+                                title={state.language === 'ru' ? 'Редактировать' : 'Edit'}
+                              >
+                                <Edit size={18} />
+                              </button>
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -1024,8 +1138,10 @@ const App: React.FC = () => {
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.date}</th>
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.model}</th>
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.customer}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Дата закупки' : 'Purchase Date'}</th>
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.sellingPrice}</th>
+                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</th>
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.status}</th>
                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
                    </tr>
@@ -1044,8 +1160,14 @@ const App: React.FC = () => {
                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{sale.customerName || "—"}</p>
                            <p className="text-[9px] font-medium text-slate-400">{sale.customerPhone || "—"}</p>
                          </td>
+                          <td className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase">
+                            {device ? formatDate(device.purchaseDate, state.language) : '—'}
+                          </td>
                                                                               <td className="px-6 py-4 font-semibold text-xs text-slate-400">${device?.purchasePrice.toLocaleString() || '0'}</td>
                                                                               <td className="px-6 py-4 font-semibold text-base text-brand-600">${sale.salePrice.toLocaleString()}</td>
+                          <td className="px-6 py-4 font-bold text-emerald-600">
+                            ${(sale.salePrice - (device?.purchasePrice || 0)).toLocaleString()}
+                          </td>
                           <td className="px-6 py-4">
                            <span className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-widest ${
                              sale.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/20'
@@ -1055,9 +1177,14 @@ const App: React.FC = () => {
                          </td>
                          <td className="px-6 py-4 text-right">
                            {sale.status === 'Completed' && (
-                             <button onClick={() => returnSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90">
-                               <RotateCcw size={14} />
-                             </button>
+                             <div className="flex justify-end items-center space-x-2">
+                               <button onClick={() => returnSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90" title={state.language === 'ru' ? 'Возврат' : 'Return'}>
+                                 <RotateCcw size={14} />
+                               </button>
+                               <button onClick={() => cancelSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90" title={state.language === 'ru' ? 'Удалить' : 'Delete'}>
+                                 <X size={14} />
+                               </button>
+                             </div>
                            )}
                          </td>
                        </tr>
@@ -1170,6 +1297,12 @@ const App: React.FC = () => {
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t.sellRate}</label>
                         <div className="flex space-x-2">
                           <input type="number" step="1" className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" value={state.sellRate} onChange={(e) => setState(s => ({...s, sellRate: Number(e.target.value)}))} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{state.language === 'ru' ? 'Банковский курс' : 'Bank Rate'}</label>
+                        <div className="flex space-x-2">
+                          <input type="number" step="1" className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" value={state.bankRate} onChange={(e) => setState(s => ({...s, bankRate: Number(e.target.value)}))} />
                         </div>
                       </div>
                     </div>
@@ -1365,7 +1498,7 @@ const App: React.FC = () => {
                       </select>
                    </InputWrapper>
                    <InputWrapper label={t.storage}>
-                      <select name="storage" required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none border-none text-sm font-medium">
+                      <select name="storage" required value={modalSelectedStorage} onChange={(e) => setModalSelectedStorage(e.target.value as Storage)} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none border-none text-sm font-medium">
                         {STORAGE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
                    </InputWrapper>
@@ -1401,6 +1534,23 @@ const App: React.FC = () => {
                 <InputWrapper label={t.purchasePrice} icon={DollarSign}>
                    <input name="purchasePrice" type="number" required placeholder="0.00" className="w-full p-4 bg-brand-500/5 dark:bg-brand-500/10 rounded-2xl outline-none text-xl font-bold text-brand-600 focus:ring-1 ring-brand-500/20" />
                 </InputWrapper>
+                {modalSelectedBrand === 'iPhone' && (
+                  <div className="space-y-2 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex justify-between">
+                      <span>{state.language === 'ru' ? 'Ёмкость батареи' : 'Battery Health'}</span>
+                      <span className="text-brand-600">{batteryHealth}%</span>
+                    </label>
+                    <input 
+                      type="range" 
+                      name="batteryHealth" 
+                      min="70" 
+                      max="100" 
+                      value={batteryHealth} 
+                      onChange={(e) => setBatteryHealth(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-100 dark:bg-slate-900 rounded-lg appearance-none cursor-pointer accent-brand-500"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex space-x-3 pt-4">
@@ -1514,6 +1664,81 @@ const App: React.FC = () => {
               <div className="flex space-x-3 pt-4">
                 <button type="button" onClick={() => setShowAddDebtorModal(false)} className="flex-1 py-3 font-semibold text-[10px] uppercase tracking-widest text-slate-400">Cancel</button>
                 <button type="submit" className="flex-[2] py-4 bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-xl shadow-lg active:scale-95 transition-all">Save Debtor</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* EDIT MODAL */}
+      {editingDevice && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-8 flex items-center gap-3">
+               <div className="p-2.5 bg-brand-50 dark:bg-brand-900/30 rounded-xl text-brand-600">
+                  <Edit size={18} />
+               </div>
+               {state.language === 'ru' ? 'Редактировать товар' : 'Edit Device'}
+            </h2>
+            
+            <form onSubmit={updateDevice} className="space-y-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                   <InputWrapper label={t.brand}>
+                      <select name="brand" required defaultValue={editingDevice.brand} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none border-none text-sm font-medium">
+                        <option value="iPhone">iPhone</option>
+                        <option value="Samsung">Samsung</option>
+                      </select>
+                   </InputWrapper>
+                   <InputWrapper label={t.storage}>
+                      <select name="storage" required defaultValue={editingDevice.storage} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none border-none text-sm font-medium">
+                        {STORAGE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                   </InputWrapper>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                   <InputWrapper label={t.model}>
+                      <input name="model" required defaultValue={editingDevice.model} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                   </InputWrapper>
+                   <InputWrapper label={t.imei} icon={Hash}>
+                      <input name="imei" required defaultValue={editingDevice.imei} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                   </InputWrapper>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <div className="grid grid-cols-2 gap-4">
+                   <InputWrapper label={t.purchasedFrom} icon={Store}>
+                      <input name="purchasedFrom" required defaultValue={editingDevice.purchasedFrom} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                   </InputWrapper>
+                   <InputWrapper label={t.purchaseDate}>
+                      <input name="purchaseDate" type="date" defaultValue={editingDevice.purchaseDate} required className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-[11px] font-bold" />
+                   </InputWrapper>
+                </div>
+                <InputWrapper label={t.purchasePrice} icon={DollarSign}>
+                   <input name="purchasePrice" type="number" required defaultValue={editingDevice.purchasePrice} className="w-full p-4 bg-brand-500/5 dark:bg-brand-500/10 rounded-2xl outline-none text-xl font-bold text-brand-600 focus:ring-1 ring-brand-500/20" />
+                </InputWrapper>
+                {editingDevice.brand === 'iPhone' && (
+                  <div className="space-y-2 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex justify-between">
+                      <span>{state.language === 'ru' ? 'Ёмкость батареи' : 'Battery Health'}</span>
+                      <span className="text-brand-600">{batteryHealth}%</span>
+                    </label>
+                    <input 
+                      type="range" 
+                      name="batteryHealth" 
+                      min="70" 
+                      max="100" 
+                      value={batteryHealth}
+                      onChange={(e) => setBatteryHealth(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-100 dark:bg-slate-900 rounded-lg appearance-none cursor-pointer accent-brand-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button type="button" onClick={() => setEditingDevice(null)} className="flex-1 py-3 font-semibold text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-600">Cancel</button>
+                <button type="submit" className="flex-[2] py-4 bg-brand-600 text-white font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg">Update Record</button>
               </div>
             </form>
           </div>

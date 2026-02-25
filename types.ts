@@ -12,6 +12,7 @@ export interface Device {
   purchasePrice: number;
   purchasedFrom: string;
   purchaseDate: string;
+  batteryHealth?: number;
   status: DeviceStatus;
   dateAdded: string;
 }
@@ -43,6 +44,8 @@ export interface AppState {
   exchangeRate: number;
   buyRate: number;
   sellRate: number;
+  bankRate: number;
+  prevExchangeRate: number;
   customModels: { [key in Brand]: string[] };
   syncSettings?: {
     githubToken?: string;
