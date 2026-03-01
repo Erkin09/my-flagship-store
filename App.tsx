@@ -453,12 +453,16 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, aiStructuredData: undefined }));
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error(state.language === 'ru' ? 'API ключ не найден в системе' : 'API Key not found in system');
+      // Use the injected key or a fallback if available in the environment
+      const apiKey = process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
+      
+      if (!apiKey || apiKey === 'undefined' || apiKey === '') {
+        // If no key is found, we'll try to proceed but warn in console
+        // In some environments, the key might be injected globally
+        console.warn('GEMINI_API_KEY not found, attempting with environment defaults');
       }
 
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ apiKey: apiKey || '' });
       
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
@@ -677,6 +681,36 @@ const App: React.FC = () => {
     reader.readAsText(file);
     // Reset input
     event.target.value = '';
+  };
+
+  const recoverLegacyData = () => {
+    const versions = ['flagship_hub', 'flagship_hub_v1', 'flagship_hub_v2', 'flagship_hub_v3', 'flagship_hub_v4', 'flagship_hub_v5', 'flagship_hub_v6'];
+    let found = false;
+
+    for (const v of versions) {
+      const data = localStorage.getItem(v);
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.devices || parsed.sales) {
+            if (confirm(state.language === 'ru' 
+              ? `Найдена старая версия данных (${v}). Восстановить её? Текущие данные будут заменены.` 
+              : `Found legacy data version (${v}). Restore it? Current data will be replaced.`)) {
+              setState(prev => ({ ...prev, ...parsed }));
+              alert(state.language === 'ru' ? 'Данные успешно восстановлены!' : 'Data successfully restored!');
+              found = true;
+              break;
+            }
+          }
+        } catch (e) {
+          console.error(`Failed to parse legacy data from ${v}`, e);
+        }
+      }
+    }
+
+    if (!found) {
+      alert(state.language === 'ru' ? 'Старые версии данных не найдены в этом браузере.' : 'No legacy data versions found in this browser.');
+    }
   };
 
   // Logic Helpers
@@ -1683,6 +1717,16 @@ const App: React.FC = () => {
                               <span>{t.importData}</span>
                             </motion.button>
                           </div>
+
+                          <motion.button 
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={recoverLegacyData}
+                            className="flex items-center justify-center space-x-2 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-4 py-4 rounded-2xl hover:bg-amber-100 transition-all font-semibold uppercase text-[10px] tracking-widest border border-amber-100 dark:border-amber-800/50"
+                          >
+                            <RotateCcw size={14} />
+                            <span>{state.language === 'ru' ? 'Найти старые данные' : 'Find Legacy Data'}</span>
+                          </motion.button>
                        </div>
                     </div>
                  </div>
