@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { Device, Sale, AppState, Brand, Storage } from './types';
 import { translations, IPHONE_MODELS, SAMSUNG_MODELS, STORAGE_OPTIONS } from './constants';
 import { 
@@ -39,9 +39,11 @@ import {
   Edit,
   Trash2,
   CheckCircle,
-  Download
+  Download,
+  ShieldCheck,
+  Upload
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
 
 // --- Utility Functions ---
@@ -121,6 +123,8 @@ const App: React.FC = () => {
       bankRate: 12150,
       prevExchangeRate: 12195,
       customModels: { iPhone: [], Samsung: [] },
+      aiChatHistory: [],
+      aiStructuredData: null,
       syncSettings: {
         githubToken: '',
         repoName: '',
@@ -131,7 +135,14 @@ const App: React.FC = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return { ...defaults, ...parsed };
+        return { 
+          ...defaults, 
+          ...parsed,
+          devices: Array.isArray(parsed.devices) ? parsed.devices : [],
+          sales: Array.isArray(parsed.sales) ? parsed.sales : [],
+          aiChatHistory: Array.isArray(parsed.aiChatHistory) ? parsed.aiChatHistory : [],
+          customModels: parsed.customModels || defaults.customModels
+        };
       } catch (e) {
         console.error("Failed to parse saved state", e);
       }
@@ -432,70 +443,240 @@ const App: React.FC = () => {
     }
   };
 
+  const [aiUserMessage, setAiUserMessage] = useState('');
+
   const generateAiAnalytics = async () => {
+    if (isGeneratingAi) return;
     setIsGeneratingAi(true);
+    
+    // Clear previous data to show loading state clearly
+    setState(prev => ({ ...prev, aiStructuredData: undefined }));
+
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error(state.language === 'ru' ? 'API ключ не найден в системе' : 'API Key not found in system');
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
       
-      // Prepare rich data for AI
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
       
+      // Prepare data for AI
       const recentSales = state.sales.filter(s => new Date(s.date) >= thirtyDaysAgo);
       const totalRevenue = recentSales.reduce((sum, s) => sum + s.salePrice, 0);
+      const totalProfit = recentSales.reduce((sum, s) => {
+        const dev = state.devices.find(d => d.id === s.deviceId);
+        return sum + (s.salePrice - (dev?.purchasePrice || 0));
+      }, 0);
       
-      const inventorySummary = state.devices
-        .filter(d => d.status === 'In Stock')
-        .map(d => `${d.brand} ${d.model} (${d.storage}) - Закупка: $${d.purchasePrice}`)
+      const inventory = state.devices.filter(d => d.status === 'In Stock');
+      const stockValue = inventory.reduce((sum, d) => sum + d.purchasePrice, 0);
+      
+      const inventorySummary = inventory
+        .slice(0, 20) // Limit to avoid token limits
+        .map(d => `${d.brand} ${d.model} (${d.storage}) - $${d.purchasePrice}`)
         .join('\n');
         
-      const salesHistory = recentSales.map(s => {
-        const device = state.devices.find(d => d.id === s.deviceId);
-        const profit = s.salePrice - (device?.purchasePrice || 0);
-        return `- ${s.date}: ${device?.model} (${device?.storage}). Продажа: $${s.salePrice}, Профит: $${profit}. Статус: ${s.status}`;
-      }).join('\n');
+      const salesHistory = recentSales
+        .slice(0, 20)
+        .map(s => {
+          const device = state.devices.find(d => d.id === s.deviceId);
+          return `- ${s.date}: ${device?.model} ($${s.salePrice})`;
+        }).join('\n');
       
-      const prompt = `
-        Ты — ведущий бизнес-консультант по рынку Б/У смартфонов (iPhone и Samsung S-серии).
-        Твоя задача: провести глубокий аудит оборота и прибыльности магазина "Flagship Hub" за последние 30 дней.
-        
-        ДАННЫЕ ДЛЯ АНАЛИЗА:
-        - Общий оборот за 30 дней: $${totalRevenue.toLocaleString()}
-        - Количество сделок за период: ${recentSales.length}
-        
-        ДЕТАЛЬНАЯ ИСТОРИЯ ПРОДАЖ (ТРЕНДЫ):
-        ${salesHistory || 'Продаж за последние 30 дней не зафиксировано.'}
-        
-        ТЕКУЩИЕ ОСТАТКИ НА СКЛАДЕ (ЗАМОРОЖЕННЫЙ КАПИТАЛ):
-        ${inventorySummary || 'Склад пуст.'}
-        
-        ЗАДАЧА:
-        1. ТРЕНДЫ: Какие модели продаются быстрее всего и приносят больше маржи?
-        2. ОБОРОТ: Оцени скорость оборачиваемости капитала. Где деньги "зависли"?
-        3. СТРАТЕГИЯ ЗАКУПОК: Основываясь на продажах, что СРОЧНО нужно докупить (например, iPhone 13 или S23 Ultra), а что стало "неликвидом"?
-        4. ФИНАНСОВЫЙ СОВЕТ: Как увеличить чистую прибыль на следующей неделе, исходя из текущего спроса?
-        
-        ТРЕБОВАНИЯ:
-        - Ответ СТРОГО на русском.
-        - Используй цифры из предоставленных данных для аргументации.
-        - Формат: Профессиональный Markdown отчет.
-      `;
+      const prompt = `Анализ магазина электроники "Flagship Hub".
+      Текущие показатели (30 дней):
+      - Выручка: $${totalRevenue}
+      - Чистая прибыль: $${totalProfit}
+      - Количество продаж: ${recentSales.length}
+      - Стоимость склада: $${stockValue}
+      - Устройств в наличии: ${inventory.length}
+      
+      История продаж:
+      ${salesHistory || 'Нет продаж за период'}
+      
+      Текущий склад (выборка):
+      ${inventorySummary || 'Склад пуст'}
+      
+      Проанализируй данные и верни JSON.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: prompt,
         config: {
-          systemInstruction: "Ты — финансовый аналитик в сфере ритейла электроники. Ты анализируешь цифры продаж и остатков, чтобы давать советы по оптимизации оборотного капитала и увеличению ROI. Ответы всегда на русском.",
+          systemInstruction: `Ты — ведущий бизнес-аналитик. Твоя цель — помочь владельцу магазина смартфонов увеличить прибыль.
+          
+          ОБЯЗАТЕЛЬНО верни JSON объект:
+          {
+            "summary": "Глубокий анализ текущей ситуации (2-3 абзаца). Упомяни тренды и аномалии.",
+            "stats": [
+              {"label": "ROI", "value": "XX%"},
+              {"label": "Средний чек", "value": "$XXX"},
+              {"label": "Оборачиваемость", "value": "X дней"},
+              {"label": "Маржа", "value": "XX%"}
+            ],
+            "chartData": [{"name": "iPhone 15", "value": 5}, {"name": "S24 Ultra", "value": 3}],
+            "brandData": [{"name": "Apple", "value": 5000}, {"name": "Samsung", "value": 3000}],
+            "profitTrend": [{"date": "01.02", "profit": 200}, {"date": "02.02", "profit": 450}],
+            "recommendations": [
+              "Конкретный совет по закупкам",
+              "Совет по ценообразованию",
+              "Маркетинговая идея"
+            ]
+          }
+          
+          Язык: Русский. Тон: Профессиональный, экспертный.`,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              summary: { type: Type.STRING },
+              stats: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    label: { type: Type.STRING },
+                    value: { type: Type.STRING }
+                  }
+                }
+              },
+              chartData: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    name: { type: Type.STRING },
+                    value: { type: Type.NUMBER }
+                  }
+                }
+              },
+              brandData: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    name: { type: Type.STRING },
+                    value: { type: Type.NUMBER }
+                  }
+                }
+              },
+              profitTrend: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    date: { type: Type.STRING },
+                    profit: { type: Type.NUMBER }
+                  }
+                }
+              },
+              recommendations: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
+              }
+            },
+            required: ["summary", "stats", "chartData", "brandData", "profitTrend", "recommendations"]
+          }
         }
       });
 
-      setAiReport(response.text || 'No report generated');
-    } catch (error) {
-      console.error(error);
-      setAiReport(state.language === 'ru' ? 'Ошибка генерации отчета. Проверьте подключение.' : 'Failed to generate report. Check connection.');
+      if (!response.text) {
+        throw new Error(state.language === 'ru' ? 'ИИ не вернул текст ответа' : 'AI returned no text');
+      }
+      
+      try {
+        const result = JSON.parse(response.text);
+        setState(prev => ({ ...prev, aiStructuredData: result }));
+      } catch (parseError) {
+        console.error('JSON Parse Error:', response.text);
+        throw new Error(state.language === 'ru' ? 'Ошибка обработки данных от ИИ' : 'Error processing AI data');
+      }
+    } catch (error: any) {
+      console.error('AI Error:', error);
+      alert(error.message || 'Error generating analytics');
     } finally {
       setIsGeneratingAi(false);
     }
+  };
+
+  const sendAiMessage = async () => {
+    if (!aiUserMessage.trim()) return;
+    const userMsg = aiUserMessage;
+    setAiUserMessage('');
+    
+    const newHistory: { role: 'user' | 'model', text: string }[] = [...(state.aiChatHistory || []), { role: 'user' as const, text: userMsg }];
+    setState(prev => ({ ...prev, aiChatHistory: newHistory }));
+
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) return;
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const chat = ai.chats.create({
+        model: "gemini-3-flash-preview",
+        config: {
+          systemInstruction: "Ты помощник владельца магазина смартфонов. Отвечай четко, по делу, без лишних символов и звездочек. Используй данные магазина если нужно."
+        }
+      });
+
+      // Send context with the first message if history is short
+      const context = `Данные магазина: Продаж за 30 дней: ${state.sales.length}, На складе: ${state.devices.filter(d=>d.status==='In Stock').length}.`;
+      const response = await chat.sendMessage({ message: `${context}\n\nВопрос пользователя: ${userMsg}` });
+      
+      setState(prev => ({
+        ...prev,
+        aiChatHistory: [...(prev.aiChatHistory || []), { role: 'model' as const, text: response.text || '' }]
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const exportData = () => {
+    try {
+      const dataStr = JSON.stringify(state, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const exportFileDefaultName = `flagship_hub_backup_${new Date().toISOString().split('T')[0]}.json`;
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    } catch (error) {
+      console.error('Export error:', error);
+      alert(state.language === 'ru' ? 'Ошибка при экспорте данных' : 'Error exporting data');
+    }
+  };
+
+  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const importedState = JSON.parse(content);
+        
+        // Basic validation
+        if (!importedState.devices || !importedState.sales) {
+          throw new Error('Invalid data format');
+        }
+
+        if (confirm(state.language === 'ru' ? 'Вы уверены? Это заменит все текущие данные.' : 'Are you sure? This will replace all current data.')) {
+          setState(importedState);
+          alert(state.language === 'ru' ? 'Данные успешно импортированы' : 'Data imported successfully');
+        }
+      } catch (error) {
+        console.error('Import error:', error);
+        alert(state.language === 'ru' ? 'Ошибка при импорте данных. Неверный формат файла.' : 'Error importing data. Invalid file format.');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input
+    event.target.value = '';
   };
 
   // Logic Helpers
@@ -754,7 +935,7 @@ const App: React.FC = () => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-r border-slate-100 dark:border-slate-800 flex flex-col p-4 space-y-1 transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen
+        fixed inset-y-0 left-0 z-50 w-64 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-r border-slate-100 dark:border-slate-800 flex flex-col p-4 space-y-1 transition-transform duration-300 lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex items-center justify-between px-3 py-8 mb-4">
@@ -1094,35 +1275,189 @@ const App: React.FC = () => {
 
              <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
                 <div className="flex items-center justify-between mb-8">
-                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                     <TrendingUp size={14} className="text-brand-500" />
-                     {state.language === 'ru' ? 'ИИ Аналитика и Советы' : 'AI Analytics & Insights'}
-                   </h3>
-                   <motion.button 
-                     whileHover={{ scale: 1.02 }}
-                     whileTap={{ scale: 0.98 }}
-                     onClick={generateAiAnalytics}
-                     disabled={isGeneratingAi}
-                     className="flex items-center space-x-2 bg-brand-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest disabled:opacity-50"
-                   >
-                     {isGeneratingAi ? <RefreshCw size={12} className="animate-spin" /> : <Plus size={12} />}
-                     <span>{state.language === 'ru' ? 'Сгенерировать отчет' : 'Generate Report'}</span>
-                   </motion.button>
-                </div>
-                
-                {aiReport ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <div className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
-                      {aiReport}
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <BarChart3 size={20} className="text-brand-500" />
+                        AI Analytics Pro
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-1">Интеллектуальный анализ вашего бизнеса</p>
                     </div>
-                  </div>
-                ) : (
-                  <div className="py-12 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl">
-                    <TrendingUp size={32} className="mx-auto mb-4 text-slate-200 dark:text-slate-700" />
-                    <p className="text-xs font-medium text-slate-400">{state.language === 'ru' ? 'Нажмите кнопку выше, чтобы получить советы от ИИ' : 'Click the button above to get AI insights'}</p>
-                  </div>
-                )}
-             </div>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={generateAiAnalytics}
+                      disabled={isGeneratingAi}
+                      className="flex items-center space-x-2 bg-brand-600 text-white px-6 py-3 rounded-2xl text-xs font-bold shadow-lg shadow-brand-500/20 disabled:opacity-50"
+                    >
+                      {isGeneratingAi ? <RefreshCw size={14} className="animate-spin" /> : <Plus size={14} />}
+                      <span>{isGeneratingAi ? 'Анализирую...' : 'Обновить анализ'}</span>
+                    </motion.button>
+                 </div>
+                 
+                 {state.aiStructuredData && state.aiStructuredData.stats && state.aiStructuredData.chartData ? (
+                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                     {/* Left Column: Summary & Main Stats */}
+                     <div className="lg:col-span-3 space-y-8">
+                       <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800">
+                         <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                           <Info size={14} className="text-brand-500" />
+                           Обзор бизнеса
+                         </h4>
+                         <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                           {state.aiStructuredData.summary}
+                         </p>
+                       </div>
+
+                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                         {state.aiStructuredData.stats.map((stat, i) => (
+                           <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">{stat.label}</p>
+                             <p className="text-xl font-bold text-brand-600 tracking-tight">{stat.value}</p>
+                           </div>
+                         ))}
+                       </div>
+
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">Продажи по моделям</h4>
+                            <div className="h-64">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={state.aiStructuredData.chartData || []}>
+                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.05} />
+                                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                  <Tooltip 
+                                    contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '16px', fontSize: '11px', color: '#fff' }}
+                                  />
+                                  <Bar dataKey="value" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={30} />
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+
+                          <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">Тренд прибыли</h4>
+                            <div className="h-64">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={state.aiStructuredData.profitTrend || []}>
+                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.05} />
+                                  <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                  <Tooltip 
+                                    contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '16px', fontSize: '11px', color: '#fff' }}
+                                  />
+                                  <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                       </div>
+
+                       <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                          <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8">Распределение капитала по брендам</h4>
+                          <div className="h-64 flex items-center justify-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={state.aiStructuredData.brandData || []}
+                                  cx="50%"
+                                  cy="50%"
+                                  innerRadius={60}
+                                  outerRadius={80}
+                                  paddingAngle={5}
+                                  dataKey="value"
+                                >
+                                  {(state.aiStructuredData.brandData || []).map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={index === 0 ? '#6366f1' : '#10b981'} />
+                                  ))}
+                                </Pie>
+                                <Tooltip 
+                                  contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '16px', fontSize: '11px', color: '#fff' }}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="flex flex-col gap-2 ml-4">
+                               {(state.aiStructuredData.brandData || []).map((entry, index) => (
+                                 <div key={index} className="flex items-center gap-2">
+                                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: index === 0 ? '#6366f1' : '#10b981' }} />
+                                   <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{entry.name}: ${entry.value.toLocaleString()}</span>
+                                 </div>
+                               ))}
+                            </div>
+                          </div>
+                       </div>
+                     </div>
+
+                     {/* Right Column: Recommendations & Chat */}
+                     <div className="space-y-8">
+                        <div className="bg-brand-600 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-brand-500/30">
+                          <h4 className="text-base font-bold mb-6 flex items-center gap-2">
+                            <CheckCircle size={20} />
+                            Рекомендации
+                          </h4>
+                          <ul className="space-y-4">
+                            {state.aiStructuredData.recommendations?.map((rec, i) => (
+                              <li key={i} className="text-sm flex gap-3 leading-snug">
+                                <span className="shrink-0 w-5 h-5 bg-white/20 rounded-full flex items-center justify-center text-[10px] font-bold">{i+1}</span>
+                                <span>{rec}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col h-[550px]">
+                          <h4 className="text-sm font-bold mb-6 flex items-center gap-2">
+                            <Menu size={18} className="text-brand-500" />
+                            Чат с ИИ
+                          </h4>
+                          <div className="flex-1 overflow-y-auto space-y-4 mb-6 pr-2 no-scrollbar">
+                            {state.aiChatHistory?.length === 0 && (
+                              <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-40">
+                                <Smartphone size={32} className="text-slate-400 mb-4" />
+                                <p className="text-xs font-medium">Задайте вопрос о продажах или стратегии развития</p>
+                              </div>
+                            )}
+                            {state.aiChatHistory?.map((msg, i) => (
+                              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[90%] p-4 rounded-3xl text-xs leading-relaxed shadow-sm ${
+                                  msg.role === 'user' 
+                                    ? 'bg-brand-600 text-white rounded-tr-none' 
+                                    : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-tl-none'
+                                }`}>
+                                  {msg.text}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex gap-3">
+                            <input 
+                              type="text" 
+                              value={aiUserMessage}
+                              onChange={(e) => setAiUserMessage(e.target.value)}
+                              onKeyPress={(e) => e.key === 'Enter' && sendAiMessage()}
+                              placeholder="Спроси аналитика..."
+                              className="flex-1 px-5 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-xs font-semibold border border-transparent focus:border-brand-500/30 transition-all"
+                            />
+                            <button 
+                              onClick={sendAiMessage}
+                              className="p-3 bg-brand-600 text-white rounded-2xl hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 active:scale-95"
+                            >
+                              <ArrowRightLeft size={18} />
+                            </button>
+                          </div>
+                        </div>
+                     </div>
+                   </div>
+                 ) : (
+                   <div className="py-20 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[2.5rem]">
+                     <div className="w-20 h-20 bg-brand-50 dark:bg-brand-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                       <BarChart3 className="text-brand-600" size={40} />
+                     </div>
+                     <h4 className="text-lg font-bold mb-2">Аналитика Pro готова</h4>
+                     <p className="text-xs font-medium text-slate-400 max-w-xs mx-auto">Нажмите кнопку выше, чтобы получить глубокий анализ с графиками и рекомендациями</p>
+                   </div>
+                 )}
+              </div>
           </div>
         )}
 
@@ -1309,7 +1644,50 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Models Management Card */}
+                 {/* Backup & Restore Card */}
+                 <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center">
+                      <ShieldCheck className="mr-2 text-brand-500 opacity-70" size={16} />
+                      {state.language === 'ru' ? 'Резервное копирование' : 'Backup & Recovery'}
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
+                       <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                         {state.language === 'ru' 
+                           ? 'Экспортируйте данные в файл JSON для локального хранения или импортируйте их из ранее созданной копии.' 
+                           : 'Export your data to a JSON file for local storage or import it from a previously created backup.'}
+                       </p>
+                       <div className="flex flex-col gap-3">
+                          <motion.button 
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={exportData}
+                            className="flex items-center justify-center space-x-2 bg-slate-900 dark:bg-slate-700 text-white px-4 py-4 rounded-2xl hover:bg-slate-800 transition-all font-semibold uppercase text-[10px] tracking-widest shadow-lg"
+                          >
+                            <Download size={14} />
+                            <span>{t.exportData}</span>
+                          </motion.button>
+                          
+                          <div className="relative">
+                            <input 
+                              type="file" 
+                              accept=".json" 
+                              onChange={importData} 
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                            />
+                            <motion.button 
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="w-full flex items-center justify-center space-x-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-4 rounded-2xl hover:bg-slate-200 transition-all font-semibold uppercase text-[10px] tracking-widest border border-dashed border-slate-300 dark:border-slate-700"
+                            >
+                              <Upload size={14} />
+                              <span>{t.importData}</span>
+                            </motion.button>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Models Management Card */}
                 <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
                    <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center">
                      <Database className="mr-2 text-brand-500 opacity-70" size={16} />
@@ -1447,7 +1825,7 @@ const App: React.FC = () => {
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={restoreFromGithub}
+                          onClick={() => restoreFromGithub()}
                           className="flex items-center justify-center space-x-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 px-4 py-4 rounded-2xl hover:bg-slate-200 transition-all font-semibold uppercase text-[10px] tracking-widest"
                         >
                           <Download size={14} />
@@ -1456,7 +1834,7 @@ const App: React.FC = () => {
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={syncToGithub}
+                          onClick={() => syncToGithub()}
                           className="flex items-center justify-center space-x-2 bg-brand-600 text-white px-4 py-4 rounded-2xl hover:bg-brand-700 transition-all font-semibold uppercase text-[10px] tracking-widest shadow-lg shadow-brand-500/20"
                         >
                           <RefreshCw size={14} />

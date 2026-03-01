@@ -75,7 +75,9 @@ export const translations = {
     lastSync: 'Last Sync',
     models: 'Models Management',
     addDebtor: 'Add Debtor',
-    restore: 'Restore'
+    restore: 'Restore',
+    exportData: 'Export Data',
+    importData: 'Import Data'
   },
   ru: {
     dashboard: 'Главная',
@@ -132,6 +134,8 @@ export const translations = {
     lastSync: 'Посл. синхронизация',
     models: 'Управление моделями',
     addDebtor: 'Добавить должника',
-    restore: 'Восстановить'
+    restore: 'Восстановить',
+    exportData: 'Экспорт данных',
+    importData: 'Импорт данных'
   }
 };

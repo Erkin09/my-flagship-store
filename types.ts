@@ -47,6 +47,15 @@ export interface AppState {
   bankRate: number;
   prevExchangeRate: number;
   customModels: { [key in Brand]: string[] };
+  aiChatHistory?: { role: 'user' | 'model', text: string }[];
+  aiStructuredData?: {
+    summary: string;
+    stats: { label: string, value: string | number }[];
+    chartData: { name: string, value: number }[];
+    brandData: { name: string, value: number }[];
+    profitTrend: { date: string, profit: number }[];
+    recommendations: string[];
+  };
   syncSettings?: {
     githubToken?: string;
     repoName?: string;
