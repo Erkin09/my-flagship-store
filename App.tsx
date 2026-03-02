@@ -197,22 +197,30 @@ const App: React.FC = () => {
       const res = await fetch('https://open.er-api.com/v6/latest/USD');
       const data = await res.json();
       
-      // Fetch Bank Rate (CBU Uzbekistan)
-      const cbuRes = await fetch('https://cbu.uz/ru/arkhiv-kursov-valyut/json/');
-      const cbuData = await cbuRes.json();
-      const usdBank = cbuData.find((item: any) => item.Ccy === 'USD');
-      const newBankRate = usdBank ? Math.round(Number(usdBank.Rate)) : 0;
+      // Fetch Bank Rate (CBU Uzbekistan) - wrapped in try-catch to prevent blocking
+      let newBankRate = 0;
+      try {
+        const cbuRes = await fetch('https://cbu.uz/ru/arkhiv-kursov-valyut/json/');
+        if (cbuRes.ok) {
+          const cbuData = await cbuRes.json();
+          const usdBank = cbuData.find((item: any) => item.Ccy === 'USD');
+          newBankRate = usdBank ? Math.round(Number(usdBank.Rate)) : 0;
+        }
+      } catch (e) {
+        console.warn('CBU rate fetch failed (likely CORS), using market rate only');
+      }
 
       if (data && data.rates && data.rates.UZS) {
         const newRate = Math.round(data.rates.UZS);
         setState(prev => {
-          // We use the user's requested market offsets
-          // User said 12170 to 12220 (diff is 50, mid is 12195)
-          // So buy = mid - 25, sell = mid + 25
           const buyOffset = 25;
           const sellOffset = 25;
 
-          if (Math.abs(prev.exchangeRate - newRate) > 1 || prev.exchangeRate === 1 || prev.bankRate !== newBankRate) {
+          // Only update if there's a meaningful change to avoid unnecessary re-renders
+          const hasRateChanged = Math.abs(prev.exchangeRate - newRate) >= 1;
+          const hasBankRateChanged = newBankRate > 0 && prev.bankRate !== newBankRate;
+
+          if (hasRateChanged || hasBankRateChanged || prev.exchangeRate === 1) {
             return { 
               ...prev, 
               prevExchangeRate: prev.exchangeRate,
@@ -461,11 +469,16 @@ const App: React.FC = () => {
 
     try {
       // Prioritize manually entered key, then user-selected key from platform dialog, then environment key
-      const apiKey = state.geminiApiKey || process.env.API_KEY || process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
+      let apiKey = state.geminiApiKey || process.env.API_KEY || process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
       
       if (!apiKey || apiKey === 'undefined' || apiKey === '') {
         const hasSelected = await (window as any).aistudio?.hasSelectedApiKey?.();
-        if (!hasSelected) {
+        if (hasSelected) {
+          // Re-read from process.env after selection as it might have been injected
+          apiKey = process.env.API_KEY || (window as any).GEMINI_API_KEY;
+        }
+        
+        if (!apiKey || apiKey === 'undefined' || apiKey === '') {
           alert(state.language === 'ru' 
             ? 'API ключ не найден. Пожалуйста, введите его вручную в настройках или нажмите "Выбрать API ключ".' 
             : 'API key not found. Please enter it manually in settings or click "Select API Key".');
@@ -474,7 +487,7 @@ const App: React.FC = () => {
         }
       }
 
-      const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
@@ -635,8 +648,11 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, aiChatHistory: newHistory }));
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) return;
+      const apiKey = state.geminiApiKey || process.env.API_KEY || process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
+      if (!apiKey) {
+        alert(state.language === 'ru' ? 'API ключ не найден' : 'API key not found');
+        return;
+      }
       const ai = new GoogleGenAI({ apiKey });
       
       const chat = ai.chats.create({
