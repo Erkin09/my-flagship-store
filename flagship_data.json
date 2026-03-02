@@ -547,6 +547,20 @@
   ],
   "sales": [
     {
+      "id": "a923dda1-c504-432e-8bf3-93ffa25b4c37",
+      "customerName": "Nafisa",
+      "customerPhone": "907171506",
+      "salePrice": 50,
+      "date": "2026-03-02T11:46:44.804Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:46:44.804Z"
+      }
+    },
+    {
       "id": "38140be1-2240-427e-a5b6-833d8f6d1966",
       "customerName": "Malika Ergasheva",
       "customerPhone": "933130039",
@@ -699,6 +713,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T11:43:33.721Z"
+    "lastSync": "2026-03-02T11:44:11.812Z"
   }
 }
