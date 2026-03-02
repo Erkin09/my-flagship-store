@@ -547,6 +547,20 @@
   ],
   "sales": [
     {
+      "id": "45fcdbbb-6421-4f7c-a673-86819fb590c1",
+      "customerName": "Sitora",
+      "customerPhone": "7777",
+      "salePrice": 536,
+      "date": "2026-03-02T11:43:27.072Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:43:27.072Z"
+      }
+    },
+    {
       "id": "f0b7ce08-61d1-470d-a7ae-a5ba37317c61",
       "customerName": "Feruz Nor aka",
       "customerPhone": "1303",
@@ -671,6 +685,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T11:41:54.800Z"
+    "lastSync": "2026-03-02T11:42:29.351Z"
   }
 }
