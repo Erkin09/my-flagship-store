@@ -63,4 +63,5 @@ export interface AppState {
     lastSync?: string;
     autoSync?: boolean;
   };
+  geminiApiKey?: string;
 }

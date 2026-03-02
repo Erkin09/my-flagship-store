@@ -130,6 +130,7 @@ const App: React.FC = () => {
       customModels: { iPhone: [], Samsung: [] },
       aiChatHistory: [],
       aiStructuredData: null,
+      geminiApiKey: '',
       syncSettings: {
         githubToken: '',
         repoName: '',
@@ -146,7 +147,8 @@ const App: React.FC = () => {
           devices: Array.isArray(parsed.devices) ? parsed.devices : [],
           sales: Array.isArray(parsed.sales) ? parsed.sales : [],
           aiChatHistory: Array.isArray(parsed.aiChatHistory) ? parsed.aiChatHistory : [],
-          customModels: parsed.customModels || defaults.customModels
+          customModels: parsed.customModels || defaults.customModels,
+          geminiApiKey: parsed.geminiApiKey || ''
         };
       } catch (e) {
         console.error("Failed to parse saved state", e);
@@ -458,15 +460,15 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, aiStructuredData: undefined }));
 
     try {
-      // Prioritize user-selected key from platform dialog, then environment key
-      const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
+      // Prioritize manually entered key, then user-selected key from platform dialog, then environment key
+      const apiKey = state.geminiApiKey || process.env.API_KEY || process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
       
       if (!apiKey || apiKey === 'undefined' || apiKey === '') {
         const hasSelected = await (window as any).aistudio?.hasSelectedApiKey?.();
         if (!hasSelected) {
           alert(state.language === 'ru' 
-            ? 'API ключ не найден. Пожалуйста, нажмите "Выбрать API ключ" в настройках или получите его на aistudio.google.com' 
-            : 'API key not found. Please click "Select API Key" in settings or get one at aistudio.google.com');
+            ? 'API ключ не найден. Пожалуйста, введите его вручную в настройках или нажмите "Выбрать API ключ".' 
+            : 'API key not found. Please enter it manually in settings or click "Select API Key".');
           setIsGeneratingAi(false);
           return;
         }
@@ -1890,6 +1892,23 @@ const App: React.FC = () => {
                    </p>
 
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                          <Key size={12} className="text-brand-500" /> {state.language === 'ru' ? 'Персональный API Ключ Gemini (Ручной ввод)' : 'Personal Gemini API Key (Manual)'}
+                        </label>
+                        <input 
+                          type="password" 
+                          placeholder="AI Studio API Key" 
+                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
+                          value={state.geminiApiKey || ''}
+                          onChange={(e) => setState(s => ({ ...s, geminiApiKey: e.target.value }))}
+                        />
+                        <p className="text-[9px] text-slate-500 ml-1">
+                          {state.language === 'ru' 
+                            ? 'Используйте этот вариант, если системный выбор ключа недоступен.' 
+                            : 'Use this option if the system key selection is unavailable.'}
+                        </p>
+                      </div>
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
                           <Key size={12} className="text-brand-500" /> {t.githubToken}
