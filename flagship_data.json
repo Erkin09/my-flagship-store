@@ -547,6 +547,20 @@
   ],
   "sales": [
     {
+      "id": "38140be1-2240-427e-a5b6-833d8f6d1966",
+      "customerName": "Malika Ergasheva",
+      "customerPhone": "933130039",
+      "salePrice": 42,
+      "date": "2026-03-02T11:44:05.171Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:44:05.171Z"
+      }
+    },
+    {
       "id": "45fcdbbb-6421-4f7c-a673-86819fb590c1",
       "customerName": "Sitora",
       "customerPhone": "7777",
@@ -685,6 +699,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T11:42:29.351Z"
+    "lastSync": "2026-03-02T11:43:33.721Z"
   }
 }
