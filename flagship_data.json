@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "9ed2afb7-9fce-4ca0-822c-370313bc33aa",
+      "brand": "Samsung",
+      "model": "Galaxy S22+",
+      "storage": "256Gb",
+      "imei": "350865890865217",
+      "purchasePrice": 200,
+      "purchasedFrom": "Client",
+      "purchaseDate": "2025-07-01",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:52:48.667Z"
+    },
+    {
       "id": "e7d20459-bcee-4c6a-9eb7-02dabad0d428",
       "brand": "Samsung",
       "model": "Galaxy S22",
@@ -166,6 +178,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T09:49:16.504Z"
+    "lastSync": "2026-03-02T09:51:29.107Z"
   }
 }
