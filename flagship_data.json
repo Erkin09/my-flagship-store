@@ -545,7 +545,22 @@
       "dateAdded": "2026-03-02T08:13:13.080Z"
     }
   ],
-  "sales": [],
+  "sales": [
+    {
+      "id": "1a18ef07-788a-4bb0-8610-c6d9cd45d9f2",
+      "customerName": "Feruz Bekki usto",
+      "customerPhone": "991537078",
+      "salePrice": 108,
+      "date": "2026-03-02T11:38:45.864Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:38:45.864Z"
+      }
+    }
+  ],
   "language": "en",
   "theme": "light",
   "cashBalance": 0,
@@ -614,6 +629,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T11:04:53.902Z"
+    "lastSync": "2026-03-02T11:34:40.003Z"
   }
 }
