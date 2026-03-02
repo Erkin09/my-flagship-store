@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "39b10ef0-a1b9-4cac-a7fc-ee18534c888a",
+      "brand": "Samsung",
+      "model": "Galaxy S21+",
+      "storage": "256Gb",
+      "imei": "353561330570015",
+      "purchasePrice": 260,
+      "purchasedFrom": "Abdulaziz",
+      "purchaseDate": "2025-10-16",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:49:10.063Z"
+    },
+    {
       "id": "8ceb5417-7a8f-4155-972d-e584f40fde8f",
       "brand": "Samsung",
       "model": "Galaxy S23",
@@ -142,6 +154,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T09:39:58.826Z"
+    "lastSync": "2026-03-02T09:46:51.378Z"
   }
 }
