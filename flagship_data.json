@@ -2,23 +2,23 @@
   "devices": [],
   "sales": [],
   "language": "ru",
-  "theme": "light",
+  "theme": "dark",
   "cashBalance": 0,
   "exchangeRate": 12204,
   "buyRate": 12179,
   "sellRate": 12229,
   "bankRate": 12172,
-  "prevExchangeRate": 12168,
+  "prevExchangeRate": 12195,
   "customModels": {
     "iPhone": [],
     "Samsung": []
   },
   "aiChatHistory": [],
-  "geminiApiKey": "Функция выбора ключа недоступна в этом окружении.",
+  "aiStructuredData": null,
+  "geminiApiKey": "",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-03-02T07:33:33.591Z",
     "autoSync": true
   }
 }
