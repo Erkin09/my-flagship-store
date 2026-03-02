@@ -47,7 +47,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { motion, AnimatePresence } from 'motion/react';
 
 // --- Utility Functions ---
-const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substr(2, 9);
+};
 const formatDate = (date: string, lang: string) => 
   new Date(date).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'short' });
 
@@ -453,13 +458,18 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, aiStructuredData: undefined }));
 
     try {
-      // Use the injected key or a fallback if available in the environment
-      const apiKey = process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
+      // Prioritize user-selected key from platform dialog, then environment key
+      const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY || (window as any).GEMINI_API_KEY;
       
       if (!apiKey || apiKey === 'undefined' || apiKey === '') {
-        // If no key is found, we'll try to proceed but warn in console
-        // In some environments, the key might be injected globally
-        console.warn('GEMINI_API_KEY not found, attempting with environment defaults');
+        const hasSelected = await (window as any).aistudio?.hasSelectedApiKey?.();
+        if (!hasSelected) {
+          alert(state.language === 'ru' 
+            ? 'API ключ не найден. Пожалуйста, нажмите "Выбрать API ключ" в настройках или получите его на aistudio.google.com' 
+            : 'API key not found. Please click "Select API Key" in settings or get one at aistudio.google.com');
+          setIsGeneratingAi(false);
+          return;
+        }
       }
 
       const ai = new GoogleGenAI({ apiKey: apiKey || '' });
@@ -468,23 +478,23 @@ const App: React.FC = () => {
       const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
       
       // Prepare data for AI
-      const recentSales = state.sales.filter(s => new Date(s.date) >= thirtyDaysAgo);
+      const recentSales = state.sales.filter(s => new Date(s.date) >= thirtyDaysAgo && s.status === 'Completed');
       const totalRevenue = recentSales.reduce((sum, s) => sum + s.salePrice, 0);
-      const totalProfit = recentSales.reduce((sum, s) => {
-        const dev = state.devices.find(d => d.id === s.deviceId);
-        return sum + (s.salePrice - (dev?.purchasePrice || 0));
+      const totalProfitVal = recentSales.reduce((sum, s) => {
+        const purchasePrice = s.purchasePrice ?? state.devices.find(d => d.id === s.deviceId)?.purchasePrice ?? 0;
+        return sum + (s.salePrice - purchasePrice);
       }, 0);
       
       const inventory = state.devices.filter(d => d.status === 'In Stock');
-      const stockValue = inventory.reduce((sum, d) => sum + d.purchasePrice, 0);
+      const stockValueVal = inventory.reduce((sum, d) => sum + d.purchasePrice, 0);
       
       const inventorySummary = inventory
-        .slice(0, 20) // Limit to avoid token limits
+        .slice(0, 30) // Limit to avoid token limits
         .map(d => `${d.brand} ${d.model} (${d.storage}) - $${d.purchasePrice}`)
         .join('\n');
         
       const salesHistory = recentSales
-        .slice(0, 20)
+        .slice(0, 30)
         .map(s => {
           const device = state.devices.find(d => d.id === s.deviceId);
           return `- ${s.date}: ${device?.model} ($${s.salePrice})`;
@@ -493,9 +503,9 @@ const App: React.FC = () => {
       const prompt = `Анализ магазина электроники "Flagship Hub".
       Текущие показатели (30 дней):
       - Выручка: $${totalRevenue}
-      - Чистая прибыль: $${totalProfit}
+      - Чистая прибыль: $${totalProfitVal}
       - Количество продаж: ${recentSales.length}
-      - Стоимость склада: $${stockValue}
+      - Стоимость склада: $${stockValueVal}
       - Устройств в наличии: ${inventory.length}
       
       История продаж:
@@ -512,7 +522,7 @@ const App: React.FC = () => {
         config: {
           systemInstruction: `Ты — ведущий бизнес-аналитик. Твоя цель — помочь владельцу магазина смартфонов увеличить прибыль.
           
-          ОБЯЗАТЕЛЬНО верни JSON объект:
+          ОБЯЗАТЕЛЬНО верни ТОЛЬКО JSON объект (без markdown разметки):
           {
             "summary": "Глубокий анализ текущей ситуации (2-3 абзаца). Упомяни тренды и аномалии.",
             "stats": [
@@ -592,11 +602,19 @@ const App: React.FC = () => {
       }
       
       try {
-        const result = JSON.parse(response.text);
+        // Robust JSON extraction
+        let jsonStr = response.text.trim();
+        if (jsonStr.startsWith('```json')) {
+          jsonStr = jsonStr.replace(/^```json/, '').replace(/```$/, '').trim();
+        } else if (jsonStr.startsWith('```')) {
+          jsonStr = jsonStr.replace(/^```/, '').replace(/```$/, '').trim();
+        }
+        
+        const result = JSON.parse(jsonStr);
         setState(prev => ({ ...prev, aiStructuredData: result }));
       } catch (parseError) {
         console.error('JSON Parse Error:', response.text);
-        throw new Error(state.language === 'ru' ? 'Ошибка обработки данных от ИИ' : 'Error processing AI data');
+        throw new Error(state.language === 'ru' ? 'Ошибка обработки данных от ИИ: Неверный формат JSON' : 'Error processing AI data: Invalid JSON format');
       }
     } catch (error: any) {
       console.error('AI Error:', error);
@@ -627,7 +645,16 @@ const App: React.FC = () => {
       });
 
       // Send context with the first message if history is short
-      const context = `Данные магазина: Продаж за 30 дней: ${state.sales.length}, На складе: ${state.devices.filter(d=>d.status==='In Stock').length}.`;
+      const context = `
+        Данные магазина:
+        - Продаж за все время: ${state.sales.length}
+        - Товаров в наличии: ${devicesInStock.length}
+        - Общая стоимость склада: $${stockValue.toLocaleString()}
+        - Общая прибыль: $${totalProfit.toLocaleString()}
+        - Касса: $${state.cashBalance.toLocaleString()}
+        - Текущий курс: ${state.exchangeRate} UZS
+        - Должников: ${debtorsList.length} на сумму $${totalDebt.toLocaleString()}
+      `.trim();
       const response = await chat.sendMessage({ message: `${context}\n\nВопрос пользователя: ${userMsg}` });
       
       setState(prev => ({
@@ -714,8 +741,8 @@ const App: React.FC = () => {
   };
 
   // Logic Helpers
-  const devicesInStock = state.devices.filter(d => d.status === 'In Stock');
-  const stockValue = devicesInStock.reduce((acc, d) => acc + d.purchasePrice, 0);
+  const devicesInStock = useMemo(() => state.devices.filter(d => d.status === 'In Stock'), [state.devices]);
+  const stockValue = useMemo(() => devicesInStock.reduce((acc, d) => acc + d.purchasePrice, 0), [devicesInStock]);
   
   const debtorsList = useMemo(() => {
     return state.sales.filter(s => 
@@ -726,15 +753,16 @@ const App: React.FC = () => {
     );
   }, [state.sales]);
 
-  const totalDebt = debtorsList.reduce((acc, s) => acc + (s.salePrice - (s.installmentPlan?.paidAmount || 0)), 0);
-  const totalAssets = stockValue + totalDebt + state.cashBalance;
+  const totalDebt = useMemo(() => debtorsList.reduce((acc, s) => acc + (s.salePrice - (s.installmentPlan?.paidAmount || 0)), 0), [debtorsList]);
+  const totalAssets = useMemo(() => stockValue + totalDebt + state.cashBalance, [stockValue, totalDebt, state.cashBalance]);
 
-  const totalProfit = state.sales
+  const totalProfit = useMemo(() => state.sales
     .filter(s => s.status === 'Completed')
     .reduce((acc, s) => {
-      const device = state.devices.find(d => d.id === s.deviceId);
-      return acc + (s.salePrice - (device?.purchasePrice || 0));
-    }, 0);
+      // Use stored purchase price if available, otherwise find it from current devices (legacy support)
+      const purchasePrice = s.purchasePrice ?? state.devices.find(d => d.id === s.deviceId)?.purchasePrice ?? 0;
+      return acc + (s.salePrice - purchasePrice);
+    }, 0), [state.sales, state.devices]);
 
   // Analytics helper with current year filter
   const chartData = useMemo(() => {
@@ -749,8 +777,8 @@ const App: React.FC = () => {
         return d.getFullYear() === currentYear && d.getMonth() === i && s.status === 'Completed';
       });
       const profit = monthlySales.reduce((acc, s) => {
-        const dev = state.devices.find(d => d.id === s.deviceId);
-        return acc + (s.salePrice - (dev?.purchasePrice || 0));
+        const purchasePrice = s.purchasePrice ?? state.devices.find(d => d.id === s.deviceId)?.purchasePrice ?? 0;
+        return acc + (s.salePrice - purchasePrice);
       }, 0);
       return { name: m, profit, sales: monthlySales.length };
     });
@@ -769,12 +797,17 @@ const App: React.FC = () => {
         return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === day && s.status === 'Completed';
       });
       const profit = dailySales.reduce((acc, s) => {
-        const dev = state.devices.find(d => d.id === s.deviceId);
-        return acc + (s.salePrice - (dev?.purchasePrice || 0));
+        const purchasePrice = s.purchasePrice ?? state.devices.find(d => d.id === s.deviceId)?.purchasePrice ?? 0;
+        return acc + (s.salePrice - purchasePrice);
       }, 0);
       return { name: day.toString(), profit };
     });
   }, [state.sales, state.devices]);
+
+  const filteredDevices = useMemo(() => devicesInStock.filter(d => 
+    d.imei.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    d.model.toLowerCase().includes(searchQuery.toLowerCase())
+  ), [devicesInStock, searchQuery]);
 
   // Handlers
   const addDevice = (e: React.FormEvent<HTMLFormElement>) => {
@@ -833,6 +866,7 @@ const App: React.FC = () => {
       customerName: isInstallment ? formData.get('customerName') as string : "Guest",
       customerPhone: isInstallment ? formData.get('customerPhone') as string : "N/A",
       salePrice: salePrice,
+      purchasePrice: showSellModal.purchasePrice,
       date: new Date().toISOString(),
       isInstallment,
       status: 'Completed',
@@ -946,11 +980,6 @@ const App: React.FC = () => {
     }));
     setShowAddDebtorModal(false);
   };
-
-  const filteredDevices = devicesInStock.filter(d => 
-    d.imei.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    d.model.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="flex min-h-screen bg-[#F9FAFB] dark:bg-[#0B0F19] text-slate-700 dark:text-slate-300 transition-colors duration-500 font-sans selection:bg-brand-500/30">
@@ -1499,27 +1528,51 @@ const App: React.FC = () => {
         {/* ... (Existing tabs logic but with refined typography classes applied) ... */}
         
         {activeTab === 'sales' && (
-           <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm animate-in fade-in duration-500">
-             <div className="overflow-x-auto scrollbar-hide">
-               <table className="w-full text-left min-w-[700px]">
-                 <thead>
-                   <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/60">
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.date}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.model}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.customer}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Дата закупки' : 'Purchase Date'}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.sellingPrice}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.status}</th>
-                     <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
-                   </tr>
-                 </thead>
-                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
-                   {state.sales.map(sale => {
-                     const device = state.devices.find(d => d.id === sale.deviceId);
-                     return (
-                       <tr key={sale.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
+          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  type="text" 
+                  placeholder={state.language === 'ru' ? 'Поиск по клиенту или модели...' : 'Search by customer or model...'}
+                  className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 outline-none shadow-sm focus:ring-2 ring-brand-500/20 transition-all text-sm font-medium"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
+              <div className="overflow-x-auto scrollbar-hide">
+                <table className="w-full text-left min-w-[700px]">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/60">
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.date}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.model}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.customer}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Дата закупки' : 'Purchase Date'}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.sellingPrice}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.status}</th>
+                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                    {state.sales
+                      .filter(s => {
+                        const device = state.devices.find(d => d.id === s.deviceId);
+                        const searchLower = searchQuery.toLowerCase();
+                        return (
+                          s.customerName?.toLowerCase().includes(searchLower) || 
+                          device?.model.toLowerCase().includes(searchLower) ||
+                          device?.imei.toLowerCase().includes(searchLower)
+                        );
+                      })
+                      .map(sale => {
+                      const device = state.devices.find(d => d.id === sale.deviceId);
+                      return (
+                        <tr key={sale.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
                          <td className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase">{formatDate(sale.date, state.language)}</td>
                          <td className="px-6 py-4">
                            <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 tracking-tight">{device?.model || '?'}</p>
@@ -1532,10 +1585,14 @@ const App: React.FC = () => {
                           <td className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase">
                             {device ? formatDate(device.purchaseDate, state.language) : '—'}
                           </td>
-                                                                              <td className="px-6 py-4 font-semibold text-xs text-slate-400">${device?.purchasePrice.toLocaleString() || '0'}</td>
-                                                                              <td className="px-6 py-4 font-semibold text-base text-brand-600">${sale.salePrice.toLocaleString()}</td>
-                          <td className="px-6 py-4 font-bold text-emerald-600">
-                            ${(sale.salePrice - (device?.purchasePrice || 0)).toLocaleString()}
+                          <td className="px-6 py-4 font-semibold text-xs text-slate-400">
+                            ${(sale.purchasePrice ?? device?.purchasePrice ?? 0).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 font-semibold text-base text-brand-600">
+                            ${sale.salePrice.toLocaleString()}
+                          </td>
+                          <td className={`px-6 py-4 font-bold ${(sale.salePrice - (sale.purchasePrice ?? device?.purchasePrice ?? 0)) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            ${(sale.salePrice - (sale.purchasePrice ?? device?.purchasePrice ?? 0)).toLocaleString()}
                           </td>
                           <td className="px-6 py-4">
                            <span className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-widest ${
@@ -1563,6 +1620,7 @@ const App: React.FC = () => {
                </table>
              </div>
            </div>
+          </div>
         )}
 
         {activeTab === 'debtors' && (
@@ -1791,11 +1849,46 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Synchronization & API Card */}
-                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 md:col-span-2">
-                   <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center">
-                     <RefreshCw className="mr-2 text-brand-500 opacity-70" size={16} />
-                     {t.sync} & {t.api}
-                   </h3>
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8 md:col-span-2">
+                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center">
+                        <RefreshCw className="mr-2 text-brand-500 opacity-70" size={16} />
+                        {t.sync} & {t.api}
+                      </h3>
+                      <div className="flex gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={async () => {
+                            if ((window as any).aistudio?.openSelectKey) {
+                              await (window as any).aistudio.openSelectKey();
+                            } else {
+                              alert(state.language === 'ru' ? 'Функция выбора ключа недоступна в этом окружении.' : 'Key selection is not available in this environment.');
+                            }
+                          }}
+                          className="flex items-center space-x-2 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 px-4 py-2 rounded-xl hover:bg-brand-100 transition-all font-bold uppercase text-[9px] tracking-widest border border-brand-100 dark:border-brand-800/50"
+                        >
+                          <Key size={12} />
+                          <span>{state.language === 'ru' ? 'Выбрать API Ключ Gemini' : 'Select Gemini API Key'}</span>
+                        </motion.button>
+                        <a 
+                          href="https://ai.google.dev/gemini-api/docs/billing" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-900 text-slate-400 px-4 py-2 rounded-xl hover:bg-slate-100 transition-all font-bold uppercase text-[9px] tracking-widest border border-slate-100 dark:border-slate-800"
+                        >
+                          <Info size={12} />
+                          <span>{state.language === 'ru' ? 'Инфо о биллинге' : 'Billing Info'}</span>
+                        </a>
+                      </div>
+                   </div>
+                   
+                   <p className="text-[10px] text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/50">
+                     {state.language === 'ru' 
+                       ? '💡 Gemini API предоставляет бесплатный уровень (Free Tier). Вы можете получить бесплатный ключ на aistudio.google.com и использовать его без оплаты.' 
+                       : '💡 Gemini API provides a Free Tier. You can get a free key at aistudio.google.com and use it at no cost.'}
+                   </p>
+
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">

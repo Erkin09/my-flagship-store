@@ -29,6 +29,7 @@ export interface Sale {
   customerName?: string;
   customerPhone?: string;
   salePrice: number;
+  purchasePrice?: number;
   date: string;
   isInstallment: boolean;
   installmentPlan?: Installment;

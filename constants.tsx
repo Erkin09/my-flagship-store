@@ -13,10 +13,10 @@ export const IPHONE_MODELS = [
 ];
 
 export const SAMSUNG_MODELS = [
-  'Galaxy S10', 'Galaxy S10+', 'Galaxy S20', 'Galaxy S20 Ultra',
-  'Galaxy S21', 'Galaxy S21 Ultra', 'Galaxy S22', 'Galaxy S22 Ultra',
-  'Galaxy S23', 'Galaxy S23 Ultra', 'Galaxy S24', 'Galaxy S24 Ultra',
-  'Galaxy S25', 'Galaxy S25 Ultra'
+  'Galaxy S10', 'Galaxy S10+', 'Galaxy S20', 'Galaxy S20+', 'Galaxy S20 Ultra',
+  'Galaxy S21', 'Galaxy S21+', 'Galaxy S21 Ultra', 'Galaxy S22', 'Galaxy S22+', 'Galaxy S22 Ultra',
+  'Galaxy S23', 'Galaxy S23+', 'Galaxy S23 Ultra', 'Galaxy S24', 'Galaxy S24+', 'Galaxy S24 Ultra',
+  'Galaxy S25', 'Galaxy S25+', 'Galaxy S25 Ultra'
 ];
 
 export const translations = {
