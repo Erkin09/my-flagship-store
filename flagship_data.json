@@ -4,7 +4,7 @@
       "id": "37fa0300-3cf8-444e-85bf-33a7b9041e7b",
       "brand": "iPhone",
       "model": "iPhone 12",
-      "storage": "128Gb",
+      "storage": "64Gb",
       "imei": "353047114207644",
       "purchasePrice": 235,
       "purchasedFrom": "Maxking",
@@ -328,6 +328,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T10:29:31.745Z"
+    "lastSync": "2026-03-02T10:32:13.030Z"
   }
 }
