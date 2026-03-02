@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "a1ddda1a-287c-4fdd-8f37-790cece9e1c1",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "256Gb",
+      "imei": "354073555719581",
+      "purchasePrice": 415,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 89,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:53:07.015Z"
+    },
+    {
       "id": "d8a958ce-bba2-4fea-b53d-d192dfe4359a",
       "brand": "iPhone",
       "model": "iPhone 13 Pro",
@@ -471,6 +484,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T10:50:19.911Z"
+    "lastSync": "2026-03-02T10:51:42.345Z"
   }
 }
