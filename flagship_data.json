@@ -8,18 +8,18 @@
   "buyRate": 12179,
   "sellRate": 12229,
   "bankRate": 12172,
-  "prevExchangeRate": 12195,
+  "prevExchangeRate": 12168,
   "customModels": {
     "iPhone": [],
-    "Samsung": [
-      "Galaxy S10 5G"
-    ]
+    "Samsung": []
   },
   "aiChatHistory": [],
+  "aiStructuredData": null,
+  "geminiApiKey": "Функция выбора ключа недоступна в этом окружении.",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "autoSync": true,
-    "lastSync": "2026-03-02T07:31:08.107Z"
+    "lastSync": "",
+    "autoSync": true
   }
 }
