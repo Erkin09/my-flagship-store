@@ -1,5 +1,18 @@
 {
-  "devices": [],
+  "devices": [
+    {
+      "id": "140a06ad-f0bb-4383-9870-a80cff471802",
+      "brand": "Samsung",
+      "model": "Galaxy S10 5G",
+      "storage": "256Gb",
+      "imei": "353516053354674",
+      "purchasePrice": 165,
+      "purchasedFrom": "Abdulaziz",
+      "purchaseDate": "2025-12-09",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T08:13:13.080Z"
+    }
+  ],
   "sales": [],
   "language": "en",
   "theme": "light",
@@ -69,6 +82,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T08:03:20.448Z"
+    "lastSync": "2026-03-02T08:11:52.520Z"
   }
 }
