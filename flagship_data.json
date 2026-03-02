@@ -7,8 +7,8 @@
   "exchangeRate": 12204,
   "buyRate": 12179,
   "sellRate": 12229,
-  "bankRate": 12172,
-  "prevExchangeRate": 12195,
+  "bankRate": 12191,
+  "prevExchangeRate": 12204,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -20,6 +20,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T13:19:31.546Z"
+    "lastSync": "2026-03-02T19:35:49.184Z"
   }
 }
