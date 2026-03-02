@@ -1,18 +1,5 @@
 {
-  "devices": [
-    {
-      "id": "la6dzw0er",
-      "brand": "iPhone",
-      "model": "14",
-      "storage": "256Gb",
-      "imei": "474473",
-      "purchasePrice": 300,
-      "purchasedFrom": "Obid ",
-      "purchaseDate": "2026-02-23",
-      "status": "In Stock",
-      "dateAdded": "2026-02-23T03:35:49.473Z"
-    }
-  ],
+  "devices": [],
   "sales": [],
   "language": "ru",
   "theme": "dark",
@@ -21,18 +8,17 @@
   "buyRate": 12179,
   "sellRate": 12229,
   "bankRate": 12172,
-  "prevExchangeRate": 12212,
+  "prevExchangeRate": 12195,
   "customModels": {
     "iPhone": [],
     "Samsung": []
   },
   "aiChatHistory": [],
   "aiStructuredData": null,
-  "geminiApiKey": "patdEm-feczos-8gapwo",
+  "geminiApiKey": "Qygxep-gezjy4-baxdaf",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "lastSync": "2026-03-02T12:00:13.294Z",
     "autoSync": true
   }
 }
