@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "93dc284a-1357-456a-9612-8f581b0e347b",
+      "brand": "iPhone",
+      "model": "iPhone 12",
+      "storage": "64Gb",
+      "imei": "358758580954577",
+      "purchasePrice": 235,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 94,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:33:32.678Z"
+    },
+    {
       "id": "37fa0300-3cf8-444e-85bf-33a7b9041e7b",
       "brand": "iPhone",
       "model": "iPhone 12",
@@ -328,6 +341,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T10:32:13.030Z"
+    "lastSync": "2026-03-02T10:32:35.758Z"
   }
 }
