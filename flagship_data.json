@@ -547,6 +547,20 @@
   ],
   "sales": [
     {
+      "id": "f0b7ce08-61d1-470d-a7ae-a5ba37317c61",
+      "customerName": "Feruz Nor aka",
+      "customerPhone": "1303",
+      "salePrice": 325,
+      "date": "2026-03-02T11:42:22.780Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:42:22.780Z"
+      }
+    },
+    {
       "id": "2d43b7a4-1d82-4758-b992-7531541bf735",
       "customerName": "Asel",
       "customerPhone": "935990428",
@@ -657,6 +671,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T11:39:51.714Z"
+    "lastSync": "2026-03-02T11:41:54.800Z"
   }
 }
