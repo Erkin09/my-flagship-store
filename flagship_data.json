@@ -1,25 +1,770 @@
 {
-  "devices": [],
-  "sales": [],
-  "language": "ru",
-  "theme": "dark",
-  "cashBalance": 0,
-  "exchangeRate": 12204,
-  "buyRate": 12179,
-  "sellRate": 12229,
-  "bankRate": 12191,
-  "prevExchangeRate": 12204,
+  "devices": [
+    {
+      "id": "8ed038f2-7c37-499d-8a93-eb110ce0a6a6",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "256Gb",
+      "imei": "000000",
+      "purchasePrice": 560,
+      "purchasedFrom": "N88",
+      "purchaseDate": "2025-08-01",
+      "batteryHealth": 91,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T11:48:15.051Z"
+    },
+    {
+      "id": "a8c4d373-9704-4e29-8949-013457b846b2",
+      "brand": "iPhone",
+      "model": "iPhone 11",
+      "storage": "128Gb",
+      "imei": "353970103681877",
+      "purchasePrice": 230,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2025-12-09",
+      "batteryHealth": 91,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T11:34:33.305Z"
+    },
+    {
+      "id": "aab0b8e5-aecc-461b-849a-a298c232ca0a",
+      "brand": "iPhone",
+      "model": "iPhone 15 Pro Max",
+      "storage": "512Gb",
+      "imei": "359732430573688",
+      "purchasePrice": 860,
+      "purchasedFrom": "Hilol",
+      "purchaseDate": "2026-01-15",
+      "batteryHealth": 86,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T11:04:47.259Z"
+    },
+    {
+      "id": "486a42d5-3bff-4bde-9932-ca876c9f7482",
+      "brand": "iPhone",
+      "model": "iPhone 15 Pro Max",
+      "storage": "256Gb",
+      "imei": "353134988627618",
+      "purchasePrice": 700,
+      "purchasedFrom": "Client",
+      "purchaseDate": "2026-02-01",
+      "batteryHealth": 87,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T11:03:57.377Z"
+    },
+    {
+      "id": "3ba9ce17-4baa-4ee3-acd1-81822d8b8c30",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro Max",
+      "storage": "128Gb",
+      "imei": "350360639242944",
+      "purchasePrice": 465,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 87,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T11:02:32.379Z"
+    },
+    {
+      "id": "e2944d94-a214-45f5-8869-2e93d128847a",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro Max",
+      "storage": "128Gb",
+      "imei": "358226369594451",
+      "purchasePrice": 465,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 85,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T11:00:44.125Z"
+    },
+    {
+      "id": "d630cd4c-132b-4c50-a034-9e7c3dfef2e2",
+      "brand": "iPhone",
+      "model": "iPhone 14 Pro",
+      "storage": "256Gb",
+      "imei": "358267719471958",
+      "purchasePrice": 600,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-03-02",
+      "batteryHealth": 91,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:59:20.745Z"
+    },
+    {
+      "id": "35c20616-1235-4131-a70a-880da254db7c",
+      "brand": "iPhone",
+      "model": "iPhone 14 Pro",
+      "storage": "256Gb",
+      "imei": "350666976029235",
+      "purchasePrice": 560,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-03-02",
+      "batteryHealth": 93,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:57:49.846Z"
+    },
+    {
+      "id": "7e44fd01-5fcd-4321-9dca-bd11e32d15fc",
+      "brand": "iPhone",
+      "model": "iPhone 14 Pro",
+      "storage": "128Gb",
+      "imei": "354811956211124",
+      "purchasePrice": 580,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2025-11-19",
+      "batteryHealth": 90,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:56:32.026Z"
+    },
+    {
+      "id": "5dbd6ba8-6773-4116-9899-2307ca6fc699",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "1Tb",
+      "imei": "350283167282134",
+      "purchasePrice": 540,
+      "purchasedFrom": "N67",
+      "purchaseDate": "2025-11-01",
+      "batteryHealth": 87,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:55:17.477Z"
+    },
+    {
+      "id": "376ceda4-de1f-442d-8ce2-ca3ecbfb7b86",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "353851662506632",
+      "purchasePrice": 415,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 92,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:54:12.443Z"
+    },
+    {
+      "id": "a1ddda1a-287c-4fdd-8f37-790cece9e1c1",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "256Gb",
+      "imei": "354073555719581",
+      "purchasePrice": 415,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 89,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:53:07.015Z"
+    },
+    {
+      "id": "d8a958ce-bba2-4fea-b53d-d192dfe4359a",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "355600721596839",
+      "purchasePrice": 435,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-01-07",
+      "batteryHealth": 91,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:51:35.882Z"
+    },
+    {
+      "id": "caeafa58-d47c-4e2c-a455-d42d44d3756f",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "359072410525584",
+      "purchasePrice": 415,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 91,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:50:11.398Z"
+    },
+    {
+      "id": "2fe5c8f8-5b16-419a-aa56-2a4c2971efe0",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "355677819436938",
+      "purchasePrice": 520,
+      "purchasedFrom": "N67",
+      "purchaseDate": "2025-10-01",
+      "batteryHealth": 83,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:48:39.080Z"
+    },
+    {
+      "id": "6099a5b2-4210-4989-86f9-01fc73fd643a",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "355471425098013",
+      "purchasePrice": 520,
+      "purchasedFrom": "N67",
+      "purchaseDate": "2025-10-01",
+      "batteryHealth": 88,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:46:50.312Z"
+    },
+    {
+      "id": "be79926b-d12d-402b-9394-c069c720ce62",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "355656506501600",
+      "purchasePrice": 360,
+      "purchasedFrom": "Obidxon",
+      "purchaseDate": "2025-10-01",
+      "batteryHealth": 100,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:45:51.070Z"
+    },
+    {
+      "id": "df0e4aa8-aa7d-4107-ab41-9098d8178f2b",
+      "brand": "iPhone",
+      "model": "iPhone 14",
+      "storage": "128Gb",
+      "imei": "350967687716502",
+      "purchasePrice": 395,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 93,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:45:03.259Z"
+    },
+    {
+      "id": "09882e91-2dce-4e38-a0fd-be57c2644fc7",
+      "brand": "iPhone",
+      "model": "iPhone 13",
+      "storage": "256Gb",
+      "imei": "357140957383873",
+      "purchasePrice": 380,
+      "purchasedFrom": "Client",
+      "purchaseDate": "2025-09-01",
+      "batteryHealth": 88,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:43:50.859Z"
+    },
+    {
+      "id": "41ad1f03-89c6-4927-bf4a-d1d57214dbb0",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro",
+      "storage": "128Gb",
+      "imei": "355656509530614",
+      "purchasePrice": 415,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 84,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:37:50.197Z"
+    },
+    {
+      "id": "eb69ba40-1556-4b1c-adeb-8e0d3d4370dc",
+      "brand": "iPhone",
+      "model": "iPhone 13",
+      "storage": "128Gb",
+      "imei": "357247397010287",
+      "purchasePrice": 335,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 93,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:36:23.138Z"
+    },
+    {
+      "id": "e471b447-3481-4e50-bcb7-d5e11a0af87b",
+      "brand": "iPhone",
+      "model": "iPhone 13",
+      "storage": "128Gb",
+      "imei": "358275801826716",
+      "purchasePrice": 335,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 92,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:34:53.019Z"
+    },
+    {
+      "id": "93dc284a-1357-456a-9612-8f581b0e347b",
+      "brand": "iPhone",
+      "model": "iPhone 12",
+      "storage": "64Gb",
+      "imei": "358758580954577",
+      "purchasePrice": 235,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 94,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:33:32.678Z"
+    },
+    {
+      "id": "37fa0300-3cf8-444e-85bf-33a7b9041e7b",
+      "brand": "iPhone",
+      "model": "iPhone 12",
+      "storage": "64Gb",
+      "imei": "353047114207644",
+      "purchasePrice": 235,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 94,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:32:06.835Z"
+    },
+    {
+      "id": "c6f8a3c6-43f5-433a-81f6-7e0ecc8f90e3",
+      "brand": "iPhone",
+      "model": "iPhone 12 Pro Max",
+      "storage": "256Gb",
+      "imei": "350002261012415",
+      "purchasePrice": 380,
+      "purchasedFrom": "Abror",
+      "purchaseDate": "2025-10-16",
+      "batteryHealth": 89,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:29:13.205Z"
+    },
+    {
+      "id": "9d577015-41a3-400b-bbcf-9c98081c5a53",
+      "brand": "iPhone",
+      "model": "iPhone 12 Pro Max",
+      "storage": "128Gb",
+      "imei": "356723116245512",
+      "purchasePrice": 425,
+      "purchasedFrom": "Abror",
+      "purchaseDate": "2025-10-16",
+      "batteryHealth": 89,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:28:01.072Z"
+    },
+    {
+      "id": "1dda7ed0-5f94-4603-8741-a23e77de0207",
+      "brand": "iPhone",
+      "model": "iPhone 11 Pro",
+      "storage": "64Gb",
+      "imei": "353248103175319",
+      "purchasePrice": 290,
+      "purchasedFrom": "Abror",
+      "purchaseDate": "2025-10-07",
+      "batteryHealth": 92,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:24:01.689Z"
+    },
+    {
+      "id": "1e4e9101-2687-497e-b983-80f4f031ec22",
+      "brand": "iPhone",
+      "model": "iPhone 11",
+      "storage": "128Gb",
+      "imei": "356656427793392",
+      "purchasePrice": 200,
+      "purchasedFrom": "Client",
+      "purchaseDate": "2025-10-01",
+      "batteryHealth": 83,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:21:27.673Z"
+    },
+    {
+      "id": "31f99927-b74b-429b-8e5b-3733e45d8ba3",
+      "brand": "iPhone",
+      "model": "iPhone 11",
+      "storage": "128Gb",
+      "imei": "352914118629902",
+      "purchasePrice": 225,
+      "purchasedFrom": "Maxking",
+      "purchaseDate": "2026-02-28",
+      "batteryHealth": 94,
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:16:32.534Z"
+    },
+    {
+      "id": "c37cc91f-b073-44a1-96fe-e81ef3c9a2c7",
+      "brand": "Samsung",
+      "model": "Galaxy S23",
+      "storage": "256Gb",
+      "imei": "351357517990031",
+      "purchasePrice": 355,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:14:03.899Z"
+    },
+    {
+      "id": "fe278a3d-a8da-42d3-8f3e-ba410e267cb8",
+      "brand": "Samsung",
+      "model": "Galaxy S23 Ultra",
+      "storage": "512Gb",
+      "imei": "353992850312142",
+      "purchasePrice": 485,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-02-28",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:03:53.054Z"
+    },
+    {
+      "id": "919fccf9-c6cc-4c6d-b733-d2fb6016df3f",
+      "brand": "Samsung",
+      "model": "Galaxy S22 Ultra",
+      "storage": "256Gb",
+      "imei": "351562314387600",
+      "purchasePrice": 395,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:01:33.639Z"
+    },
+    {
+      "id": "f1ce19f7-2000-4c4e-8402-29195139daf7",
+      "brand": "Samsung",
+      "model": "Galaxy S22 Ultra",
+      "storage": "512Gb",
+      "imei": "352019420501037",
+      "purchasePrice": 415,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-02-28",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T10:00:06.022Z"
+    },
+    {
+      "id": "0f0b896e-6eb5-4bd9-962c-cb8666aae0d9",
+      "brand": "Samsung",
+      "model": "Galaxy S23+",
+      "storage": "256Gb",
+      "imei": "350309330626558",
+      "purchasePrice": 380,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2025-12-09",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:57:35.515Z"
+    },
+    {
+      "id": "fdae0a3f-dbdc-4ef3-9e1a-df37c564baa2",
+      "brand": "Samsung",
+      "model": "Galaxy S23+",
+      "storage": "256Gb",
+      "imei": "350309332639435",
+      "purchasePrice": 380,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:56:05.939Z"
+    },
+    {
+      "id": "9ed2afb7-9fce-4ca0-822c-370313bc33aa",
+      "brand": "Samsung",
+      "model": "Galaxy S22+",
+      "storage": "256Gb",
+      "imei": "350865890865217",
+      "purchasePrice": 200,
+      "purchasedFrom": "Client",
+      "purchaseDate": "2025-07-01",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:52:48.667Z"
+    },
+    {
+      "id": "e7d20459-bcee-4c6a-9eb7-02dabad0d428",
+      "brand": "Samsung",
+      "model": "Galaxy S22",
+      "storage": "256Gb",
+      "imei": "351424776796986",
+      "purchasePrice": 263,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-02-28",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:51:22.923Z"
+    },
+    {
+      "id": "39b10ef0-a1b9-4cac-a7fc-ee18534c888a",
+      "brand": "Samsung",
+      "model": "Galaxy S21+",
+      "storage": "256Gb",
+      "imei": "353561330570015",
+      "purchasePrice": 260,
+      "purchasedFrom": "Abdulaziz",
+      "purchaseDate": "2025-10-16",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:49:10.063Z"
+    },
+    {
+      "id": "8ceb5417-7a8f-4155-972d-e584f40fde8f",
+      "brand": "Samsung",
+      "model": "Galaxy S23",
+      "storage": "256Gb",
+      "imei": "351357516174579",
+      "purchasePrice": 355,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-01-07",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:46:45.336Z"
+    },
+    {
+      "id": "e15aac42-9b9c-4ee4-ad15-ebccf38ebae4",
+      "brand": "Samsung",
+      "model": "Galaxy S22",
+      "storage": "256Gb",
+      "imei": "356587431385026",
+      "purchasePrice": 263,
+      "purchasedFrom": "Korea mobile",
+      "purchaseDate": "2026-03-02",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:39:52.766Z"
+    },
+    {
+      "id": "31f1fabd-afbe-4c8d-940f-ad0223d60e87",
+      "brand": "Samsung",
+      "model": "Galaxy S22",
+      "storage": "256Gb",
+      "imei": "00000000",
+      "purchasePrice": 260,
+      "purchasedFrom": "Obidxon",
+      "purchaseDate": "2025-12-09",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T09:38:52.002Z"
+    },
+    {
+      "id": "c3ecf425-73fe-452a-959a-34b1c0d41465",
+      "brand": "Samsung",
+      "model": "Galaxy S21",
+      "storage": "256Gb",
+      "imei": "354773802966584",
+      "purchasePrice": 170,
+      "purchasedFrom": "Muhammadali",
+      "purchaseDate": "2025-12-01",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T08:50:52.309Z"
+    },
+    {
+      "id": "2d081a2d-30cd-4f37-b10c-c43600a23c56",
+      "brand": "Samsung",
+      "model": "Galaxy S21",
+      "storage": "256Gb",
+      "imei": "351376410721368",
+      "purchasePrice": 210,
+      "purchasedFrom": "Abdulaziz",
+      "purchaseDate": "2026-03-02",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T08:18:33.637Z"
+    },
+    {
+      "id": "140a06ad-f0bb-4383-9870-a80cff471802",
+      "brand": "Samsung",
+      "model": "Galaxy S10 5G",
+      "storage": "256Gb",
+      "imei": "353516053354674",
+      "purchasePrice": 165,
+      "purchasedFrom": "Abdulaziz",
+      "purchaseDate": "2025-12-09",
+      "status": "In Stock",
+      "dateAdded": "2026-03-02T08:13:13.080Z"
+    }
+  ],
+  "sales": [
+    {
+      "id": "bb0a2e62-1792-4938-acaf-d420e81daa33",
+      "customerName": "Fazli kursdosh",
+      "customerPhone": "882988833",
+      "salePrice": 80,
+      "date": "2026-03-02T11:50:58.688Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:50:58.688Z"
+      }
+    },
+    {
+      "id": "a923dda1-c504-432e-8bf3-93ffa25b4c37",
+      "customerName": "Nafisa",
+      "customerPhone": "907171506",
+      "salePrice": 50,
+      "date": "2026-03-02T11:46:44.804Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:46:44.804Z"
+      }
+    },
+    {
+      "id": "38140be1-2240-427e-a5b6-833d8f6d1966",
+      "customerName": "Malika Ergasheva",
+      "customerPhone": "933130039",
+      "salePrice": 42,
+      "date": "2026-03-02T11:44:05.171Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:44:05.171Z"
+      }
+    },
+    {
+      "id": "45fcdbbb-6421-4f7c-a673-86819fb590c1",
+      "customerName": "Sitora",
+      "customerPhone": "7777",
+      "salePrice": 536,
+      "date": "2026-03-02T11:43:27.072Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:43:27.072Z"
+      }
+    },
+    {
+      "id": "f0b7ce08-61d1-470d-a7ae-a5ba37317c61",
+      "customerName": "Feruz Nor aka",
+      "customerPhone": "1303",
+      "salePrice": 325,
+      "date": "2026-03-02T11:42:22.780Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 125,
+        "dueDate": "2026-04-01T11:42:22.780Z"
+      }
+    },
+    {
+      "id": "2d43b7a4-1d82-4758-b992-7531541bf735",
+      "customerName": "Asel",
+      "customerPhone": "935990428",
+      "salePrice": 150,
+      "date": "2026-03-02T11:41:48.324Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:41:48.324Z"
+      }
+    },
+    {
+      "id": "ac687b2b-2f65-4141-a721-0f20fb7e2bf9",
+      "customerName": "Muhammadali",
+      "customerPhone": "913340100",
+      "salePrice": 450,
+      "date": "2026-03-02T11:39:45.190Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:39:45.190Z"
+      }
+    },
+    {
+      "id": "1a18ef07-788a-4bb0-8610-c6d9cd45d9f2",
+      "customerName": "Feruz Bekki usto",
+      "customerPhone": "991537078",
+      "salePrice": 108,
+      "date": "2026-03-02T11:38:45.864Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-01T11:38:45.864Z"
+      }
+    }
+  ],
+  "language": "en",
+  "theme": "light",
+  "cashBalance": 125,
+  "exchangeRate": 12215,
+  "buyRate": 12190,
+  "sellRate": 12240,
+  "bankRate": 12210,
+  "prevExchangeRate": 12198,
   "customModels": {
     "iPhone": [],
-    "Samsung": []
+    "Samsung": [
+      "Galaxy S10 5G"
+    ]
   },
-  "aiChatHistory": [],
-  "aiStructuredData": null,
-  "geminiApiKey": "tajsyk-xoqhuw-2hektI",
+  "aiChatHistory": [
+    {
+      "role": "user",
+      "text": "как лучше продать остатки?"
+    },
+    {
+      "role": "model",
+      "text": "Для эффективной продажи 44 остатков при нулевой кассе и наличии долгов рекомендую следующие шаги:\n\n1. Сбор дебиторской задолженности. Ваши должники удерживают $1 741, что равно всей вашей прибыли. Направьте усилия на возврат этих средств для формирования оборотных денег.\n\n2. Акции на покупку за наличные. У вас $0 в кассе. Предложите скидку 3-5% или защитное стекло в подарок при полной оплате наличными. Это поможет быстро получить ликвидность.\n\n3. Формирование комплектов. Чтобы быстрее реализовать товар на $17 046, продавайте смартфоны вместе с аксессуарами по специальной цене. Это увеличит привлекательность предложения.\n\n4. Остановка продаж в долг. Учитывая, что количество должников (8) равно количеству совершенных продаж (8), ваша текущая модель не приносит живых денег. Временно прекратите отпуск товара без полной оплаты.\n\n5. Запуск Trade-in. Принимайте старые устройства в счет оплаты новых. Это снизит финансовый порог для покупателя и позволит быстрее освободить склад.\n\n6. Локальный маркетинг. Используйте социальные сети для демонстрации конкретных моделей из наличия, делая упор на актуальный курс 12 204 UZS для прозрачности расчетов."
+    }
+  ],
+  "aiStructuredData": {
+    "summary": "Анализ деятельности магазина 'Flagship Hub' выявил критическую проблему низкой оборачиваемости запасов. При стоимости склада более $17,000, месячная выручка составляет всего $1,741, что указывает на цикл полной реализации склада примерно в 10 месяцев. Это недопустимо для рынка электроники из-за быстрой девальвации стоимости гаджетов. Наблюдается аномальная концентрация капитала в линейке iPhone 13 (преимущественно версии Pro 128Gb), которая составляет ядро складских остатков.\n\nВсе зафиксированные продажи произошли в один день (02.03), что может свидетельствовать о разовой активности или задержке в фиксации транзакций. Текущая бизнес-модель демонстрирует высокую маржинальность (согласно предоставленным данным, чистая прибыль равна выручке), однако крайне низкий темп продаж (8 единиц за 30 дней) не позволяет эффективно масштабировать бизнес.",
+    "stats": [
+      {
+        "label": "ROI (на капитал)",
+        "value": "10.21%"
+      },
+      {
+        "label": "Средний чек",
+        "value": "$217.6"
+      },
+      {
+        "label": "Оборачиваемость",
+        "value": "294 дня"
+      },
+      {
+        "label": "Маржа",
+        "value": "100%"
+      }
+    ],
+    "chartData": [
+      {
+        "name": "iPhone 13 Series",
+        "value": 22
+      },
+      {
+        "name": "iPhone 11/12 Series",
+        "value": 11
+      },
+      {
+        "name": "iPhone 14 Series",
+        "value": 4
+      },
+      {
+        "name": "iPhone 15 Series",
+        "value": 2
+      },
+      {
+        "name": "Samsung Galaxy",
+        "value": 1
+      }
+    ],
+    "brandData": [
+      {
+        "name": "Apple",
+        "value": 16691
+      },
+      {
+        "name": "Samsung",
+        "value": 355
+      }
+    ],
+    "profitTrend": [
+      {
+        "date": "02.03",
+        "profit": 1741
+      }
+    ],
+    "recommendations": [
+      "Срочная ликвидация избытков iPhone 13 Pro: Данная модель занимает более 40% склада. Рекомендуется запустить акцию 'Комплект аксессуаров в подарок' для ускорения продажи устаревающих позиций.",
+      "Оптимизация складской матрицы: Необходимо перенаправить высвобожденный капитал в покупку актуальных iPhone 15 и 16. Текущий ассортимент смещен в сторону бюджетного и среднего сегмента, что ограничивает рост среднего чека.",
+      "Внедрение системы динамического ценообразования: Учитывая, что в наличии много единиц одной модели (iPhone 13 Pro 128Gb), следует протестировать снижение цены на 3-5% для привлечения трафика и повышения коэффициента оборачиваемости ниже 60 дней."
+    ]
+  },
+  "geminiApiKey": "AIzaSyDWGCLYMeMK9wN3NotszS90mb9QMQNtKMQ",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T19:36:10.589Z"
+    "lastSync": "2026-03-02T12:03:49.295Z"
   }
 }
