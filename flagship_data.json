@@ -218,7 +218,7 @@
       "purchasedFrom": "Obidxon",
       "purchaseDate": "2025-10-01",
       "batteryHealth": 100,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-03-02T10:45:51.070Z"
     },
     {
@@ -560,6 +560,17 @@
   ],
   "sales": [
     {
+      "id": "1f844f24-1662-4cfc-a3e7-730fb67963cc",
+      "deviceId": "be79926b-d12d-402b-9394-c069c720ce62",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 452,
+      "purchasePrice": 360,
+      "date": "2026-03-05T06:04:03.023Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
+    {
       "id": "bb0a2e62-1792-4938-acaf-d420e81daa33",
       "customerName": "Fazli kursdosh",
       "customerPhone": "882988833",
@@ -674,12 +685,12 @@
   ],
   "language": "en",
   "theme": "light",
-  "cashBalance": 125,
-  "exchangeRate": 12215,
-  "buyRate": 12190,
-  "sellRate": 12240,
-  "bankRate": 12210,
-  "prevExchangeRate": 12198,
+  "cashBalance": 577,
+  "exchangeRate": 12202,
+  "buyRate": 12177,
+  "sellRate": 12227,
+  "bankRate": 12180,
+  "prevExchangeRate": 12215,
   "customModels": {
     "iPhone": [],
     "Samsung": [
@@ -765,6 +776,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-02T12:03:49.295Z"
+    "lastSync": "2026-03-04T05:39:03.936Z"
   }
 }
