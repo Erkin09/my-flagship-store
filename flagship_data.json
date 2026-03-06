@@ -4,10 +4,10 @@
   "language": "ru",
   "theme": "dark",
   "cashBalance": 0,
-  "exchangeRate": 12200,
-  "buyRate": 12175,
-  "sellRate": 12225,
-  "bankRate": 12176,
+  "exchangeRate": 12168,
+  "buyRate": 12143,
+  "sellRate": 12193,
+  "bankRate": 12137,
   "prevExchangeRate": 12195,
   "customModels": {
     "iPhone": [],
@@ -15,11 +15,10 @@
   },
   "aiChatHistory": [],
   "aiStructuredData": null,
-  "geminiApiKey": "AIzaSyC5xU-t-hcZj8fS4pYKGzvpWth6KMj_zuA",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-06T10:18:38.292Z"
+    "lastSync": "2026-03-01T06:54:34.856Z"
   }
 }
