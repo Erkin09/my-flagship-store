@@ -166,7 +166,7 @@
       "purchasedFrom": "Maxking",
       "purchaseDate": "2026-01-07",
       "batteryHealth": 91,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-03-02T10:51:35.882Z"
     },
     {
@@ -560,6 +560,22 @@
   ],
   "sales": [
     {
+      "id": "0fb5a076-2df5-4a61-92dc-3ab0790ab903",
+      "deviceId": "d8a958ce-bba2-4fea-b53d-d192dfe4359a",
+      "customerName": "*****",
+      "customerPhone": "1171",
+      "salePrice": 540,
+      "purchasePrice": 435,
+      "date": "2026-03-06T09:52:38.705Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 82,
+        "dueDate": "2026-04-05T09:52:38.705Z"
+      }
+    },
+    {
       "id": "ec9a1c8a-81de-4abf-862b-a8e8cfa7701c",
       "deviceId": "486a42d5-3bff-4bde-9932-ca876c9f7482",
       "customerName": "Guest",
@@ -696,7 +712,7 @@
   ],
   "language": "en",
   "theme": "light",
-  "cashBalance": 1317,
+  "cashBalance": 1399,
   "exchangeRate": 12202,
   "buyRate": 12177,
   "sellRate": 12227,
@@ -787,6 +803,6 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-03T05:03:17.222Z"
+    "lastSync": "2026-03-06T09:50:25.735Z"
   }
 }
