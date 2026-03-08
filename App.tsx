@@ -202,41 +202,51 @@ const App: React.FC = () => {
     }
 
     try {
-      // Fetch Market Rate (using er-api as a base)
+      // 1. Fetch Market Rate (Global USD/UZS)
       const res = await fetch('https://open.er-api.com/v6/latest/USD');
       const data = await res.json();
       
-      // Fetch Bank Rate (CBU Uzbekistan) - wrapped in try-catch to prevent blocking
+      // 2. Fetch Official Bank Rate (CBU Uzbekistan) using a CORS proxy
       let newBankRate = 0;
       try {
-        const cbuRes = await fetch('https://cbu.uz/ru/arkhiv-kursov-valyut/json/');
-        if (cbuRes.ok) {
-          const cbuData = await cbuRes.json();
+        // Using allorigins proxy to bypass CORS for the official CBU API
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://cbu.uz/ru/arkhiv-kursov-valyut/json/')}`;
+        const cbuProxyRes = await fetch(proxyUrl);
+        if (cbuProxyRes.ok) {
+          const cbuProxyData = await cbuProxyRes.json();
+          const cbuData = JSON.parse(cbuProxyData.contents);
           const usdBank = cbuData.find((item: any) => item.Ccy === 'USD');
-          newBankRate = usdBank ? Math.round(Number(usdBank.Rate)) : 0;
+          if (usdBank) {
+            newBankRate = Math.round(Number(usdBank.Rate));
+          }
         }
       } catch (e) {
-        console.warn('CBU rate fetch failed (likely CORS), using market rate only');
+        console.warn('CBU rate fetch via proxy failed, falling back to market rate');
       }
 
       if (data && data.rates && data.rates.UZS) {
-        const newRate = Math.round(data.rates.UZS);
+        const marketRate = Math.round(data.rates.UZS);
+        
+        // If we couldn't get the bank rate, we use the market rate as a fallback for it
+        const finalBankRate = newBankRate || marketRate;
+
         setState(prev => {
           const buyOffset = prev.currencySettings?.buyOffset ?? 25;
           const sellOffset = prev.currencySettings?.sellOffset ?? 25;
 
-          // Only update if there's a meaningful change to avoid unnecessary re-renders
-          const hasRateChanged = Math.abs(prev.exchangeRate - newRate) >= 1;
-          const hasBankRateChanged = newBankRate > 0 && prev.bankRate !== newBankRate;
+          // The "exact" rate for a business is often the Market Rate
+          // We'll use the market rate as the base for Buy/Sell
+          const hasRateChanged = Math.abs(prev.exchangeRate - marketRate) >= 1;
+          const hasBankRateChanged = finalBankRate > 0 && prev.bankRate !== finalBankRate;
 
           if (hasRateChanged || hasBankRateChanged || prev.exchangeRate === 1) {
             return { 
               ...prev, 
               prevExchangeRate: prev.exchangeRate,
-              exchangeRate: newRate,
-              buyRate: newRate - buyOffset,
-              sellRate: newRate + sellOffset,
-              bankRate: newBankRate || prev.bankRate
+              exchangeRate: marketRate,
+              buyRate: marketRate - buyOffset,
+              sellRate: marketRate + sellOffset,
+              bankRate: finalBankRate
             };
           }
           return prev;
@@ -752,25 +762,107 @@ const App: React.FC = () => {
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        const importedState = JSON.parse(content);
+        let imported: any;
+        try {
+          imported = JSON.parse(content);
+          console.log('Importing data:', imported);
+        } catch (e) {
+          throw new Error(state.language === 'ru' ? 'Файл не является корректным JSON. Проверьте содержимое файла.' : 'File is not a valid JSON. Check file content.');
+        }
         
-        // Basic validation
-        if (!importedState.devices || !importedState.sales) {
-          throw new Error('Invalid data format');
+        let devices: Device[] = [];
+        let sales: Sale[] = [];
+        
+        // 1. Handle Inventory -> Devices
+        const rawInventory = imported.inventory || imported.devices || (Array.isArray(imported) ? imported : []);
+        if (Array.isArray(rawInventory)) {
+          devices = rawInventory.map((item: any) => {
+            const storageRaw = String(item.storage || '128Gb');
+            let storage: Storage = '128Gb';
+            if (storageRaw.toLowerCase().includes('64')) storage = '64Gb';
+            else if (storageRaw.toLowerCase().includes('128')) storage = '128Gb';
+            else if (storageRaw.toLowerCase().includes('256')) storage = '256Gb';
+            else if (storageRaw.toLowerCase().includes('512')) storage = '512Gb';
+            else if (storageRaw.toLowerCase().includes('1t')) storage = '1Tb';
+
+            return {
+              id: String(item.id || generateId()),
+              brand: (item.brand === 'Apple' || item.brand === 'iPhone') ? 'iPhone' : 'Samsung',
+              model: String(item.model || 'Unknown'),
+              storage,
+              imei: String(item.imei || ''),
+              purchasePrice: Number(item.purchasePrice || item.buyPrice || 0),
+              purchasedFrom: String(item.purchasedFrom || item.supplier || ''),
+              purchaseDate: String(item.purchaseDate || item.createdAt || new Date().toISOString()),
+              batteryHealth: item.battery === null ? undefined : Number(item.batteryHealth || item.battery || 100),
+              status: (item.status === 'In Stock' || item.status === 'Sold' || item.status === 'Returned') ? item.status : 'In Stock',
+              dateAdded: String(item.dateAdded || item.createdAt || new Date().toISOString())
+            };
+          });
         }
 
-        if (confirm(state.language === 'ru' ? 'Вы уверены? Это заменит все текущие данные.' : 'Are you sure? This will replace all current data.')) {
-          setState(importedState);
-          localStorage.setItem('flagship_hub_v7', JSON.stringify(importedState));
+        // 2. Handle Sales -> Sales
+        const rawSales = imported.sales || [];
+        if (Array.isArray(rawSales)) {
+          sales = rawSales.map((item: any) => ({
+            id: String(item.id || generateId()),
+            deviceId: item.deviceId ? String(item.deviceId) : undefined,
+            customerName: String(item.customerName || ''),
+            customerPhone: String(item.customerPhone || ''),
+            salePrice: Number(item.salePrice || item.sellPrice || 0),
+            purchasePrice: Number(item.purchasePrice || item.buyPrice || 0),
+            date: String(item.date || item.soldAt || new Date().toISOString()),
+            isInstallment: Boolean(item.isInstallment || false),
+            status: (item.status === 'Completed' || item.status === 'Returned') ? item.status : 'Completed'
+          }));
+        }
+
+        // 3. Handle Debtors -> Sales (Installments)
+        const rawDebtors = imported.debtors || [];
+        if (Array.isArray(rawDebtors)) {
+          const debtorSales: Sale[] = rawDebtors.map((item: any) => ({
+            id: String(item.id || generateId()),
+            customerName: String(item.name || ''),
+            salePrice: Number(item.amountTotal || 0),
+            purchasePrice: 0,
+            date: String(item.createdAt || new Date().toISOString()),
+            isInstallment: true,
+            status: 'Completed' as const,
+            installmentPlan: {
+              months: (item.months === 1 || item.months === 2 || item.months === 3) ? item.months : 1,
+              paidAmount: Number((item.amountTotal || 0) - (item.amountLeft || 0)),
+              dueDate: String(item.dueDate || new Date().toISOString())
+            }
+          }));
+          sales = [...sales, ...debtorSales];
+        }
+
+        if (devices.length === 0 && sales.length === 0 && imported.cash === undefined && imported.cashBalance === undefined) {
+          throw new Error(state.language === 'ru' ? 'В файле не найдено данных об устройствах, продажах или должниках' : 'No device, sales or debtors data found in file');
+        }
+
+        if (confirm(state.language === 'ru' ? `Найдено: устройств (${devices.length}), продаж (${sales.length}). Вы уверены? Это заменит все текущие данные.` : `Found: devices (${devices.length}), sales (${sales.length}). Are you sure? This will replace all current data.`)) {
+          const newState: AppState = {
+            ...state,
+            devices,
+            sales,
+            cashBalance: imported.cash !== undefined ? Number(imported.cash) : (imported.cashBalance !== undefined ? Number(imported.cashBalance) : state.cashBalance),
+            theme: (imported.theme === 'light' || imported.theme === 'dark') ? imported.theme : state.theme,
+            language: (imported.language === 'ru' || imported.language === 'en') ? imported.language : state.language,
+            syncSettings: state.syncSettings,
+            geminiApiKey: state.geminiApiKey
+          };
+
+          setState(newState);
+          localStorage.setItem('flagship_hub_v7', JSON.stringify(newState));
           alert(state.language === 'ru' ? 'Данные успешно восстановлены!' : 'Data successfully restored!');
         }
-      } catch (error) {
-        console.error('Import error:', error);
-        alert(state.language === 'ru' ? 'Ошибка при импорте данных. Неверный формат файла.' : 'Error importing data. Invalid file format.');
+      } catch (error: any) {
+        console.error('Import error details:', error);
+        alert((state.language === 'ru' ? 'Ошибка при импорте: ' : 'Import error: ') + (error.message || 'Unknown error'));
       }
     };
     reader.readAsText(file);
-    // Reset input
     event.target.value = '';
   };
 
@@ -2026,6 +2118,62 @@ const App: React.FC = () => {
                     </h3>
                     
                     <div className="grid grid-cols-1 gap-4">
+                      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-widest">
+                            {state.language === 'ru' ? 'Автообновление' : 'Auto Update'}
+                          </span>
+                          <span className="text-[8px] text-slate-400 font-medium uppercase tracking-tighter mt-0.5">
+                            {state.language === 'ru' ? 'Обновлять курс автоматически' : 'Fetch rates automatically'}
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => setState(s => ({
+                            ...s, 
+                            currencySettings: { 
+                              ...s.currencySettings, 
+                              autoUpdate: !s.currencySettings?.autoUpdate 
+                            }
+                          }))}
+                          className={`w-10 h-5 rounded-full transition-all relative ${state.currencySettings?.autoUpdate ? 'bg-brand-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                        >
+                          <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${state.currencySettings?.autoUpdate ? 'left-6' : 'left-1'}`} />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{state.language === 'ru' ? 'Покупка (-)' : 'Buy Offset'}</label>
+                          <input 
+                            type="number" 
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" 
+                            value={state.currencySettings?.buyOffset ?? 25} 
+                            onChange={(e) => setState(s => ({
+                              ...s, 
+                              currencySettings: { 
+                                ...s.currencySettings, 
+                                buyOffset: Number(e.target.value) 
+                              }
+                            }))} 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{state.language === 'ru' ? 'Продажа (+)' : 'Sell Offset'}</label>
+                          <input 
+                            type="number" 
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all" 
+                            value={state.currencySettings?.sellOffset ?? 25} 
+                            onChange={(e) => setState(s => ({
+                              ...s, 
+                              currencySettings: { 
+                                ...s.currencySettings, 
+                                sellOffset: Number(e.target.value) 
+                              }
+                            }))} 
+                          />
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t.buyRate}</label>
                         <div className="flex space-x-2">
