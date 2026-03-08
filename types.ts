@@ -63,5 +63,11 @@ export interface AppState {
     lastSync?: string;
     autoSync?: boolean;
   };
+  currencySettings?: {
+    manualRate?: number;
+    buyOffset?: number;
+    sellOffset?: number;
+    autoUpdate?: boolean;
+  };
   geminiApiKey?: string;
 }

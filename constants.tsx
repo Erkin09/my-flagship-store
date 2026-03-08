@@ -77,7 +77,9 @@ export const translations = {
     addDebtor: 'Add Debtor',
     restore: 'Restore',
     exportData: 'Export Data',
-    importData: 'Import Data'
+    importData: 'Import Data',
+    monthlyTotals: 'Monthly Totals (Last 3 Months)',
+    syncing: 'Syncing...'
   },
   ru: {
     dashboard: 'Главная',
@@ -136,6 +138,8 @@ export const translations = {
     addDebtor: 'Добавить должника',
     restore: 'Восстановить',
     exportData: 'Экспорт данных',
-    importData: 'Импорт данных'
+    importData: 'Импорт данных',
+    monthlyTotals: 'Итоги за последние 3 месяца',
+    syncing: 'Синхронизация...'
   }
 };

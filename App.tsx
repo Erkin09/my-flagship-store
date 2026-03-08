@@ -28,6 +28,7 @@ import {
   Box,
   Hash,
   Info,
+  Cloud,
   CalendarDays,
   Tag,
   RefreshCw,
@@ -60,10 +61,8 @@ const formatDate = (date: string, lang: string) =>
 
 const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
   <motion.button
-    whileHover={{ x: 4 }}
-    whileTap={{ scale: 0.98 }}
     onClick={onClick}
-    className={`flex items-center space-x-3 w-full p-3 rounded-xl transition-all duration-300 ${
+    className={`flex items-center space-x-3 w-full p-3 rounded-xl transition-all duration-200 ${
       active 
         ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/20' 
         : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-slate-100'
@@ -77,9 +76,8 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }: any) => (
 
 const Card = ({ title, subtitle, icon: Icon, colorClass = "bg-brand-50 text-brand-600", trend }: any) => (
   <motion.div 
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    whileHover={{ y: -5 }}
     className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none transition-all duration-300 group"
   >
     <div className="flex justify-between items-start mb-4">
@@ -114,6 +112,7 @@ const InputWrapper = ({ label, children, icon: Icon }: any) => (
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'sales' | 'debtors' | 'analytics' | 'settings'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('flagship_hub_v7');
     const defaults: AppState = {
@@ -135,6 +134,11 @@ const App: React.FC = () => {
         githubToken: '',
         repoName: '',
         autoSync: false
+      },
+      currencySettings: {
+        autoUpdate: true,
+        buyOffset: 25,
+        sellOffset: 25
       }
     };
 
@@ -192,6 +196,11 @@ const App: React.FC = () => {
   }, [modalSelectedBrand]);
 
   const fetchRate = async () => {
+    // If manual mode is on, don't fetch
+    if (state.currencySettings?.autoUpdate === false && state.currencySettings?.manualRate) {
+      return;
+    }
+
     try {
       // Fetch Market Rate (using er-api as a base)
       const res = await fetch('https://open.er-api.com/v6/latest/USD');
@@ -213,8 +222,8 @@ const App: React.FC = () => {
       if (data && data.rates && data.rates.UZS) {
         const newRate = Math.round(data.rates.UZS);
         setState(prev => {
-          const buyOffset = 25;
-          const sellOffset = 25;
+          const buyOffset = prev.currencySettings?.buyOffset ?? 25;
+          const sellOffset = prev.currencySettings?.sellOffset ?? 25;
 
           // Only update if there's a meaningful change to avoid unnecessary re-renders
           const hasRateChanged = Math.abs(prev.exchangeRate - newRate) >= 1;
@@ -260,6 +269,17 @@ const App: React.FC = () => {
     }
   }, [state]);
 
+  // Magic Restore: If settings are entered and inventory is empty, try to restore
+  useEffect(() => {
+    if (state.devices.length === 0 && state.sales.length === 0 && 
+        state.syncSettings?.githubToken && state.syncSettings?.repoName) {
+      const timer = setTimeout(() => {
+        restoreFromGithub(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.syncSettings?.githubToken, state.syncSettings?.repoName]);
+
   const t = translations[state.language];
 
   // Auto-Sync Logic
@@ -271,7 +291,7 @@ const App: React.FC = () => {
     }, 5000); // Debounce 5 seconds
 
     return () => clearTimeout(timeout);
-  }, [state.devices, state.sales, state.cashBalance, state.customModels]);
+  }, [state.devices, state.sales, state.cashBalance, state.customModels, state.syncSettings?.autoSync]);
 
   // Sync to GitHub Logic
   const syncToGithub = async (silent = false) => {
@@ -280,6 +300,13 @@ const App: React.FC = () => {
       return;
     }
 
+    // Safety check: Don't auto-sync if local data is empty but we have sync settings
+    // This prevents overwriting cloud backup if local storage was cleared by browser
+    if (silent && state.devices.length === 0 && state.sales.length === 0) {
+      return;
+    }
+
+    setIsSyncing(true);
     try {
       const { githubToken, repoName } = state.syncSettings;
       const fileName = 'flagship_data.json';
@@ -360,6 +387,8 @@ const App: React.FC = () => {
     } catch (error) {
       console.error(error);
       if (!silent) alert('Sync failed');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -369,10 +398,11 @@ const App: React.FC = () => {
       return;
     }
 
-    if (!silent && !confirm(state.language === 'ru' ? 'Это перезапишет текущие данные. Продолжить?' : 'This will overwrite current data. Continue?')) {
+    if (!silent && state.devices.length > 0 && !confirm(state.language === 'ru' ? 'Это перезапишет текущие данные. Продолжить?' : 'This will overwrite current data. Continue?')) {
       return;
     }
 
+    setIsSyncing(true);
     try {
       const { githubToken, repoName } = state.syncSettings;
       const fileName = 'flagship_data.json';
@@ -381,30 +411,43 @@ const App: React.FC = () => {
       const trimmedToken = githubToken.trim();
 
       const res = await fetch(`https://api.github.com/repos/${trimmedRepo}/contents/${fileName}`, {
-        headers: { 'Authorization': `Bearer ${trimmedToken}` }
+        headers: { 
+          'Authorization': `Bearer ${trimmedToken}`,
+          'Cache-Control': 'no-cache'
+        }
       });
 
       if (res.ok) {
         const data = await res.json();
-        const decodedContent = decodeURIComponent(escape(atob(data.content)));
+        // GitHub content can have newlines, strip them before atob
+        const base64Content = data.content.replace(/\n/g, '');
+        const decodedContent = decodeURIComponent(escape(atob(base64Content)));
         const restoredState = JSON.parse(decodedContent);
         
         // Merge sync settings to keep current token/repo
-        setState({
+        setState(prev => ({
           ...restoredState,
-          syncSettings: state.syncSettings
-        });
+          syncSettings: prev.syncSettings,
+          // Ensure we don't lose the Gemini API key if it was entered manually
+          geminiApiKey: prev.geminiApiKey || restoredState.geminiApiKey
+        }));
         
-        if (!silent) alert(state.language === 'ru' ? 'Данные восстановлены' : 'Data restored');
+        if (!silent) alert(state.language === 'ru' ? 'Данные восстановлены из облака' : 'Data restored from cloud');
       } else {
         if (!silent) {
           const err = await res.json();
-          alert(`Error: ${err.message}`);
+          if (res.status === 404) {
+            alert(state.language === 'ru' ? 'Файл данных не найден в репозитории.' : 'Data file not found in repository.');
+          } else {
+            alert(`Error: ${err.message}`);
+          }
         }
       }
     } catch (error) {
       console.error(error);
-      if (!silent) alert('Restore failed');
+      if (!silent) alert('Restore failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -687,12 +730,14 @@ const App: React.FC = () => {
   const exportData = () => {
     try {
       const dataStr = JSON.stringify(state, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
       const exportFileDefaultName = `flagship_hub_backup_${new Date().toISOString().split('T')[0]}.json`;
       const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('href', url);
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export error:', error);
       alert(state.language === 'ru' ? 'Ошибка при экспорте данных' : 'Error exporting data');
@@ -716,7 +761,8 @@ const App: React.FC = () => {
 
         if (confirm(state.language === 'ru' ? 'Вы уверены? Это заменит все текущие данные.' : 'Are you sure? This will replace all current data.')) {
           setState(importedState);
-          alert(state.language === 'ru' ? 'Данные успешно импортированы' : 'Data imported successfully');
+          localStorage.setItem('flagship_hub_v7', JSON.stringify(importedState));
+          alert(state.language === 'ru' ? 'Данные успешно восстановлены!' : 'Data successfully restored!');
         }
       } catch (error) {
         console.error('Import error:', error);
@@ -821,6 +867,43 @@ const App: React.FC = () => {
       return { name: day.toString(), profit };
     });
   }, [state.sales, state.devices]);
+
+  const lastThreeMonthsData = useMemo(() => {
+    const now = new Date();
+    const result = [];
+    const months = state.language === 'ru' 
+      ? ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+      : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    for (let i = 2; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthIndex = d.getMonth();
+      const year = d.getFullYear();
+      
+      const monthlySales = state.sales.filter(s => {
+        const sd = new Date(s.date);
+        return sd.getFullYear() === year && sd.getMonth() === monthIndex && s.status === 'Completed';
+      });
+
+      const totalRevenue = monthlySales.reduce((acc, s) => acc + s.salePrice, 0);
+      const totalProfit = monthlySales.reduce((acc, s) => {
+        const purchasePrice = s.purchasePrice ?? state.devices.find(dev => dev.id === s.deviceId)?.purchasePrice ?? 0;
+        return acc + (s.salePrice - purchasePrice);
+      }, 0);
+
+      // Calculate percentage based on a dynamic target (e.g. 1.5x previous month or fixed 5k)
+      const target = 5000; 
+      const percent = Math.min(Math.round((totalProfit / target) * 100), 100);
+
+      result.push({
+        name: months[monthIndex],
+        revenue: totalRevenue,
+        profit: totalProfit,
+        percent
+      });
+    }
+    return result;
+  }, [state.sales, state.devices, state.language]);
 
   const filteredDevices = useMemo(() => devicesInStock.filter(d => 
     d.imei.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -1070,11 +1153,44 @@ const App: React.FC = () => {
                 <div className="flex items-center space-x-2 text-slate-400 text-[9px] font-semibold uppercase tracking-widest mt-1">
                   <Calendar size={10} className="text-brand-500 opacity-60" />
                   <span>{new Date().toLocaleDateString(state.language === 'ru' ? 'ru-RU' : 'en-US', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                  {state.syncSettings?.lastSync && (
+                    <>
+                      <span className="text-slate-200 dark:text-slate-700">|</span>
+                      <Cloud size={10} className="text-emerald-500 opacity-60" />
+                      <span className="text-emerald-500/80">{new Date(state.syncSettings.lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
             
+            <div className="flex items-center space-x-2">
+              {state.syncSettings?.githubToken && state.syncSettings?.repoName && (
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => syncToGithub()}
+                  disabled={isSyncing}
+                  className={`hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
+                    isSyncing ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 hover:bg-brand-100'
+                  }`}
+                >
+                  <RefreshCw size={12} className={isSyncing ? 'animate-spin' : ''} />
+                  <span>{isSyncing ? t.syncing : t.syncNow}</span>
+                </motion.button>
+              )}
+            </div>
+              
             <div className="flex items-center space-x-2 md:hidden">
+              {state.syncSettings?.githubToken && state.syncSettings?.repoName && (
+                <motion.button 
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => syncToGithub()}
+                  className="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-brand-500 shadow-sm transition-all"
+                  title={state.language === 'ru' ? 'Синхронизировать сейчас' : 'Sync Now'}
+                >
+                  <RefreshCw size={16} />
+                </motion.button>
+              )}
               <motion.button 
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setState(s => ({ ...s, theme: s.theme === 'light' ? 'dark' : 'light' }))}
@@ -1093,6 +1209,12 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-2 w-full md:w-auto justify-start md:justify-end overflow-x-auto scrollbar-hide py-1 no-scrollbar">
+            {isSyncing && (
+              <div className="flex items-center space-x-2 px-3 py-2 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800/50 text-brand-600 dark:text-brand-400 animate-pulse shrink-0">
+                <RefreshCw size={12} className="animate-spin" />
+                <span className="text-[9px] font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Облако...' : 'Cloud...'}</span>
+              </div>
+            )}
             <div className="flex items-center space-x-3 px-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm shrink-0">
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
@@ -1116,6 +1238,26 @@ const App: React.FC = () => {
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-2">
+              {state.syncSettings?.githubToken && state.syncSettings?.repoName && (
+                <>
+                  <motion.button 
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => restoreFromGithub()}
+                    className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 shadow-sm transition-all flex items-center gap-2"
+                    title={state.language === 'ru' ? 'Восстановить из облака' : 'Restore from Cloud'}
+                  >
+                    <Download size={18} />
+                  </motion.button>
+                  <motion.button 
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => syncToGithub()}
+                    className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-brand-500 shadow-sm transition-all flex items-center gap-2"
+                    title={state.language === 'ru' ? 'Синхронизировать сейчас' : 'Sync Now'}
+                  >
+                    <RefreshCw size={18} />
+                  </motion.button>
+                </>
+              )}
               <motion.button 
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setState(s => ({ ...s, theme: s.theme === 'light' ? 'dark' : 'light' }))}
@@ -1138,6 +1280,57 @@ const App: React.FC = () => {
         {/* Dashboard */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6 animate-in fade-in duration-500">
+            {(!state.syncSettings?.githubToken || !state.syncSettings?.repoName) && (
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 p-4 rounded-2xl flex items-center justify-between gap-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-100 dark:bg-amber-800 rounded-xl text-amber-600 dark:text-amber-400">
+                    <ShieldCheck size={18} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-amber-900 dark:text-amber-100 uppercase tracking-tight">
+                      {state.language === 'ru' ? 'Данные не защищены' : 'Data not protected'}
+                    </p>
+                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
+                      {state.language === 'ru' 
+                        ? 'Данные хранятся только в браузере и могут быть удалены. Настройте GitHub Sync в Настройках.' 
+                        : 'Data is only stored in your browser and may be cleared. Configure GitHub Sync in Settings.'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 shrink-0">
+                  <button 
+                    onClick={recoverLegacyData}
+                    className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[9px] font-bold uppercase tracking-widest rounded-xl shadow-sm hover:bg-blue-100 transition-all flex items-center gap-2"
+                  >
+                    <RotateCcw size={12} />
+                    {state.language === 'ru' ? 'Поиск старых данных' : 'Search Legacy'}
+                  </button>
+                  <label className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[9px] font-bold uppercase tracking-widest rounded-xl shadow-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-2 cursor-pointer">
+                    <Upload size={12} />
+                    {state.language === 'ru' ? 'Восстановить' : 'Restore'}
+                    <input type="file" className="hidden" accept=".json" onChange={importData} />
+                  </label>
+                  <button 
+                    onClick={exportData}
+                    className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white text-[9px] font-bold uppercase tracking-widest rounded-xl shadow-sm hover:bg-slate-800 transition-all flex items-center gap-2"
+                  >
+                    <Download size={12} />
+                    {state.language === 'ru' ? 'Скачать копию' : 'Download Backup'}
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('settings')}
+                    className="px-4 py-2 bg-amber-600 text-white text-[9px] font-bold uppercase tracking-widest rounded-xl shadow-sm hover:bg-amber-700 transition-all"
+                  >
+                    {state.language === 'ru' ? 'Настроить Sync' : 'Configure Sync'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                <div className="md:col-span-2 bg-brand-600 p-8 rounded-[2rem] text-white relative overflow-hidden shadow-sm">
                   <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
@@ -1169,6 +1362,58 @@ const App: React.FC = () => {
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+               <div className="flex items-center justify-between mb-6">
+                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                   <ShieldCheck size={14} className="text-brand-500" />
+                   {state.language === 'ru' ? 'Безопасность данных' : 'Data Safety'}
+                 </h3>
+                 <div className="flex gap-2">
+                    <button 
+                      onClick={recoverLegacyData}
+                      className="text-[9px] font-bold text-blue-500 uppercase tracking-widest hover:underline"
+                    >
+                      {state.language === 'ru' ? 'Поиск старых данных' : 'Search Legacy'}
+                    </button>
+                 </div>
+               </div>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button 
+                    onClick={exportData}
+                    className="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 hover:bg-slate-100 transition-all group"
+                  >
+                    <Download size={24} className="text-slate-400 group-hover:text-brand-500 mb-2 transition-colors" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Скачать копию' : 'Download Backup'}</span>
+                    <span className="text-[8px] text-slate-400 mt-1">{state.language === 'ru' ? 'Сохранить JSON файл' : 'Save JSON file'}</span>
+                  </button>
+                  <label className="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 hover:bg-slate-100 transition-all group cursor-pointer">
+                    <Upload size={24} className="text-slate-400 group-hover:text-brand-500 mb-2 transition-colors" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Восстановить' : 'Restore'}</span>
+                    <span className="text-[8px] text-slate-400 mt-1">{state.language === 'ru' ? 'Загрузить JSON файл' : 'Upload JSON file'}</span>
+                    <input type="file" className="hidden" accept=".json" onChange={importData} />
+                  </label>
+                  {state.syncSettings?.githubToken && state.syncSettings?.repoName ? (
+                    <button 
+                      onClick={() => syncToGithub()}
+                      className="flex flex-col items-center justify-center p-6 bg-brand-600 rounded-2xl border border-brand-500 hover:bg-brand-700 transition-all group shadow-lg shadow-brand-500/20"
+                    >
+                      <RefreshCw size={24} className="text-white mb-2 transition-transform group-hover:rotate-180 duration-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-white">{state.language === 'ru' ? 'Синхронизировать' : 'Sync Now'}</span>
+                      <span className="text-[8px] text-brand-100 mt-1">{state.language === 'ru' ? 'Обновить облако' : 'Update cloud'}</span>
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => setActiveTab('settings')}
+                      className="flex flex-col items-center justify-center p-6 bg-brand-50 dark:bg-brand-900/20 rounded-2xl border border-brand-100 dark:border-brand-800/50 hover:bg-brand-100 transition-all group"
+                    >
+                      <RefreshCw size={24} className="text-brand-400 group-hover:text-brand-600 mb-2 transition-colors" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-600">{state.language === 'ru' ? 'Настроить Облако' : 'Configure Cloud'}</span>
+                      <span className="text-[8px] text-brand-400 mt-1">{state.language === 'ru' ? 'GitHub Sync' : 'GitHub Sync'}</span>
+                    </button>
+                  )}
+               </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
                <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-6">{t.monthlyPerformance}</h3>
                <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -1186,7 +1431,7 @@ const App: React.FC = () => {
                         contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '12px', fontSize: '11px', color: '#fff' }}
                         itemStyle={{ color: '#38bdf8', fontWeight: 'semibold' }}
                       />
-                      <Area type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfit)" />
+                      <Area isAnimationActive={false} type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfit)" />
                     </AreaChart>
                   </ResponsiveContainer>
                </div>
@@ -1314,7 +1559,7 @@ const App: React.FC = () => {
 
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
-          <div className="space-y-8 animate-in fade-in duration-500">
+          <div className="space-y-8 animate-in fade-in duration-300">
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-8">{t.monthlyProfit}</h3>
@@ -1333,7 +1578,7 @@ const App: React.FC = () => {
                             <Tooltip 
                               contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '12px', fontSize: '11px', color: '#fff' }}
                             />
-                            <Area type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfitAnalytic)" />
+                            <Area isAnimationActive={false} type="monotone" dataKey="profit" stroke="#0ea5e9" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfitAnalytic)" />
                          </AreaChart>
                       </ResponsiveContainer>
                    </div>
@@ -1347,10 +1592,59 @@ const App: React.FC = () => {
                             <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis hide />
                             <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
-                            <Bar dataKey="profit" fill="#10b981" radius={[6, 6, 0, 0]} barSize={12} />
+                            <Bar isAnimationActive={false} dataKey="profit" fill="#10b981" radius={[6, 6, 0, 0]} barSize={12} />
                          </BarChart>
                       </ResponsiveContainer>
                    </div>
+                </div>
+             </div>
+
+             <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-8">{t.monthlyTotals}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   {lastThreeMonthsData.map((data, i) => (
+                     <div key={i} className="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50">
+                       <div className="relative w-28 h-28 mb-4">
+                          <svg className="w-full h-full transform -rotate-90">
+                             <circle
+                               cx="56"
+                               cy="56"
+                               r="50"
+                               stroke="currentColor"
+                               strokeWidth="8"
+                               fill="transparent"
+                               className="text-slate-200 dark:text-slate-800"
+                             />
+                             <motion.circle
+                               cx="56"
+                               cy="56"
+                               r="50"
+                               stroke="currentColor"
+                               strokeWidth="8"
+                               fill="transparent"
+                               strokeDasharray={314}
+                               initial={{ strokeDashoffset: 314 }}
+                               animate={{ strokeDashoffset: 314 - (314 * data.percent) / 100 }}
+                               transition={{ duration: 1.5, ease: "circOut" }}
+                               className="text-brand-500"
+                               strokeLinecap="round"
+                             />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                             <span className="text-xl font-black text-slate-900 dark:text-white tracking-tighter">
+                               {data.percent}%
+                             </span>
+                          </div>
+                       </div>
+                       <div className="text-center">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{data.name}</p>
+                          <p className="text-base font-bold text-brand-600 tracking-tight">${data.profit.toLocaleString()}</p>
+                          <p className="text-[9px] font-medium text-slate-400 mt-0.5">
+                            {state.language === 'ru' ? 'Выручка' : 'Rev'}: ${data.revenue.toLocaleString()}
+                          </p>
+                       </div>
+                     </div>
+                   ))}
                 </div>
              </div>
 
@@ -1866,6 +2160,95 @@ const App: React.FC = () => {
                    </div>
                 </div>
 
+                {/* Currency Settings Card */}
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
+                   <div className="flex justify-between items-center">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center">
+                        <Coins className="mr-2 text-brand-500 opacity-70" size={16} />
+                        {state.language === 'ru' ? 'Настройки Валюты' : 'Currency Settings'}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                           {state.language === 'ru' ? 'Авто-обновление' : 'Auto-Update'}
+                         </span>
+                         <button 
+                           onClick={() => setState(s => ({ ...s, currencySettings: { ...s.currencySettings, autoUpdate: !s.currencySettings?.autoUpdate } }))}
+                           className={`w-10 h-5 rounded-full transition-all relative ${state.currencySettings?.autoUpdate ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                         >
+                           <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${state.currencySettings?.autoUpdate ? 'left-5.5' : 'left-0.5'}`} />
+                         </button>
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                           {state.language === 'ru' ? 'Курс (Ручной)' : 'Exchange Rate (Manual)'}
+                         </label>
+                         <input 
+                           type="number" 
+                           disabled={state.currencySettings?.autoUpdate}
+                           className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all disabled:opacity-50"
+                           value={state.currencySettings?.manualRate || state.exchangeRate}
+                           onChange={(e) => {
+                             const val = Number(e.target.value);
+                             setState(s => ({
+                               ...s,
+                               exchangeRate: val,
+                               buyRate: val - (s.currencySettings?.buyOffset || 25),
+                               sellRate: val + (s.currencySettings?.sellOffset || 25),
+                               currencySettings: { ...s.currencySettings, manualRate: val }
+                             }));
+                           }}
+                         />
+                      </div>
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                           {state.language === 'ru' ? 'Покупка (Отступ)' : 'Buy Offset'}
+                         </label>
+                         <input 
+                           type="number" 
+                           className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
+                           value={state.currencySettings?.buyOffset || 25}
+                           onChange={(e) => {
+                             const val = Number(e.target.value);
+                             setState(s => ({
+                               ...s,
+                               buyRate: s.exchangeRate - val,
+                               currencySettings: { ...s.currencySettings, buyOffset: val }
+                             }));
+                           }}
+                         />
+                      </div>
+                      <div className="space-y-1.5">
+                         <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">
+                           {state.language === 'ru' ? 'Продажа (Отступ)' : 'Sell Offset'}
+                         </label>
+                         <input 
+                           type="number" 
+                           className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl outline-none text-sm font-semibold border border-transparent focus:border-brand-500/30 transition-all"
+                           value={state.currencySettings?.sellOffset || 25}
+                           onChange={(e) => {
+                             const val = Number(e.target.value);
+                             setState(s => ({
+                               ...s,
+                               sellRate: s.exchangeRate + val,
+                               currencySettings: { ...s.currencySettings, sellOffset: val }
+                             }));
+                           }}
+                         />
+                      </div>
+                   </div>
+                   
+                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800/50">
+                      <p className="text-[10px] text-blue-700 dark:text-blue-300 font-medium">
+                        {state.language === 'ru' 
+                          ? '💡 Совет: Вы можете отключить авто-обновление и ввести курс вручную, если рыночный курс отображается неверно. Отступы определяют разницу между покупкой и продажей.' 
+                          : '💡 Tip: You can disable auto-update and enter the rate manually if the market rate is incorrect. Offsets define the difference between buy and sell rates.'}
+                      </p>
+                   </div>
+                </div>
+
                 {/* Synchronization & API Card */}
                 <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8 md:col-span-2">
                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1949,22 +2332,45 @@ const App: React.FC = () => {
                           onChange={(e) => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, repoName: e.target.value } }))}
                         />
                       </div>
-                      <div className="md:col-span-2 flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-xl ${state.syncSettings?.autoSync ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'}`}>
-                            <RefreshCw size={16} className={state.syncSettings?.autoSync ? 'animate-spin-slow' : ''} />
+                      <div className="md:col-span-2 flex flex-col md:flex-row gap-4">
+                        <div className="flex-1 flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-xl ${state.syncSettings?.autoSync ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'}`}>
+                              <RefreshCw size={16} className={state.syncSettings?.autoSync ? 'animate-spin-slow' : ''} />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Авто-синхронизация' : 'Auto-Sync'}</p>
+                              <p className="text-[10px] text-slate-400 font-medium">{state.language === 'ru' ? 'Автоматически сохранять изменения в облако' : 'Automatically save changes to cloud'}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-xs font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Авто-синхронизация' : 'Auto-Sync'}</p>
-                            <p className="text-[10px] text-slate-400 font-medium">{state.language === 'ru' ? 'Автоматически сохранять изменения в облако' : 'Automatically save changes to cloud'}</p>
-                          </div>
+                          <button 
+                            onClick={() => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, autoSync: !s.syncSettings?.autoSync } }))}
+                            className={`w-12 h-6 rounded-full transition-all relative ${state.syncSettings?.autoSync ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                          >
+                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.syncSettings?.autoSync ? 'left-7' : 'left-1'}`} />
+                          </button>
                         </div>
-                        <button 
-                          onClick={() => setState(s => ({ ...s, syncSettings: { ...s.syncSettings, autoSync: !s.syncSettings?.autoSync } }))}
-                          className={`w-12 h-6 rounded-full transition-all relative ${state.syncSettings?.autoSync ? 'bg-emerald-500' : 'bg-slate-300'}`}
-                        >
-                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${state.syncSettings?.autoSync ? 'left-7' : 'left-1'}`} />
-                        </button>
+                        <div className="flex-1 flex items-center justify-between bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-xl bg-brand-50 dark:bg-brand-900/20 text-brand-500">
+                              <Cloud size={16} />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Облачный статус' : 'Cloud Status'}</p>
+                              <p className="text-[10px] text-slate-400 font-medium">
+                                {state.syncSettings?.lastSync 
+                                  ? `${state.language === 'ru' ? 'Последняя копия:' : 'Last sync:'} ${new Date(state.syncSettings.lastSync).toLocaleTimeString()}`
+                                  : (state.language === 'ru' ? 'Не синхронизировано' : 'Not synced')}
+                              </p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => restoreFromGithub()}
+                            className="px-3 py-1.5 bg-white dark:bg-slate-800 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 transition-all"
+                          >
+                            {state.language === 'ru' ? 'Загрузить' : 'Load'}
+                          </button>
+                        </div>
                       </div>
                    </div>
                    <div className="flex flex-col md:flex-row items-center justify-between pt-4 gap-4">
