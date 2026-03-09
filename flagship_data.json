@@ -193,19 +193,6 @@
       "dateAdded": "2026-01-30T07:35:07.477Z"
     },
     {
-      "id": "1769758063007_9936322db9447",
-      "brand": "iPhone",
-      "model": "iPhone 12 Pro",
-      "storage": "128Gb",
-      "imei": "356696725276013",
-      "purchasePrice": 300,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:27:43.007Z",
-      "batteryHealth": 88,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T07:27:43.007Z"
-    },
-    {
       "id": "1769757859327_f260a241f37b6",
       "brand": "iPhone",
       "model": "iPhone 12 Pro Max",
@@ -230,19 +217,6 @@
       "batteryHealth": 89,
       "status": "In Stock",
       "dateAdded": "2026-01-30T07:23:37.883Z"
-    },
-    {
-      "id": "1769757766778_78d73c58750b78",
-      "brand": "iPhone",
-      "model": "iPhone XR",
-      "storage": "64Gb",
-      "imei": "353065108710474",
-      "purchasePrice": 175,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:22:46.778Z",
-      "batteryHealth": 88,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T07:22:46.778Z"
     },
     {
       "id": "1769757730153_cbc8e505cb8218",
@@ -749,7 +723,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T05:22:39.260Z"
+    "lastSync": "2026-03-09T05:24:20.870Z"
   },
   "currencySettings": {
     "autoUpdate": true,
