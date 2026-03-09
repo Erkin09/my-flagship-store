@@ -414,45 +414,6 @@
       "dateAdded": "2026-01-30T06:56:15.467Z"
     },
     {
-      "id": "1769756101609_2bd6a39aaac8e8",
-      "brand": "iPhone",
-      "model": "iPhone 13 Pro Max",
-      "storage": "128Gb",
-      "imei": "350419535682841",
-      "purchasePrice": 500,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T06:55:01.609Z",
-      "batteryHealth": 89,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:55:01.609Z"
-    },
-    {
-      "id": "1769756063920_bb161fed71c148",
-      "brand": "iPhone",
-      "model": "iPhone 13 Pro Max",
-      "storage": "128Gb",
-      "imei": "358408877734056",
-      "purchasePrice": 550,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T06:54:23.920Z",
-      "batteryHealth": 85,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:54:23.920Z"
-    },
-    {
-      "id": "1769755989038_ba52c1e794e78",
-      "brand": "iPhone",
-      "model": "iPhone 13 Pro Max",
-      "storage": "256Gb",
-      "imei": "356514419853726",
-      "purchasePrice": 550,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T06:53:09.038Z",
-      "batteryHealth": 82,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:53:09.038Z"
-    },
-    {
       "id": "1769755922189_b578d9d6432098",
       "brand": "Samsung",
       "model": "Galaxy S10",
@@ -775,7 +736,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T05:12:35.372Z"
+    "lastSync": "2026-03-09T05:12:45.649Z"
   },
   "currencySettings": {
     "autoUpdate": true,
