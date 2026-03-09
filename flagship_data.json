@@ -105,19 +105,6 @@
       "dateAdded": "2026-01-30T08:10:16.651Z"
     },
     {
-      "id": "1769758569377_2770b04a9e2f9",
-      "brand": "iPhone",
-      "model": "iPhone 11",
-      "storage": "128Gb",
-      "imei": "356874119419446",
-      "purchasePrice": 270,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:36:09.377Z",
-      "batteryHealth": 87,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T07:36:09.377Z"
-    },
-    {
       "id": "1769758507477_dff3bf36e2a36",
       "brand": "iPhone",
       "model": "iPhone 15 Pro Max",
@@ -778,7 +765,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T04:48:37.261Z"
+    "lastSync": "2026-03-09T04:50:11.060Z"
   },
   "currencySettings": {
     "autoUpdate": true,
