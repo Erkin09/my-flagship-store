@@ -746,13 +746,12 @@
     "Samsung": []
   },
   "aiChatHistory": [],
-  "aiStructuredData": null,
   "geminiApiKey": "AIzaSyDWGCLYMeMK9wN3NotszS90mb9QMQNtKMQ",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-08T15:20:04.028Z"
+    "lastSync": "2026-03-09T03:12:44.878Z"
   },
   "currencySettings": {
     "autoUpdate": true,
