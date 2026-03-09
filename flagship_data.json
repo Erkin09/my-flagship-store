@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "1206dc82-1003-4128-bc76-6b75eee81d10",
+      "brand": "iPhone",
+      "model": "iPhone 14 Pro Max",
+      "storage": "256Gb",
+      "imei": "351542669588192",
+      "purchasePrice": 500,
+      "purchasedFrom": "Client Ishonch",
+      "purchaseDate": "2026-02-10",
+      "batteryHealth": 86,
+      "status": "In Stock",
+      "dateAdded": "2026-03-09T04:34:28.904Z"
+    },
+    {
       "id": "d8a7e211-6d98-4bbb-8817-43ce66a303a3",
       "brand": "iPhone",
       "model": "iPhone 13 Pro Max",
@@ -765,7 +778,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T04:31:42.887Z"
+    "lastSync": "2026-03-09T04:33:16.478Z"
   },
   "currencySettings": {
     "autoUpdate": true,
