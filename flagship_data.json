@@ -482,19 +482,6 @@
       "dateAdded": "2026-01-30T06:08:26.370Z"
     },
     {
-      "id": "1769753228004_9eed8aee32588",
-      "brand": "Samsung",
-      "model": "Galaxy S24",
-      "storage": "128Gb",
-      "imei": "354516960001458",
-      "purchasePrice": 400,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T06:07:08.004Z",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:07:08.004Z"
-    },
-    {
       "id": "1769753188488_321f5362a15f5",
       "brand": "Samsung",
       "model": "Galaxy S21+",
@@ -791,7 +778,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T04:53:12.820Z"
+    "lastSync": "2026-03-09T04:54:40.682Z"
   },
   "currencySettings": {
     "autoUpdate": true,
