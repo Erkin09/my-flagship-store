@@ -559,6 +559,20 @@
   ],
   "sales": [
     {
+      "id": "96d5832c-b136-4ca3-b335-0025bf5c35e0",
+      "customerName": "Fazli kurs",
+      "customerPhone": "000000",
+      "salePrice": 80,
+      "date": "2026-03-09T05:36:37.139Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-08T05:36:37.139Z"
+      }
+    },
+    {
       "id": "a1b11975-dae0-475e-9836-4fc5a0266cb9",
       "customerName": "Malika",
       "customerPhone": "933130039",
@@ -807,7 +821,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T05:32:59.086Z"
+    "lastSync": "2026-03-09T05:33:18.750Z"
   },
   "currencySettings": {
     "autoUpdate": true,
