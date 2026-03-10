@@ -619,7 +619,7 @@
       "status": "Completed",
       "installmentPlan": {
         "months": 1,
-        "paidAmount": 0,
+        "paidAmount": 248,
         "dueDate": "2026-04-08T05:32:52.838Z"
       }
     },
@@ -827,23 +827,95 @@
   ],
   "language": "ru",
   "theme": "light",
-  "cashBalance": 3699,
-  "exchangeRate": 12228,
-  "buyRate": 12203,
-  "sellRate": 12253,
-  "bankRate": 12176,
-  "prevExchangeRate": 12228,
+  "cashBalance": 3947,
+  "exchangeRate": 12209,
+  "buyRate": 12184,
+  "sellRate": 12234,
+  "bankRate": 12191,
+  "prevExchangeRate": 12209,
   "customModels": {
     "iPhone": [],
     "Samsung": []
   },
   "aiChatHistory": [],
+  "aiStructuredData": {
+    "summary": "Магазин демонстрирует высокую маржинальность на уровне 42.6%, что значительно выше среднего по рынку электроники. Однако выявлена критическая проблема: низкая оборачиваемость склада. При текущем объеме продаж запасов ($14 216) хватит более чем на 5 месяцев (163 дня), что ведет к заморозке оборотного капитала и рискам удешевления моделей iPhone 11-13.\n\nАномалией является высокая доля продаж с меткой 'undefined' (54% от общего количества транзакций). Это указывает на серьезные пробелы в складском учете или на то, что значительная часть выручки формируется за счет аксессуаров и услуг, которые не типизированы. Основной доход в сегменте смартфонов приносят модели iPhone 13 Pro и iPhone 15 Pro Max, в то время как линейка Samsung Galaxy представлена единичными продажами.",
+    "stats": [
+      {
+        "label": "ROI (мес)",
+        "value": "13.6%"
+      },
+      {
+        "label": "Средний чек",
+        "value": "$350"
+      },
+      {
+        "label": "Оборачиваемость",
+        "value": "163 дня"
+      },
+      {
+        "label": "Маржа",
+        "value": "42.6%"
+      }
+    ],
+    "chartData": [
+      {
+        "name": "iPhone 13 Pro",
+        "value": 2
+      },
+      {
+        "name": "iPhone 15 Pro Max",
+        "value": 1
+      },
+      {
+        "name": "Galaxy S22 Ultra",
+        "value": 1
+      },
+      {
+        "name": "Galaxy S21/S22",
+        "value": 2
+      },
+      {
+        "name": "Прочее/Misc",
+        "value": 7
+      }
+    ],
+    "brandData": [
+      {
+        "name": "Apple",
+        "value": 1872
+      },
+      {
+        "name": "Samsung",
+        "value": 1106
+      },
+      {
+        "name": "Undefined/Accessory",
+        "value": 1567
+      }
+    ],
+    "profitTrend": [
+      {
+        "date": "08.03",
+        "profit": 1059
+      },
+      {
+        "date": "09.03",
+        "profit": 876
+      }
+    ],
+    "recommendations": [
+      "Стимулировать продажи устаревающих моделей (iPhone 11 и 12) через трейд-ин или комплекты с аксессуарами, чтобы высвободить $2500+ замороженного капитала.",
+      "Внедрить обязательное штрихкодирование для всех позиций: текущие 54% 'undefined' продаж делают невозможным точное прогнозирование спроса.",
+      "Сократить закупки iPhone 13 Pro (в наличии 6 шт. при продажах 2 шт./мес) и переориентировать бюджет на ликвидные новинки или дефицитные позиции Samsung серии S24."
+    ]
+  },
   "geminiApiKey": "AIzaSyDvqf3BYymdJERUAQte77LrVxoS1w89Pio",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-09T12:11:50.772Z"
+    "lastSync": "2026-03-10T04:25:22.103Z"
   },
   "currencySettings": {
     "autoUpdate": true,
