@@ -396,7 +396,7 @@
       "purchasedFrom": "Korea mobile",
       "purchaseDate": "2026-02-28",
       "batteryHealth": 100,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-01-30T06:57:17.555Z"
     },
     {
@@ -570,6 +570,17 @@
     }
   ],
   "sales": [
+    {
+      "id": "94cf0fd5-d5aa-405f-82d9-91fd19a7116d",
+      "deviceId": "1769756237555_7f8ef9bf89d3b8",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 290,
+      "purchasePrice": 263,
+      "date": "2026-03-13T08:19:29.320Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
     {
       "id": "c9f1af81-8dcd-4218-b987-a4ac146698db",
       "deviceId": "15da231f-8785-4770-86fb-5bd82f603f09",
@@ -827,12 +838,12 @@
   ],
   "language": "ru",
   "theme": "light",
-  "cashBalance": 3947,
-  "exchangeRate": 12194,
-  "buyRate": 12169,
-  "sellRate": 12219,
-  "bankRate": 12194,
-  "prevExchangeRate": 12194,
+  "cashBalance": 4237,
+  "exchangeRate": 12161,
+  "buyRate": 12136,
+  "sellRate": 12186,
+  "bankRate": 12161,
+  "prevExchangeRate": 12158,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -915,7 +926,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-10T11:56:32.794Z"
+    "lastSync": "2026-03-11T21:11:57.039Z"
   },
   "currencySettings": {
     "autoUpdate": true,
