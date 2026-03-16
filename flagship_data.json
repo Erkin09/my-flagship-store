@@ -240,7 +240,7 @@
       "purchasedFrom": "",
       "purchaseDate": "2026-01-30T07:22:10.153Z",
       "batteryHealth": 83,
-      "status": "Sold",
+      "status": "In Stock",
       "dateAdded": "2026-01-30T07:22:10.153Z"
     },
     {
@@ -579,7 +579,7 @@
       "purchasePrice": 200,
       "date": "2026-03-16T10:30:19.803Z",
       "isInstallment": true,
-      "status": "Completed",
+      "status": "Returned",
       "installmentPlan": {
         "months": 1,
         "paidAmount": 0,
@@ -925,7 +925,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-15T14:18:32.231Z"
+    "lastSync": "2026-03-16T10:30:26.529Z"
   },
   "currencySettings": {
     "autoUpdate": true,
