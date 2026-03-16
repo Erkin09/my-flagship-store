@@ -236,9 +236,9 @@
       "model": "iPhone 11",
       "storage": "128Gb",
       "imei": "356656420793392",
-      "purchasePrice": 200,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:22:10.153Z",
+      "purchasePrice": 166,
+      "purchasedFrom": "Client",
+      "purchaseDate": "2025-11-11",
       "batteryHealth": 83,
       "status": "In Stock",
       "dateAdded": "2026-01-30T07:22:10.153Z"
@@ -925,7 +925,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-16T10:30:26.529Z"
+    "lastSync": "2026-03-16T10:49:48.538Z"
   },
   "currencySettings": {
     "autoUpdate": true,
