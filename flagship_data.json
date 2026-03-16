@@ -240,7 +240,7 @@
       "purchasedFrom": "",
       "purchaseDate": "2026-01-30T07:22:10.153Z",
       "batteryHealth": 83,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-01-30T07:22:10.153Z"
     },
     {
@@ -571,6 +571,22 @@
   ],
   "sales": [
     {
+      "id": "4341f8e7-35b0-4f24-a7f5-f28c7c6ecd79",
+      "deviceId": "1769757730153_cbc8e505cb8218",
+      "customerName": "Aziz Bekmurodov",
+      "customerPhone": "883052812",
+      "salePrice": 192,
+      "purchasePrice": 200,
+      "date": "2026-03-16T10:30:19.803Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-04-15T10:30:19.803Z"
+      }
+    },
+    {
       "id": "eb525beb-c0d0-497e-bd1d-eaa445222a39",
       "deviceId": "9cfa498e-a630-4320-8f60-921ff41f7836",
       "customerName": "Guest",
@@ -894,11 +910,11 @@
   "language": "ru",
   "theme": "light",
   "cashBalance": 6887,
-  "exchangeRate": 12122,
-  "buyRate": 12097,
-  "sellRate": 12147,
-  "bankRate": 12102,
-  "prevExchangeRate": 12118,
+  "exchangeRate": 12225,
+  "buyRate": 12200,
+  "sellRate": 12250,
+  "bankRate": 12082,
+  "prevExchangeRate": 12225,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -909,7 +925,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-15T12:32:47.396Z"
+    "lastSync": "2026-03-15T14:18:32.231Z"
   },
   "currencySettings": {
     "autoUpdate": true,
