@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "5b391ad1-3cdd-4b69-a8e7-c277339e204c",
+      "brand": "Samsung",
+      "model": "Galaxy S22+",
+      "storage": "256Gb",
+      "imei": "350865892829229",
+      "purchasePrice": 235,
+      "purchasedFrom": "Import mobile 42",
+      "purchaseDate": "2026-03-17",
+      "status": "In Stock",
+      "dateAdded": "2026-03-18T06:54:54.105Z"
+    },
+    {
       "id": "b318bf11-b165-44f2-8f56-1cb0799bd2ee",
       "brand": "iPhone",
       "model": "iPhone 13 Pro Max",
@@ -1084,7 +1096,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-18T06:39:01.847Z"
+    "lastSync": "2026-03-18T06:52:38.932Z"
   },
   "currencySettings": {
     "autoUpdate": true,
