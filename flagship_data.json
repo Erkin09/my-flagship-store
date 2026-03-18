@@ -82,7 +82,7 @@
       "imei": "356955702964805",
       "purchasePrice": 475,
       "purchasedFrom": "Raxmatullo 777",
-      "purchaseDate": "2026-03-18",
+      "purchaseDate": "2026-03-17",
       "batteryHealth": 88,
       "status": "In Stock",
       "dateAdded": "2026-03-18T06:35:03.062Z"
@@ -1132,7 +1132,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-18T07:21:09.713Z"
+    "lastSync": "2026-03-18T07:22:26.832Z"
   },
   "currencySettings": {
     "autoUpdate": true,
