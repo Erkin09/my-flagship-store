@@ -1128,12 +1128,12 @@
   ],
   "language": "ru",
   "theme": "light",
-  "cashBalance": 0,
+  "cashBalance": 1600,
   "exchangeRate": 12182,
   "buyRate": 12157,
   "sellRate": 12207,
-  "bankRate": 12129,
-  "prevExchangeRate": 12225,
+  "bankRate": 12182,
+  "prevExchangeRate": 12182,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -1144,7 +1144,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-18T07:22:48.843Z"
+    "lastSync": "2026-03-18T07:26:17.566Z"
   },
   "currencySettings": {
     "autoUpdate": true,
