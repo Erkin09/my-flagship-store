@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "a0d578ee-8f57-40f7-bc73-4bae2ab268a4",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro Max",
+      "storage": "128Gb",
+      "imei": "356955702964805",
+      "purchasePrice": 475,
+      "purchasedFrom": "Raxmatullo 777",
+      "purchaseDate": "2026-03-18",
+      "batteryHealth": 88,
+      "status": "In Stock",
+      "dateAdded": "2026-03-18T06:35:03.062Z"
+    },
+    {
       "id": "7743af72-e15a-4038-91f7-34e822d9279c",
       "brand": "iPhone",
       "model": "iPhone 13 Pro",
@@ -1045,7 +1058,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-18T06:17:58.745Z"
+    "lastSync": "2026-03-18T06:32:12.634Z"
   },
   "currencySettings": {
     "autoUpdate": true,
