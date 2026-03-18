@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "34a6b941-5836-4962-883f-3cf94b029969",
+      "brand": "iPhone",
+      "model": "iPhone 11",
+      "storage": "64Gb",
+      "imei": "356591100331527",
+      "purchasePrice": 210,
+      "purchasedFrom": "Yosinxon",
+      "purchaseDate": "2026-03-17",
+      "batteryHealth": 93,
+      "status": "In Stock",
+      "dateAdded": "2026-03-18T05:54:20.495Z"
+    },
+    {
       "id": "f6872951-7ee0-4dcb-ac89-9b82fac3efce",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -980,7 +993,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-18T05:46:15.209Z"
+    "lastSync": "2026-03-18T05:52:25.965Z"
   },
   "currencySettings": {
     "autoUpdate": true,
