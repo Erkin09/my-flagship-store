@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "e7c16a8b-57c7-45a9-8214-0b43869bf1e9",
+      "brand": "iPhone",
+      "model": "iPhone 15 Pro Max",
+      "storage": "256Gb",
+      "imei": "356876526214153",
+      "purchasePrice": 650,
+      "purchasedFrom": "Feruz Usto",
+      "purchaseDate": "2026-03-22",
+      "batteryHealth": 85,
+      "status": "In Stock",
+      "dateAdded": "2026-03-23T08:36:56.402Z"
+    },
+    {
       "id": "8c3e021d-cba5-44b2-aa71-3f6a4ec9d042",
       "brand": "Samsung",
       "model": "Galaxy S25 Ultra",
@@ -1173,11 +1186,11 @@
   "language": "ru",
   "theme": "light",
   "cashBalance": 3366,
-  "exchangeRate": 12191,
-  "buyRate": 12166,
-  "sellRate": 12216,
-  "bankRate": 12191,
-  "prevExchangeRate": 12182,
+  "exchangeRate": 12200,
+  "buyRate": 12175,
+  "sellRate": 12225,
+  "bankRate": 12200,
+  "prevExchangeRate": 12198,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -1188,7 +1201,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-19T12:16:40.467Z"
+    "lastSync": "2026-03-19T12:17:13.072Z"
   },
   "currencySettings": {
     "autoUpdate": true,
