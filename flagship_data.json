@@ -352,7 +352,7 @@
       "purchasedFrom": "Maxking",
       "purchaseDate": "2026-02-28",
       "batteryHealth": 92,
-      "status": "Sold",
+      "status": "In Stock",
       "dateAdded": "2026-03-09T04:43:03.676Z"
     },
     {
@@ -808,7 +808,7 @@
       "purchasePrice": 415,
       "date": "2026-03-23T09:44:24.352Z",
       "isInstallment": true,
-      "status": "Completed",
+      "status": "Returned",
       "installmentPlan": {
         "months": 1,
         "paidAmount": 470,
@@ -1225,12 +1225,12 @@
   ],
   "language": "ru",
   "theme": "light",
-  "cashBalance": 3630,
-  "exchangeRate": 12200,
-  "buyRate": 12175,
-  "sellRate": 12225,
-  "bankRate": 12200,
-  "prevExchangeRate": 12198,
+  "cashBalance": 3160,
+  "exchangeRate": 12166,
+  "buyRate": 12141,
+  "sellRate": 12191,
+  "bankRate": 12192,
+  "prevExchangeRate": 12166,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -1241,7 +1241,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-03-24T05:21:12.889Z"
+    "lastSync": "2026-03-24T05:58:56.425Z"
   },
   "currencySettings": {
     "autoUpdate": true,
