@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "2eda89cf-9081-4d4b-b2de-0347e53c69a3",
+      "brand": "Samsung",
+      "model": "Galaxy S23+",
+      "storage": "256Gb",
+      "imei": "355468150675684",
+      "purchasePrice": 335,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-07-12",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T06:55:52.423Z"
+    },
+    {
       "id": "e31dea61-0765-42e3-86cd-29ae100a90df",
       "brand": "Samsung",
       "model": "Galaxy Note 20 Ultra",
@@ -1150,7 +1162,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:54:52.409Z"
+    "lastSync": "2026-07-14T06:55:26.610Z"
   },
   "currencySettings": {
     "autoUpdate": true,
