@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "dbbc6562-8c3c-4c1d-b885-c47045a95c23",
+      "brand": "Samsung",
+      "model": "Galaxy S24",
+      "storage": "512Gb",
+      "imei": "351420620393194",
+      "purchasePrice": 435,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-05-06",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T09:54:35.160Z"
+    },
+    {
       "id": "1a4534a2-d3a0-4d51-acb8-422f9532e5e3",
       "brand": "Samsung",
       "model": "Galaxy S21",
@@ -1515,7 +1527,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T09:49:42.813Z"
+    "lastSync": "2026-07-14T09:51:03.201Z"
   },
   "currencySettings": {
     "autoUpdate": true,
