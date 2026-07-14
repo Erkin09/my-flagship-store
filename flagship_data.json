@@ -339,19 +339,6 @@
       "dateAdded": "2026-01-30T07:17:48.749Z"
     },
     {
-      "id": "1769757333703_09ba007115e4b",
-      "brand": "iPhone",
-      "model": "iPhone 13",
-      "storage": "256Gb",
-      "imei": "357140957383873",
-      "purchasePrice": 380,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:15:33.703Z",
-      "batteryHealth": 88,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T07:15:33.703Z"
-    },
-    {
       "id": "1769757265187_17694af6408198",
       "brand": "iPhone",
       "model": "iPhone 14",
@@ -428,19 +415,6 @@
       "batteryHealth": 93,
       "status": "Sold",
       "dateAdded": "2026-01-30T07:02:01.626Z"
-    },
-    {
-      "id": "1769756453878_69f695e1b8ab08",
-      "brand": "iPhone",
-      "model": "iPhone 14 Pro",
-      "storage": "256Gb",
-      "imei": "358267719471958",
-      "purchasePrice": 600,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:00:53.878Z",
-      "batteryHealth": 91,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T07:00:53.878Z"
     },
     {
       "id": "1769756237555_7f8ef9bf89d3b8",
@@ -1115,7 +1089,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:27:38.924Z"
+    "lastSync": "2026-07-14T06:27:48.191Z"
   },
   "currencySettings": {
     "autoUpdate": true,
