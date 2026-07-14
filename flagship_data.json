@@ -1317,13 +1317,13 @@
   "language": "ru",
   "theme": "light",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-14",
+  "lastDailyBackup": "",
   "cashBalance": 7735,
-  "exchangeRate": 12149,
-  "buyRate": 12124,
-  "sellRate": 12174,
-  "bankRate": 12093,
-  "prevExchangeRate": 12233,
+  "exchangeRate": 12242,
+  "buyRate": 12217,
+  "sellRate": 12267,
+  "bankRate": 12242,
+  "prevExchangeRate": 12242,
   "customModels": {
     "iPhone": [],
     "Samsung": []
@@ -1335,8 +1335,7 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "autoSync": true,
-    "lastSync": "2026-07-13T07:55:52.969Z"
+    "autoSync": true
   },
   "currencySettings": {
     "autoUpdate": true,
