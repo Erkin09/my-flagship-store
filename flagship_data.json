@@ -248,19 +248,6 @@
       "dateAdded": "2026-03-09T04:40:03.451Z"
     },
     {
-      "id": "1206dc82-1003-4128-bc76-6b75eee81d10",
-      "brand": "iPhone",
-      "model": "iPhone 14 Pro Max",
-      "storage": "256Gb",
-      "imei": "351542669588192",
-      "purchasePrice": 500,
-      "purchasedFrom": "Client Ishonch",
-      "purchaseDate": "2026-02-10",
-      "batteryHealth": 86,
-      "status": "In Stock",
-      "dateAdded": "2026-03-09T04:34:28.904Z"
-    },
-    {
       "id": "d8a7e211-6d98-4bbb-8817-43ce66a303a3",
       "brand": "iPhone",
       "model": "iPhone 13 Pro Max",
@@ -376,19 +363,6 @@
       "batteryHealth": 92,
       "status": "In Stock",
       "dateAdded": "2026-01-30T07:17:48.749Z"
-    },
-    {
-      "id": "1769757419784_d98fa639ed2ed8",
-      "brand": "iPhone",
-      "model": "iPhone 12",
-      "storage": "64Gb",
-      "imei": "358758580954577",
-      "purchasePrice": 235,
-      "purchasedFrom": "Maxking",
-      "purchaseDate": "2026-02-28",
-      "batteryHealth": 94,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T07:16:59.784Z"
     },
     {
       "id": "1769757333703_09ba007115e4b",
@@ -1167,7 +1141,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:26:41.837Z"
+    "lastSync": "2026-07-14T06:27:19.647Z"
   },
   "currencySettings": {
     "autoUpdate": true,
