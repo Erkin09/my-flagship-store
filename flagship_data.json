@@ -493,32 +493,6 @@
       "batteryHealth": 100,
       "status": "Sold",
       "dateAdded": "2026-01-30T06:03:11.126Z"
-    },
-    {
-      "id": "1769752958468_ccb4eb8edb3018",
-      "brand": "Samsung",
-      "model": "Galaxy S23+",
-      "storage": "256Gb",
-      "imei": "350309332639435",
-      "purchasePrice": 380,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T06:02:38.468Z",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:02:38.468Z"
-    },
-    {
-      "id": "1769752891710_ce015f39218478",
-      "brand": "Samsung",
-      "model": "Galaxy S22 Ultra",
-      "storage": "256Gb",
-      "imei": "351562314387600",
-      "purchasePrice": 400,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T06:01:31.710Z",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:01:31.710Z"
     }
   ],
   "sales": [
@@ -1024,7 +998,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:28:52.198Z"
+    "lastSync": "2026-07-14T06:29:05.921Z"
   },
   "currencySettings": {
     "autoUpdate": true,
