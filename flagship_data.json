@@ -131,19 +131,6 @@
       "dateAdded": "2026-03-18T06:17:52.072Z"
     },
     {
-      "id": "4a1396b1-62e2-4582-bd13-fd4f97a996ef",
-      "brand": "iPhone",
-      "model": "iPhone 13",
-      "storage": "128Gb",
-      "imei": "355439679751181",
-      "purchasePrice": 335,
-      "purchasedFrom": "Making",
-      "purchaseDate": "2026-03-17",
-      "batteryHealth": 90,
-      "status": "In Stock",
-      "dateAdded": "2026-03-18T06:13:57.228Z"
-    },
-    {
       "id": "34a6b941-5836-4962-883f-3cf94b029969",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -1258,7 +1245,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:24:16.873Z"
+    "lastSync": "2026-07-14T06:25:05.742Z"
   },
   "currencySettings": {
     "autoUpdate": true,
