@@ -1306,7 +1306,8 @@
       "Macbook Neo"
     ],
     "Samsung": [
-      "Galaxy Note 20 Ultra"
+      "Galaxy Note 20 Ultra",
+      "Galaxy S10 5G"
     ]
   },
   "aiChatHistory": [],
@@ -1317,7 +1318,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:30:06.836Z"
+    "lastSync": "2026-07-14T08:30:52.815Z"
   },
   "currencySettings": {
     "autoUpdate": true,
