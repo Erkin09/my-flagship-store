@@ -1126,7 +1126,9 @@
   "prevExchangeRate": 12242,
   "customModels": {
     "iPhone": [],
-    "Samsung": []
+    "Samsung": [
+      "Galaxy Note 20 Ultra"
+    ]
   },
   "aiChatHistory": [],
   "aiStructuredData": null,
@@ -1136,7 +1138,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:53:30.476Z"
+    "lastSync": "2026-07-14T06:54:05.916Z"
   },
   "currencySettings": {
     "autoUpdate": true,
