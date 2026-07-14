@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор Рассрочки</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .input-section {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .input-group {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            max-width: 400px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgb(0 0 0 / 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .service-name {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg);
+            color: var(--primary);
+        }
+
+        .term-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .term-item {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+
+        .term-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .term-details {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .amount-value {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .monthly-value {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        @media (max-width: 640px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Калькулятор Рассрочки</h1>
+        <p style="color: var(--text-muted); font-size: 14px;">Все сервисы в одном месте</p>
+    </header>
+
+    <div class="input-section">
+        <div class="input-group">
+            <label for="amount">Сумма товара (USD)</label>
+            <input type="number" id="amount" placeholder="Введите сумму..." min="0">
+        </div>
+        <button onclick="calculate()">Рассчитать</button>
+    </div>
+
+    <div id="results" class="results-grid">
+        <!-- Результаты будут здесь -->
+    </div>
+</div>
+
+<script>
+    const services = [
+        {
+            name: "Alif",
+            terms: [
+                { months: 1, percent: 7 },
+                { months: 3, percent: 15 },
+                { months: 6, percent: 25 },
+                { months: 9, percent: 32 },
+                { months: 12, percent: 38 },
+                { months: 15, percent: 50 },
+                { months: 18, percent: 56 },
+                { months: 24, percent: 75 }
+            ]
+        },
+        {
+            name: "Uzum",
+            terms: [
+                { months: 6, percent: 29 },
+                { months: 12, percent: 44 }
+            ]
+        },
+        {
+            name: "Payme (TBS Nasiya)",
+            terms: [
+                { months: 12, percent: 38 },
+                { months: 18, percent: 57 },
+                { months: 24, percent: 76 }
+            ]
+        },
+        {
+            name: "Variant",
+            terms: [
+                { months: 6, percent: 20 },
+                { months: 12, percent: 40 }
+            ]
+        },
+        {
+            name: "Hamroh Nasiya",
+            terms: [
+                { months: 1, percent: 6 },
+                { months: 3, percent: 15 },
+                { months: 6, percent: 28 },
+                { months: 9, percent: 35 },
+                { months: 12, percent: 41 },
+                { months: 18, percent: 60 },
+                { months: 24, percent: 79 }
+            ]
+        }
+    ];
+
+    const ishonch = [
+        { name: "Ishonch (зарплата)", percent: 42 },
+        { name: "Ishonch (карта)", percent: 50 }
+    ];
+
+    function formatNumber(num) {
+        return num.toLocaleString('ru-RU', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function calculate() {
+        const amount = parseFloat(document.getElementById('amount').value);
+        if (isNaN(amount) || amount <= 0) {
+            alert("Пожалуйста, введите корректную сумму");
+            return;
+        }
+
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = '';
+
+        const baseAmount = amount * 1.10;
+
+        // Обычные сервисы
+        services.forEach(service => {
+            const card = document.createElement('div');
+            card.className = 'service-card';
+            
+            let html = `<div class="service-name">${service.name}</div>`;
+            html += `<div class="term-list">`;
+
+            service.terms.forEach(term => {
+                const total = baseAmount + (baseAmount * term.percent / 100);
+                const monthly = total / term.months;
+
+                html += `
+                    <div class="term-item">
+                        <div class="term-title">
+                            <span>${term.months} мес.</span>
+                            <span style="color: var(--text-muted); font-size: 12px;">+${term.percent}%</span>
+                        </div>
+                        <div class="amount-row">
+                            <span class="term-details">Итог:</span>
+                            <span class="amount-value">${formatNumber(total)}</span>
+                        </div>
+                        <div class="amount-row">
+                            <span class="term-details">В месяц:</span>
+                            <span class="monthly-value">${formatNumber(monthly)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            card.innerHTML = html;
+            resultsContainer.appendChild(card);
+        });
+
+        // Ishonch
+        ishonch.forEach(variant => {
+            const card = document.createElement('div');
+            card.className = 'service-card';
+            
+            let html = `<div class="service-name">${variant.name}</div>`;
+            html += `<div class="term-list">`;
+
+            const step1 = amount * 1.10;
+            const step2 = step1 * 1.01;
+            const total = step2 + (step2 * variant.percent / 100);
+            const monthly = total / 12;
+
+            html += `
+                <div class="term-item">
+                    <div class="term-title">
+                        <span>12 мес.</span>
+                        <span style="color: var(--text-muted); font-size: 12px;">+1% + ${variant.percent}%</span>
+                    </div>
+                    <div class="amount-row">
+                        <span class="term-details">Итог:</span>
+                        <span class="amount-value">${formatNumber(total)}</span>
+                    </div>
+                    <div class="amount-row">
+                        <span class="term-details">В месяц:</span>
+                        <span class="monthly-value">${formatNumber(monthly)}</span>
+                    </div>
+                </div>
+            `;
+
+            html += `</div>`;
+            card.innerHTML = html;
+            resultsContainer.appendChild(card);
+        });
+    }
+
+    // Позволяет нажимать Enter для расчета
+    document.getElementById('amount').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            calculate();
+        }
+    });
+</script>
+
+</body>
+</html>

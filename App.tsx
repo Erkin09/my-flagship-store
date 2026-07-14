@@ -23,6 +23,7 @@ import {
   DollarSign,
   ArrowRightLeft,
   ChevronRight,
+  Sparkles,
   Wallet,
   Coins,
   Box,
@@ -42,10 +43,16 @@ import {
   CheckCircle,
   Download,
   ShieldCheck,
-  Upload
+  Upload,
+  Palette
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
+
+// Import design concept mockups
+const cyberDarkMockup = '/src/assets/images/cyber_dark_mockup_1783966294530.jpg';
+const luxuryEditorialMockup = '/src/assets/images/luxury_editorial_mockup_1783966313554.jpg';
+const glassmorphismSpaceMockup = '/src/assets/images/glassmorphism_space_mockup_1783966331363.jpg';
 
 // --- Utility Functions ---
 const generateId = () => {
@@ -56,6 +63,14 @@ const generateId = () => {
 };
 const formatDate = (date: string, lang: string) => 
   new Date(date).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'short' });
+
+const getCookie = (name: string) => {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return decodeURIComponent(parts.pop()!.split(';').shift()!);
+  return null;
+};
 
 // --- Components ---
 
@@ -107,6 +122,95 @@ const InputWrapper = ({ label, children, icon: Icon }: any) => (
   </div>
 );
 
+// --- Color Themes configurations for design variations ---
+export const colorThemes = {
+  sky: {
+    nameRu: 'Небесный (Синий)',
+    nameEn: 'Sky Blue',
+    primary: '#0ea5e9',
+    colors: {
+      '--brand-50': '#f0f9ff',
+      '--brand-100': '#e0f2fe',
+      '--brand-200': '#bae6fd',
+      '--brand-300': '#7dd3fc',
+      '--brand-400': '#38bdf8',
+      '--brand-500': '#0ea5e9',
+      '--brand-600': '#0284c7',
+      '--brand-700': '#0369a1',
+      '--brand-800': '#075985',
+      '--brand-900': '#0c4a6e',
+    }
+  },
+  emerald: {
+    nameRu: 'Изумрудная мята',
+    nameEn: 'Emerald Mint',
+    primary: '#10b981',
+    colors: {
+      '--brand-50': '#ecfdf5',
+      '--brand-100': '#d1fae5',
+      '--brand-200': '#a7f3d0',
+      '--brand-300': '#6ee7b7',
+      '--brand-400': '#34d399',
+      '--brand-500': '#10b981',
+      '--brand-600': '#059669',
+      '--brand-700': '#047857',
+      '--brand-800': '#065f46',
+      '--brand-900': '#064e3b',
+    }
+  },
+  indigo: {
+    nameRu: 'Космический индиго',
+    nameEn: 'Cosmic Indigo',
+    primary: '#6366f1',
+    colors: {
+      '--brand-50': '#eef2ff',
+      '--brand-100': '#e0e7ff',
+      '--brand-200': '#c7d2fe',
+      '--brand-300': '#a5b4fc',
+      '--brand-400': '#818cf8',
+      '--brand-500': '#6366f1',
+      '--brand-600': '#4f46e5',
+      '--brand-700': '#4338ca',
+      '--brand-800': '#3730a3',
+      '--brand-900': '#312e81',
+    }
+  },
+  amber: {
+    nameRu: 'Янтарный закат',
+    nameEn: 'Amber Sunset',
+    primary: '#f59e0b',
+    colors: {
+      '--brand-50': '#fffbeb',
+      '--brand-100': '#fef3c7',
+      '--brand-200': '#fde68a',
+      '--brand-300': '#fcd34d',
+      '--brand-400': '#fbbf24',
+      '--brand-500': '#f59e0b',
+      '--brand-600': '#d97706',
+      '--brand-700': '#b45309',
+      '--brand-800': '#92400e',
+      '--brand-900': '#78350f',
+    }
+  },
+  rose: {
+    nameRu: 'Бархатная роза',
+    nameEn: 'Rose Velvet',
+    primary: '#f43f5e',
+    colors: {
+      '--brand-50': '#fff1f2',
+      '--brand-100': '#ffe4e6',
+      '--brand-200': '#fecdd3',
+      '--brand-300': '#fda4af',
+      '--brand-400': '#fb7185',
+      '--brand-500': '#f43f5e',
+      '--brand-600': '#e11d48',
+      '--brand-700': '#be123c',
+      '--brand-800': '#9f1239',
+      '--brand-900': '#881337',
+    }
+  }
+};
+
 // --- Main App ---
 
 const App: React.FC = () => {
@@ -115,11 +219,36 @@ const App: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('flagship_hub_v7');
+    
+    let initialSyncSettings = {
+      githubToken: '',
+      repoName: '',
+      autoSync: false
+    };
+
+    try {
+      const cookieVal = getCookie('flagship_sync_config');
+      if (cookieVal) {
+        const parsedCookie = JSON.parse(cookieVal);
+        if (parsedCookie && (parsedCookie.githubToken || parsedCookie.repoName)) {
+          initialSyncSettings = {
+            githubToken: parsedCookie.githubToken || '',
+            repoName: parsedCookie.repoName || '',
+            autoSync: !!parsedCookie.autoSync
+          };
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to parse cookie config", e);
+    }
+
     const defaults: AppState = {
       devices: [],
       sales: [],
       language: 'ru',
       theme: 'dark',
+      themeStyle: 'default',
+      lastDailyBackup: '',
       cashBalance: 0,
       exchangeRate: 12195,
       buyRate: 12170,
@@ -130,11 +259,8 @@ const App: React.FC = () => {
       aiChatHistory: [],
       aiStructuredData: null,
       geminiApiKey: '',
-      syncSettings: {
-        githubToken: '',
-        repoName: '',
-        autoSync: false
-      },
+      colorTheme: 'sky',
+      syncSettings: initialSyncSettings,
       currencySettings: {
         autoUpdate: true,
         buyOffset: 25,
@@ -148,11 +274,17 @@ const App: React.FC = () => {
         return { 
           ...defaults, 
           ...parsed,
+          themeStyle: parsed.themeStyle || 'default',
+          lastDailyBackup: parsed.lastDailyBackup || '',
           devices: Array.isArray(parsed.devices) ? parsed.devices : [],
           sales: Array.isArray(parsed.sales) ? parsed.sales : [],
           aiChatHistory: Array.isArray(parsed.aiChatHistory) ? parsed.aiChatHistory : [],
           customModels: parsed.customModels || defaults.customModels,
-          geminiApiKey: parsed.geminiApiKey || ''
+          geminiApiKey: parsed.geminiApiKey || '',
+          syncSettings: {
+            ...initialSyncSettings,
+            ...(parsed.syncSettings || {})
+          }
         };
       } catch (e) {
         console.error("Failed to parse saved state", e);
@@ -175,6 +307,10 @@ const App: React.FC = () => {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [inventorySortKey, setInventorySortKey] = useState<'model' | 'price' | 'date'>('date');
+  const [inventorySortOrder, setInventorySortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedDetailMonthKey, setSelectedDetailMonthKey] = useState<string>('');
+  const [conceptFeedback, setConceptFeedback] = useState<string | null>(null);
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -183,6 +319,58 @@ const App: React.FC = () => {
   const [editingDevice, setEditingDevice] = useState<Device | null>(null);
   const [isInstallmentMode, setIsInstallmentMode] = useState(false);
   
+  const [backupsList, setBackupsList] = useState<string[]>([]);
+
+  const loadBackupsIndex = () => {
+    try {
+      const indexJSON = localStorage.getItem('flagship_backups_index');
+      if (indexJSON) {
+        setBackupsList(JSON.parse(indexJSON).reverse()); // Newest first
+      } else {
+        setBackupsList([]);
+      }
+    } catch (e) {
+      console.error("Failed to load backups index", e);
+    }
+  };
+
+  const restoreBackup = (date: string) => {
+    try {
+      const backupKey = `flagship_backup_${date}`;
+      const backupJSON = localStorage.getItem(backupKey);
+      if (!backupJSON) {
+        setConceptFeedback(
+          state.language === 'ru' 
+            ? '❌ Ошибка: Бэкап не найден!' 
+            : '❌ Error: Backup not found!'
+        );
+        return;
+      }
+      const backupData = JSON.parse(backupJSON);
+      
+      setState(prev => ({
+        ...prev,
+        devices: backupData.devices || [],
+        sales: backupData.sales || [],
+        cashBalance: backupData.cashBalance !== undefined ? backupData.cashBalance : prev.cashBalance,
+        exchangeRate: backupData.exchangeRate !== undefined ? backupData.exchangeRate : prev.exchangeRate,
+        buyRate: backupData.buyRate !== undefined ? backupData.buyRate : prev.buyRate,
+        sellRate: backupData.sellRate !== undefined ? backupData.sellRate : prev.sellRate,
+        bankRate: backupData.bankRate !== undefined ? backupData.bankRate : prev.bankRate,
+        prevExchangeRate: backupData.prevExchangeRate !== undefined ? backupData.prevExchangeRate : prev.prevExchangeRate,
+        customModels: backupData.customModels || prev.customModels,
+      }));
+      
+      setConceptFeedback(
+        state.language === 'ru'
+          ? `✓ Данные успешно восстановлены из оффлайн бэкапа за ${date}!`
+          : `✓ Data successfully restored from offline backup for ${date}!`
+      );
+    } catch (e) {
+      setConceptFeedback(`Error: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    }
+  };
+
   const [modalSelectedBrand, setModalSelectedBrand] = useState<Brand>('iPhone');
   const [modalSelectedStorage, setModalSelectedStorage] = useState<Storage>('128Gb');
   const [batteryHealth, setBatteryHealth] = useState(100);
@@ -260,6 +448,7 @@ const App: React.FC = () => {
   // Fetch Exchange Rate on mount
   useEffect(() => {
     fetchRate();
+    loadBackupsIndex();
     const interval = setInterval(fetchRate, 3600000);
     
     // Auto-Restore on mount if enabled
@@ -272,12 +461,85 @@ const App: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('flagship_hub_v7', JSON.stringify(state));
+    if (state.syncSettings && (state.syncSettings.githubToken || state.syncSettings.repoName)) {
+      document.cookie = `flagship_sync_config=${encodeURIComponent(JSON.stringify(state.syncSettings))}; max-age=315360000; path=/; SameSite=Strict`;
+    }
     if (state.theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+
+    // Apply dynamic color theme
+    const activeThemeKey = state.colorTheme || 'sky';
+    const activeTheme = colorThemes[activeThemeKey as keyof typeof colorThemes] || colorThemes.sky;
+    Object.entries(activeTheme.colors).forEach(([variable, value]) => {
+      document.documentElement.style.setProperty(variable, value);
+    });
   }, [state]);
+
+  // Automatic daily offline backup
+  useEffect(() => {
+    try {
+      if (state.devices.length === 0 && state.sales.length === 0) return;
+      
+      const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+      const backupKey = `flagship_backup_${today}`;
+      const backupData = {
+        date: today,
+        timestamp: Date.now(),
+        devices: state.devices,
+        sales: state.sales,
+        cashBalance: state.cashBalance,
+        exchangeRate: state.exchangeRate,
+        buyRate: state.buyRate,
+        sellRate: state.sellRate,
+        bankRate: state.bankRate,
+        prevExchangeRate: state.prevExchangeRate,
+        customModels: state.customModels,
+        colorTheme: state.colorTheme,
+        themeStyle: state.themeStyle
+      };
+      
+      localStorage.setItem(backupKey, JSON.stringify(backupData));
+
+      // Add to index
+      const indexJSON = localStorage.getItem('flagship_backups_index');
+      let backupsIndex: string[] = [];
+      if (indexJSON) {
+        try {
+          backupsIndex = JSON.parse(indexJSON);
+        } catch (e) {}
+      }
+      
+      let indexChanged = false;
+      if (!backupsIndex.includes(today)) {
+        backupsIndex.push(today);
+        indexChanged = true;
+        // Keep only last 14 backups
+        while (backupsIndex.length > 14) {
+          const oldest = backupsIndex.shift();
+          if (oldest) {
+            localStorage.removeItem(`flagship_backup_${oldest}`);
+          }
+        }
+      }
+
+      if (indexChanged) {
+        localStorage.setItem('flagship_backups_index', JSON.stringify(backupsIndex));
+        loadBackupsIndex();
+      }
+
+      if (state.lastDailyBackup !== today) {
+        setState(prev => ({
+          ...prev,
+          lastDailyBackup: today
+        }));
+      }
+    } catch (e) {
+      console.error("Automatic daily offline backup error:", e);
+    }
+  }, [state.devices, state.sales, state.cashBalance, state.customModels]);
 
   // Magic Restore: If settings are entered and inventory is empty, try to restore
   useEffect(() => {
@@ -849,8 +1111,17 @@ const App: React.FC = () => {
             cashBalance: imported.cash !== undefined ? Number(imported.cash) : (imported.cashBalance !== undefined ? Number(imported.cashBalance) : state.cashBalance),
             theme: (imported.theme === 'light' || imported.theme === 'dark') ? imported.theme : state.theme,
             language: (imported.language === 'ru' || imported.language === 'en') ? imported.language : state.language,
+            exchangeRate: imported.exchangeRate !== undefined ? Number(imported.exchangeRate) : state.exchangeRate,
+            buyRate: imported.buyRate !== undefined ? Number(imported.buyRate) : state.buyRate,
+            sellRate: imported.sellRate !== undefined ? Number(imported.sellRate) : state.sellRate,
+            bankRate: imported.bankRate !== undefined ? Number(imported.bankRate) : state.bankRate,
+            prevExchangeRate: imported.prevExchangeRate !== undefined ? Number(imported.prevExchangeRate) : state.prevExchangeRate,
+            customModels: imported.customModels || state.customModels,
+            aiChatHistory: imported.aiChatHistory || state.aiChatHistory,
+            aiStructuredData: imported.aiStructuredData || state.aiStructuredData,
+            currencySettings: imported.currencySettings || state.currencySettings,
             syncSettings: state.syncSettings,
-            geminiApiKey: state.geminiApiKey
+            geminiApiKey: state.geminiApiKey || imported.geminiApiKey
           };
 
           setState(newState);
@@ -997,10 +1268,193 @@ const App: React.FC = () => {
     return result;
   }, [state.sales, state.devices, state.language]);
 
-  const filteredDevices = useMemo(() => devicesInStock.filter(d => 
-    d.imei.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    d.model.toLowerCase().includes(searchQuery.toLowerCase())
-  ), [devicesInStock, searchQuery]);
+  const dashboardStats = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    // 1. Current month sales count
+    const currentMonthSales = state.sales.filter(s => {
+      const d = new Date(s.date);
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth && s.status === 'Completed';
+    });
+    const currentMonthSalesCount = currentMonthSales.length;
+
+    // Previous month sales for comparison
+    const prevMonthDate = new Date(currentYear, currentMonth - 1, 1);
+    const prevMonthSales = state.sales.filter(s => {
+      const d = new Date(s.date);
+      return d.getFullYear() === prevMonthDate.getFullYear() && d.getMonth() === prevMonthDate.getMonth() && s.status === 'Completed';
+    });
+    const prevMonthSalesCount = prevMonthSales.length;
+
+    // 2. Group sales by product (model details)
+    const productGroups: { [key: string]: { brand: string, model: string, storage: string, count: number, totalProfit: number, revenue: number } } = {};
+    
+    state.sales.forEach(s => {
+      if (s.status !== 'Completed') return;
+      
+      let brand = '';
+      let model = '';
+      let storage = '';
+      
+      const matchedDevice = state.devices.find(d => d.id === s.deviceId);
+      if (matchedDevice) {
+        brand = matchedDevice.brand;
+        model = matchedDevice.model;
+        storage = matchedDevice.storage;
+      }
+      
+      if (!model) {
+        model = state.language === 'ru' ? 'Прочее/Услуга' : 'Other/Service';
+        brand = '';
+        storage = '';
+      }
+      
+      const key = `${brand}_${model}_${storage}`;
+      const purchasePrice = s.purchasePrice ?? matchedDevice?.purchasePrice ?? 0;
+      const profit = s.salePrice - purchasePrice;
+      
+      if (!productGroups[key]) {
+        productGroups[key] = {
+          brand,
+          model,
+          storage,
+          count: 0,
+          totalProfit: 0,
+          revenue: 0
+        };
+      }
+      
+      productGroups[key].count += 1;
+      productGroups[key].totalProfit += profit;
+      productGroups[key].revenue += s.salePrice;
+    });
+
+    const groupsList = Object.values(productGroups).filter(g => g.model !== (state.language === 'ru' ? 'Прочее/Услуга' : 'Other/Service') || g.count > 0);
+
+    // Sort by count descending for top sold
+    const topSold = [...groupsList]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+
+    // Sort by total profit descending for top profitable
+    const topProfitable = [...groupsList]
+      .filter(g => g.totalProfit > 0)
+      .sort((a, b) => b.totalProfit - a.totalProfit)
+      .slice(0, 3);
+
+    return {
+      currentMonthSalesCount,
+      prevMonthSalesCount,
+      topSold,
+      topProfitable
+    };
+  }, [state.sales, state.devices, state.language]);
+
+  const monthlyDetailedStats = useMemo(() => {
+    const stats: Record<string, {
+      monthYearLabel: string;
+      year: number;
+      month: number;
+      totalSalesCount: number;
+      totalProfit: number;
+      totalRevenue: number;
+      brands: Record<string, { quantity: number; profit: number; revenue: number }>;
+      models: Record<string, { quantity: number; brand: string; profit: number; revenue: number }>;
+    }> = {};
+
+    const monthsRu = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    const monthsEn = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    state.sales.forEach(sale => {
+      if (sale.status !== 'Completed') return;
+      const d = new Date(sale.date);
+      const year = d.getFullYear() || 2026;
+      const month = d.getMonth();
+      const key = `${year}-${month}`;
+
+      if (!stats[key]) {
+        const monthLabel = state.language === 'ru' ? monthsRu[month] : monthsEn[month];
+        stats[key] = {
+          monthYearLabel: `${monthLabel} ${year}`,
+          year,
+          month,
+          totalSalesCount: 0,
+          totalProfit: 0,
+          totalRevenue: 0,
+          brands: {},
+          models: {}
+        };
+      }
+
+      const device = state.devices.find(dev => dev.id === sale.deviceId);
+      if (!device) return;
+
+      const brand = device.brand || 'iPhone';
+      const model = device.model || 'Unknown';
+      const purchasePrice = sale.purchasePrice ?? device.purchasePrice ?? 0;
+      const profit = sale.salePrice - purchasePrice;
+
+      stats[key].totalSalesCount += 1;
+      stats[key].totalRevenue += sale.salePrice;
+      stats[key].totalProfit += profit;
+
+      if (!stats[key].brands[brand]) {
+        stats[key].brands[brand] = { quantity: 0, profit: 0, revenue: 0 };
+      }
+      stats[key].brands[brand].quantity += 1;
+      stats[key].brands[brand].profit += profit;
+      stats[key].brands[brand].revenue += sale.salePrice;
+
+      if (!stats[key].models[model]) {
+        stats[key].models[model] = { quantity: 0, brand, profit: 0, revenue: 0 };
+      }
+      stats[key].models[model].quantity += 1;
+      stats[key].models[model].profit += profit;
+      stats[key].models[model].revenue += sale.salePrice;
+    });
+
+    return Object.values(stats).sort((a, b) => {
+      if (a.year !== b.year) return b.year - a.year;
+      return b.month - a.month;
+    });
+  }, [state.sales, state.devices, state.language]);
+
+  const inventoryModelCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    devicesInStock.forEach(d => {
+      counts[d.model] = (counts[d.model] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [devicesInStock]);
+
+  const filteredDevices = useMemo(() => {
+    const filtered = devicesInStock.filter(d => 
+      (d.imei || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (d.model || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return [...filtered].sort((a, b) => {
+      let comparison = 0;
+      if (inventorySortKey === 'model') {
+        comparison = a.model.localeCompare(b.model);
+      } else if (inventorySortKey === 'price') {
+        comparison = a.purchasePrice - b.purchasePrice;
+      } else if (inventorySortKey === 'date') {
+        const dateA = new Date(a.purchaseDate).getTime() || 0;
+        const dateB = new Date(b.purchaseDate).getTime() || 0;
+        comparison = dateA - dateB;
+      }
+      return inventorySortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [devicesInStock, searchQuery, inventorySortKey, inventorySortOrder]);
 
   // Handlers
   const addDevice = (e: React.FormEvent<HTMLFormElement>) => {
@@ -1038,10 +1492,29 @@ const App: React.FC = () => {
       purchaseDate: formData.get('purchaseDate') as string,
       batteryHealth: formData.get('batteryHealth') ? Number(formData.get('batteryHealth')) : editingDevice.batteryHealth
     };
-    setState(prev => ({
-      ...prev,
-      devices: prev.devices.map(d => d.id === editingDevice.id ? updatedDevice : d)
-    }));
+    setState(prev => {
+      let updatedSales = prev.sales;
+      const associatedSale = prev.sales.find(s => s.deviceId === editingDevice.id);
+      
+      if (associatedSale && editingDevice.status === 'Sold') {
+        const saleDateInput = formData.get('saleDate') as string;
+        const updatedSale: Sale = {
+          ...associatedSale,
+          customerName: formData.get('saleCustomerName') as string || associatedSale.customerName,
+          customerPhone: formData.get('saleCustomerPhone') as string || associatedSale.customerPhone,
+          salePrice: Number(formData.get('salePrice')) || associatedSale.salePrice,
+          purchasePrice: Number(formData.get('purchasePrice')), // Keep purchase price synced
+          date: saleDateInput ? new Date(saleDateInput).toISOString() : associatedSale.date
+        };
+        updatedSales = prev.sales.map(s => s.id === associatedSale.id ? updatedSale : s);
+      }
+
+      return {
+        ...prev,
+        devices: prev.devices.map(d => d.id === editingDevice.id ? updatedDevice : d),
+        sales: updatedSales
+      };
+    });
     setEditingDevice(null);
   };
 
@@ -1423,35 +1896,155 @@ const App: React.FC = () => {
               </motion.div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-               <div className="md:col-span-2 bg-brand-600 p-8 rounded-[2rem] text-white relative overflow-hidden shadow-sm">
-                  <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
-                  <div className="relative z-10 flex flex-col h-full justify-between">
-                     <div className="flex justify-between items-start">
-                        <div className="p-2.5 bg-white/10 rounded-xl">
-                           <Coins size={22} />
-                        </div>
-                        <span className="text-[9px] font-semibold uppercase tracking-widest bg-white/10 px-2.5 py-1 rounded-full">{t.totalAssets}</span>
-                     </div>
-                     <div className="mt-8">
-                        <p className="text-4xl font-semibold tracking-tight">${totalAssets.toLocaleString()}</p>
-                     </div>
-                  </div>
-               </div>
-               <Card title={t.cash} subtitle={`$${state.cashBalance.toLocaleString()}`} icon={Wallet} colorClass="bg-emerald-50 text-emerald-600" />
-               <Card title={t.debtors} subtitle={`$${totalDebt.toLocaleString()}`} icon={Users} colorClass="bg-rose-50 text-rose-600" />
-            </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Card title={t.totalAssets} subtitle={`$${totalAssets.toLocaleString()}`} icon={Coins} colorClass="bg-brand-50 text-brand-600" />
+                <Card title={t.cash} subtitle={`$${state.cashBalance.toLocaleString()}`} icon={Wallet} colorClass="bg-emerald-50 text-emerald-600" />
+                <Card title={t.debtors} subtitle={`$${totalDebt.toLocaleString()}`} icon={Users} colorClass="bg-rose-50 text-rose-600" />
+                <Card 
+                  title={state.language === 'ru' ? 'Склад' : 'Stock'} 
+                  subtitle={`$${stockValue.toLocaleString()} (${devicesInStock.length} шт.)`} 
+                  icon={Box} 
+                  colorClass="bg-blue-50 text-blue-600" 
+                />
+                <Card title={t.totalSales} subtitle={state.sales.filter(s => s.status === 'Completed').length.toString()} icon={ShoppingCart} colorClass="bg-amber-50 text-amber-600" />
+                <Card title={t.profit} subtitle={`$${totalProfit.toLocaleString()}`} icon={TrendingUp} colorClass="bg-purple-50 text-purple-600" />
+             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card 
-                title={state.language === 'ru' ? 'Склад' : 'Stock'} 
-                subtitle={`$${stockValue.toLocaleString()} (${devicesInStock.length} шт.)`} 
-                icon={Box} 
-                colorClass="bg-blue-50 text-blue-600" 
-              />
-              <Card title={t.totalSales} subtitle={state.sales.filter(s => s.status === 'Completed').length.toString()} icon={ShoppingCart} colorClass="bg-amber-50 text-amber-600" />
-              <Card title={t.profit} subtitle={`$${totalProfit.toLocaleString()}`} icon={TrendingUp} colorClass="bg-purple-50 text-purple-600" />
-            </div>
+             {/* Quick Monthly Stats & Top Products Bento Section */}
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Monthly Sales Count Statistics Card */}
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex flex-col justify-between shadow-sm">
+                   <div>
+                      <div className="flex items-center justify-between mb-4">
+                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                            <BarChart3 size={14} className="text-amber-500" />
+                            {state.language === 'ru' ? 'Продажи за месяц' : 'Monthly Sales'}
+                         </h4>
+                         <span className="text-[9px] font-bold uppercase px-2 py-0.5 bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 rounded-full border border-slate-100 dark:border-slate-800">
+                            {new Date().toLocaleString(state.language === 'ru' ? 'ru-RU' : 'en-US', { month: 'long' })}
+                         </span>
+                      </div>
+                      <div className="mt-2">
+                         <p className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
+                            {dashboardStats.currentMonthSalesCount} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">{state.language === 'ru' ? 'сделок' : 'deals'}</span>
+                         </p>
+                         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1">
+                            {state.language === 'ru' ? 'В прошлом месяце: ' : 'Previous month: '}
+                            <span className="font-semibold text-slate-600 dark:text-slate-300">{dashboardStats.prevMonthSalesCount}</span>
+                         </p>
+                      </div>
+                   </div>
+                   
+                   {/* Visual comparative progress indicator */}
+                   <div className="mt-6 pt-4 border-t border-slate-50 dark:border-slate-800/50">
+                      <div className="flex justify-between text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
+                         <span>{state.language === 'ru' ? 'Прогресс к прошлому месяцу' : 'Progress vs Last Month'}</span>
+                         <span>
+                            {dashboardStats.prevMonthSalesCount > 0 
+                               ? `${Math.round((dashboardStats.currentMonthSalesCount / dashboardStats.prevMonthSalesCount) * 100)}%`
+                               : '100%'}
+                         </span>
+                      </div>
+                      <div className="w-full bg-slate-50 dark:bg-slate-900/60 h-2 rounded-full overflow-hidden border border-slate-100/50 dark:border-slate-800/50">
+                         <div 
+                            className="bg-brand-500 h-full rounded-full transition-all duration-500"
+                            style={{ 
+                               width: `${Math.min(
+                                  dashboardStats.prevMonthSalesCount > 0 
+                                     ? (dashboardStats.currentMonthSalesCount / dashboardStats.prevMonthSalesCount) * 100 
+                                     : 100, 
+                                  100
+                               )}%` 
+                            }}
+                         />
+                      </div>
+                   </div>
+                </div>
+
+                {/* Top 3 Best Selling Items Card */}
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <TrendingUp size={14} className="text-emerald-500" />
+                      {state.language === 'ru' ? 'Топ 3 продаваемых товаров' : 'Top 3 Best Sellers'}
+                   </h4>
+                   <div className="space-y-3">
+                      {dashboardStats.topSold.length === 0 ? (
+                         <p className="text-xs text-slate-400 py-6 text-center italic">
+                            {state.language === 'ru' ? 'Нет данных о продажах' : 'No sales data yet'}
+                         </p>
+                      ) : (
+                         dashboardStats.topSold.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/30 rounded-2xl border border-slate-100/50 dark:border-slate-800/30">
+                               <div className="flex items-center gap-3">
+                                  <span className={`w-6 h-6 rounded-xl flex items-center justify-center text-[10px] font-bold ${
+                                     index === 0 ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400' :
+                                     index === 1 ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300' :
+                                     'bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400'
+                                  }`}>
+                                     {index + 1}
+                                  </span>
+                                  <div>
+                                     <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        {item.brand} {item.model}
+                                     </p>
+                                     <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase">
+                                        {item.storage}
+                                     </p>
+                                  </div>
+                               </div>
+                               <div className="text-right">
+                                  <p className="text-xs font-black text-slate-900 dark:text-white">
+                                     {item.count} <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">{state.language === 'ru' ? 'шт.' : 'pcs'}</span>
+                                  </p>
+                               </div>
+                            </div>
+                         ))
+                      )}
+                   </div>
+                </div>
+
+                {/* Top 3 Best Profit Items Card */}
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Coins size={14} className="text-purple-500" />
+                      {state.language === 'ru' ? 'Товары по лучшей прибыли' : 'Top Items by Profit'}
+                   </h4>
+                   <div className="space-y-3">
+                      {dashboardStats.topProfitable.length === 0 ? (
+                         <p className="text-xs text-slate-400 py-6 text-center italic">
+                            {state.language === 'ru' ? 'Нет данных о прибыли' : 'No profit data yet'}
+                         </p>
+                      ) : (
+                         dashboardStats.topProfitable.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/30 rounded-2xl border border-slate-100/50 dark:border-slate-800/30">
+                               <div className="flex items-center gap-3">
+                                  <span className={`w-6 h-6 rounded-xl flex items-center justify-center text-[10px] font-bold ${
+                                     index === 0 ? 'bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400' :
+                                     index === 1 ? 'bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400' :
+                                     'bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400'
+                                  }`}>
+                                     {index + 1}
+                                  </span>
+                                  <div>
+                                     <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                        {item.brand} {item.model}
+                                      </p>
+                                      <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase">
+                                        {item.storage}
+                                      </p>
+                                   </div>
+                                </div>
+                                <div className="text-right">
+                                   <p className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+                                      +${Math.round(item.totalProfit).toLocaleString()}
+                                   </p>
+                                </div>
+                             </div>
+                          ))
+                       )}
+                    </div>
+                 </div>
+              </div>
 
             <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
                <div className="flex items-center justify-between mb-6">
@@ -1534,18 +2127,119 @@ const App: React.FC = () => {
         {/* Inventory View */}
         {activeTab === 'inventory' && (
           <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-              <div className="relative w-full md:w-80 group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input 
-                  type="text" 
-                  placeholder={t.search}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border-none rounded-xl shadow-sm text-sm font-medium outline-none focus:ring-1 ring-brand-500/20"
-                />
+            
+            {/* Stock Quantities & Models Breakdown Bento Card */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-4 animate-in slide-in-from-top-2 duration-300">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    {state.language === 'ru' ? 'Количество товаров на складе' : 'Goods in Stock'}
+                  </h4>
+                  <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+                    {devicesInStock.length} <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{state.language === 'ru' ? 'шт.' : 'units'}</span>
+                  </p>
+                </div>
+                <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider bg-slate-50 dark:bg-slate-900 px-3 py-1 rounded-xl border border-slate-100 dark:border-slate-800/50">
+                  {state.language === 'ru' ? 'Нажмите на модель ниже для быстрой фильтрации' : 'Click a model below to filter instantly'}
+                </div>
               </div>
-              <div className="flex space-x-2 items-center">
+              
+              {/* Models breakdown pill list */}
+              <div className="flex flex-wrap gap-2 pt-1 max-h-24 overflow-y-auto scrollbar-hide">
+                {inventoryModelCounts.map(([model, count]) => {
+                  const isCurrentFilter = searchQuery.toLowerCase() === model.toLowerCase();
+                  return (
+                    <button
+                      key={model}
+                      onClick={() => {
+                        if (isCurrentFilter) {
+                          setSearchQuery('');
+                        } else {
+                          setSearchQuery(model);
+                        }
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
+                        isCurrentFilter 
+                          ? 'bg-brand-500 text-white border-brand-500 shadow-sm shadow-brand-500/20' 
+                          : 'bg-slate-50 dark:bg-slate-900/30 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-800 hover:border-brand-500/30 hover:bg-slate-100 dark:hover:bg-slate-900/60'
+                      }`}
+                    >
+                      <span>{model}</span>
+                      <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black ${
+                        isCurrentFilter ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+                {inventoryModelCounts.length === 0 && (
+                  <p className="text-xs text-slate-400/60 italic font-medium">
+                    {state.language === 'ru' ? 'Нет товаров на складе' : 'No goods in stock'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col xl:flex-row gap-4 justify-between items-stretch xl:items-center">
+              <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center flex-1">
+                {/* Search Bar */}
+                <div className="relative w-full md:w-80 group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <input 
+                    type="text" 
+                    placeholder={t.search}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border-none rounded-xl shadow-sm text-sm font-medium outline-none focus:ring-1 ring-brand-500/20"
+                  />
+                </div>
+
+                {/* Sorting Controls */}
+                <div className="flex flex-wrap items-center gap-1.5 bg-white dark:bg-slate-800 p-1.5 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 px-2 whitespace-nowrap">
+                    {state.language === 'ru' ? 'Сортировка:' : 'Sort:'}
+                  </span>
+                  
+                  {[
+                    { key: 'model', labelRu: 'Модель', labelEn: 'Model' },
+                    { key: 'date', labelRu: 'Дата прихода', labelEn: 'Date' },
+                    { key: 'price', labelRu: 'Цена закупки', labelEn: 'Price' }
+                  ].map((option) => {
+                    const isActive = inventorySortKey === option.key;
+                    return (
+                      <button
+                        key={option.key}
+                        onClick={() => setInventorySortKey(option.key as any)}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all whitespace-nowrap ${
+                          isActive 
+                            ? 'bg-brand-500 text-white shadow-sm' 
+                            : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900'
+                        }`}
+                      >
+                        {state.language === 'ru' ? option.labelRu : option.labelEn}
+                      </button>
+                    );
+                  })}
+
+                  <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
+
+                  <button
+                    onClick={() => setInventorySortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest whitespace-nowrap"
+                    title={state.language === 'ru' ? 'Изменить направление' : 'Toggle direction'}
+                  >
+                    <span>{inventorySortOrder === 'asc' ? '▲' : '▼'}</span>
+                    <span>
+                      {inventorySortOrder === 'asc' 
+                        ? (state.language === 'ru' ? 'Возраст.' : 'Asc') 
+                        : (state.language === 'ru' ? 'Убыв.' : 'Desc')}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex space-x-2 items-center self-end xl:self-auto">
                  <div className="px-4 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800">
                     <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest leading-none mb-1">{t.stockValue}</p>
                     <p className="text-lg font-semibold text-brand-600 tracking-tight leading-none">${stockValue.toLocaleString()}</p>
@@ -1740,8 +2434,155 @@ const App: React.FC = () => {
                 </div>
              </div>
 
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between mb-8">
+              {/* Detailed Monthly Analytics Section */}
+              <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+                  <div>
+                    <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase flex items-center gap-2">
+                      <BarChart3 size={18} className="text-brand-500" />
+                      {state.language === 'ru' ? 'Подробная Аналитика Продаж' : 'Detailed Sales Analytics'}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {state.language === 'ru' ? 'Детальный разрез по брендам, моделям и топ продаж с объемами' : 'Detailed breakdown by brands, models and top sales with quantities'}
+                    </p>
+                  </div>
+
+                  {/* Month Selection Buttons */}
+                  {monthlyDetailedStats.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {monthlyDetailedStats.map(m => {
+                        const key = `${m.year}-${m.month}`;
+                        const isActive = (selectedDetailMonthKey || `${monthlyDetailedStats[0].year}-${monthlyDetailedStats[0].month}`) === key;
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => setSelectedDetailMonthKey(key)}
+                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                              isActive
+                                ? 'bg-slate-900 dark:bg-brand-600 text-white shadow-md shadow-brand-500/20'
+                                : 'bg-slate-50 dark:bg-slate-900/45 text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                            }`}
+                          >
+                            {m.monthYearLabel}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {monthlyDetailedStats.length === 0 ? (
+                  <div className="py-12 text-center text-slate-400">
+                    <p className="text-xs font-bold uppercase tracking-widest">{state.language === 'ru' ? 'Нет данных для аналитики' : 'No data available for analytics'}</p>
+                  </div>
+                ) : (() => {
+                  const activeKey = selectedDetailMonthKey || `${monthlyDetailedStats[0].year}-${monthlyDetailedStats[0].month}`;
+                  const currentData = monthlyDetailedStats.find(m => `${m.year}-${m.month}` === activeKey) || monthlyDetailedStats[0];
+
+                  const brandList = Object.entries(currentData.brands).map(([name, val]) => ({ name, ...val }));
+                  const modelList = Object.entries(currentData.models)
+                    .map(([name, val]) => ({ name, ...val }))
+                    .sort((a, b) => b.quantity - a.quantity);
+
+                  return (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      {/* Brand Breakdown Card */}
+                      <div className="bg-slate-50/50 dark:bg-slate-900/10 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/40">
+                        <div className="flex justify-between items-center mb-6">
+                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Анализ Брендов' : 'Brand Breakdown'}</h4>
+                          <span className="px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/40 text-[9px] font-bold text-brand-600 dark:text-brand-400">
+                            {state.language === 'ru' ? `${brandList.length} брендов` : `${brandList.length} brands`}
+                          </span>
+                        </div>
+
+                        <div className="space-y-4">
+                          {brandList.map((b) => {
+                            const percent = Math.round((b.quantity / currentData.totalSalesCount) * 100);
+                            return (
+                              <div key={b.name} className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-850 shadow-xs">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">{b.name}</p>
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{b.quantity} {state.language === 'ru' ? 'шт.' : 'pcs'} ({percent}%)</p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-xs font-black text-emerald-600 dark:text-emerald-400">+${b.profit.toLocaleString()}</p>
+                                    <p className="text-[8px] font-bold text-slate-400 uppercase">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</p>
+                                  </div>
+                                </div>
+                                <div className="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                  <div className="bg-brand-500 h-full rounded-full" style={{ width: `${percent}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Model Breakdown Card */}
+                      <div className="bg-slate-50/50 dark:bg-slate-900/10 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/40">
+                        <div className="flex justify-between items-center mb-6">
+                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Детали по Моделям' : 'Model Breakdown'}</h4>
+                          <span className="px-2 py-0.5 rounded bg-brand-50 dark:bg-brand-950/40 text-[9px] font-bold text-brand-600 dark:text-brand-400">
+                            {state.language === 'ru' ? `${modelList.length} моделей` : `${modelList.length} models`}
+                          </span>
+                        </div>
+
+                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1 scrollbar-hide">
+                          {modelList.map((m) => {
+                            return (
+                              <div key={m.name} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-850 shadow-xs">
+                                <div>
+                                  <p className="text-xs font-black text-slate-900 dark:text-white tracking-tight">{m.name}</p>
+                                  <p className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">{m.brand} • {m.quantity} {state.language === 'ru' ? 'шт.' : 'pcs'}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-xs font-black text-slate-900 dark:text-white">${m.revenue.toLocaleString()}</p>
+                                  <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400">+${m.profit.toLocaleString()}</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Top Selling Models Visual Board */}
+                      <div className="bg-slate-50/50 dark:bg-slate-900/10 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/40">
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-6">{state.language === 'ru' ? 'Лидеры Продаж (Топ продаж)' : 'Top Sales Leaders'}</h4>
+
+                        <div className="space-y-4">
+                          {modelList.slice(0, 4).map((m, idx) => {
+                            const colors = ['bg-amber-500', 'bg-slate-400', 'bg-amber-700', 'bg-brand-500'];
+                            const medals = ['🥇', '🥈', '🥉', '4️⃣'];
+                            return (
+                              <div key={m.name} className="relative bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-850 shadow-xs overflow-hidden">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm">{medals[idx]}</span>
+                                    <div>
+                                      <p className="text-xs font-black text-slate-900 dark:text-white">{m.name}</p>
+                                      <p className="text-[9px] font-bold text-brand-600 dark:text-brand-400 uppercase">{m.brand}</p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className="text-xs font-black text-slate-900 dark:text-white">{m.quantity} {state.language === 'ru' ? 'продано' : 'sold'}</span>
+                                  </div>
+                                </div>
+                                <div className="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full ${colors[idx] || 'bg-brand-500'}`} style={{ width: `${Math.min(100, (m.quantity / modelList[0].quantity) * 100)}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                 <div className="flex items-center justify-between mb-8">
                     <div>
                       <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <BarChart3 size={20} className="text-brand-500" />
@@ -1931,101 +2772,234 @@ const App: React.FC = () => {
         {/* Settings, Sales, Debtors remain similarly refined in App.tsx logic... */}
         {/* ... (Existing tabs logic but with refined typography classes applied) ... */}
         
-        {activeTab === 'sales' && (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="text" 
-                  placeholder={state.language === 'ru' ? 'Поиск по клиенту или модели...' : 'Search by customer or model...'}
-                  className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 outline-none shadow-sm focus:ring-2 ring-brand-500/20 transition-all text-sm font-medium"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
+        {activeTab === 'sales' && (() => {
+          const monthsRu = [
+            'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+            'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+          ];
+          const monthsEn = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ];
+          
+          const monthColors = [
+            { text: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50/50 dark:bg-blue-950/20', border: 'border-blue-100 dark:border-blue-900/40', badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', leftBorder: 'border-l-4 border-l-blue-500', accent: 'bg-blue-500' },       // Jan
+            { text: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50/50 dark:bg-indigo-950/20', border: 'border-indigo-100 dark:border-indigo-900/40', badge: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200', leftBorder: 'border-l-4 border-l-indigo-500', accent: 'bg-indigo-500' }, // Feb
+            { text: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/50 dark:bg-violet-950/20', border: 'border-violet-100 dark:border-violet-900/40', badge: 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200', leftBorder: 'border-l-4 border-l-violet-500', accent: 'bg-violet-500' }, // Mar
+            { text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/50 dark:bg-emerald-950/20', border: 'border-emerald-100 dark:border-emerald-900/40', badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200', leftBorder: 'border-l-4 border-l-emerald-500', accent: 'bg-emerald-500' }, // Apr
+            { text: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50/50 dark:bg-teal-950/20', border: 'border-teal-100 dark:border-teal-900/40', badge: 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200', leftBorder: 'border-l-4 border-l-teal-500', accent: 'bg-teal-500' },    // May
+            { text: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50/50 dark:bg-cyan-950/20', border: 'border-cyan-100 dark:border-cyan-900/40', badge: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200', leftBorder: 'border-l-4 border-l-cyan-500', accent: 'bg-cyan-500' },    // Jun
+            { text: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50/50 dark:bg-sky-950/20', border: 'border-sky-100 dark:border-sky-900/40', badge: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200', leftBorder: 'border-l-4 border-l-sky-500', accent: 'bg-sky-500' },       // Jul
+            { text: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/50 dark:bg-amber-950/20', border: 'border-amber-100 dark:border-amber-900/40', badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200', leftBorder: 'border-l-4 border-l-amber-500', accent: 'bg-amber-500' }, // Aug
+            { text: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50/50 dark:bg-orange-950/20', border: 'border-orange-100 dark:border-orange-900/40', badge: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200', leftBorder: 'border-l-4 border-l-orange-500', accent: 'bg-orange-500' }, // Sep
+            { text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/50 dark:bg-rose-950/20', border: 'border-rose-100 dark:border-rose-900/40', badge: 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200', leftBorder: 'border-l-4 border-l-rose-500', accent: 'bg-rose-500' },    // Oct
+            { text: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50/50 dark:bg-pink-950/20', border: 'border-pink-100 dark:border-pink-900/40', badge: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200', leftBorder: 'border-l-4 border-l-pink-500', accent: 'bg-pink-500' },    // Nov
+            { text: 'text-fuchsia-600 dark:text-fuchsia-400', bg: 'bg-fuchsia-50/50 dark:bg-fuchsia-950/20', border: 'border-fuchsia-100 dark:border-fuchsia-900/40', badge: 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900 dark:text-fuchsia-200', leftBorder: 'border-l-4 border-l-fuchsia-500', accent: 'bg-fuchsia-500' }, // Dec
+          ];
 
-            <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
-              <div className="overflow-x-auto scrollbar-hide">
-                <table className="w-full text-left min-w-[700px]">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800/60">
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.date}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.model}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.customer}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Дата закупки' : 'Purchase Date'}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.sellingPrice}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.status}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
-                    {state.sales
-                      .filter(s => {
-                        const device = state.devices.find(d => d.id === s.deviceId);
-                        const searchLower = searchQuery.toLowerCase();
-                        return (
-                          s.customerName?.toLowerCase().includes(searchLower) || 
-                          device?.model.toLowerCase().includes(searchLower) ||
-                          device?.imei.toLowerCase().includes(searchLower)
-                        );
-                      })
-                      .map(sale => {
-                      const device = state.devices.find(d => d.id === sale.deviceId);
-                      return (
-                        <tr key={sale.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
-                         <td className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase">{formatDate(sale.date, state.language)}</td>
-                         <td className="px-6 py-4">
-                           <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 tracking-tight">{device?.model || '?'}</p>
-                           <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">{device?.storage} • {device?.imei.slice(-4)}</p>
-                         </td>
-                         <td className="px-6 py-4">
-                           <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{sale.customerName || "—"}</p>
-                           <p className="text-[9px] font-medium text-slate-400">{sale.customerPhone || "—"}</p>
-                         </td>
-                          <td className="px-6 py-4 text-[10px] font-semibold text-slate-400 uppercase">
-                            {device ? formatDate(device.purchaseDate, state.language) : '—'}
-                          </td>
-                          <td className="px-6 py-4 font-semibold text-xs text-slate-400">
-                            ${(sale.purchasePrice ?? device?.purchasePrice ?? 0).toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 font-semibold text-base text-brand-600">
-                            ${sale.salePrice.toLocaleString()}
-                          </td>
-                          <td className={`px-6 py-4 font-bold ${(sale.salePrice - (sale.purchasePrice ?? device?.purchasePrice ?? 0)) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            ${(sale.salePrice - (sale.purchasePrice ?? device?.purchasePrice ?? 0)).toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4">
-                           <span className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-widest ${
-                             sale.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/20'
-                           }`}>
-                             {sale.status === 'Completed' ? (sale.isInstallment ? 'In Debt' : 'Paid') : 'Returned'}
-                           </span>
-                         </td>
-                         <td className="px-6 py-4 text-right">
-                           {sale.status === 'Completed' && (
-                             <div className="flex justify-end items-center space-x-2">
-                               <button onClick={() => returnSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90" title={state.language === 'ru' ? 'Возврат' : 'Return'}>
-                                 <RotateCcw size={14} />
-                               </button>
-                               <button onClick={() => cancelSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90" title={state.language === 'ru' ? 'Удалить' : 'Delete'}>
-                                 <X size={14} />
-                               </button>
-                             </div>
-                           )}
-                         </td>
-                       </tr>
-                     );
-                   })}
-                 </tbody>
-               </table>
-             </div>
-           </div>
-          </div>
-        )}
+          // Filter first
+          const filtered = state.sales.filter(s => {
+            const device = state.devices.find(d => d.id === s.deviceId);
+            const searchLower = searchQuery.toLowerCase();
+            return (
+              (s.customerName || '').toLowerCase().includes(searchLower) || 
+              (device?.model || '').toLowerCase().includes(searchLower) ||
+              (device?.imei || '').toLowerCase().includes(searchLower)
+            );
+          });
+
+          // Group by year and month
+          const groups: Record<string, {
+            year: number;
+            month: number;
+            sales: typeof state.sales;
+            totalRevenue: number;
+            totalProfit: number;
+          }> = {};
+
+          filtered.forEach(sale => {
+            const d = new Date(sale.date);
+            const year = d.getFullYear() || 2026;
+            const month = d.getMonth(); // 0-11
+            const key = `${year}-${month}`;
+
+            if (!groups[key]) {
+              groups[key] = {
+                year,
+                month,
+                sales: [],
+                totalRevenue: 0,
+                totalProfit: 0
+              };
+            }
+
+            const device = state.devices.find(dev => dev.id === sale.deviceId);
+            const purchasePrice = sale.purchasePrice ?? device?.purchasePrice ?? 0;
+            const profit = sale.salePrice - purchasePrice;
+
+            groups[key].sales.push(sale);
+            groups[key].totalRevenue += sale.salePrice;
+            groups[key].totalProfit += profit;
+          });
+
+          // Sort groups descending (most recent first)
+          const sortedGroups = Object.values(groups).sort((a, b) => {
+            if (a.year !== b.year) return b.year - a.year;
+            return b.month - a.month;
+          });
+
+          return (
+            <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="relative w-full md:w-96">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input 
+                    type="text" 
+                    placeholder={state.language === 'ru' ? 'Поиск по клиенту или модели...' : 'Search by customer or model...'}
+                    className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 outline-none shadow-sm focus:ring-2 ring-brand-500/20 transition-all text-sm font-medium"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {sortedGroups.length === 0 ? (
+                <div className="bg-white dark:bg-slate-800 rounded-[2rem] p-12 text-center border border-slate-100 dark:border-slate-800 shadow-sm">
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                    {state.language === 'ru' ? 'Продажи не найдены' : 'No sales found'}
+                  </p>
+                </div>
+              ) : (
+                sortedGroups.map(group => {
+                  const colorConfig = monthColors[group.month] || monthColors[0];
+                  const monthName = state.language === 'ru' ? monthsRu[group.month] : monthsEn[group.month];
+
+                  return (
+                    <div 
+                      key={`${group.year}-${group.month}`}
+                      className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md"
+                    >
+                      {/* Group Month Header Bar */}
+                      <div className={`px-8 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 dark:border-slate-800/60 ${colorConfig.bg}`}>
+                        <div className="flex items-center gap-3">
+                          <span className={`w-3 h-3 rounded-full ${colorConfig.accent}`} />
+                          <div>
+                            <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase">
+                              {monthName} {group.year}
+                            </h3>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                              {state.language === 'ru' ? `Продажи за месяц: ${group.sales.length}` : `Monthly sales: ${group.sales.length}`}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Month metrics */}
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{state.language === 'ru' ? 'Выручка' : 'Revenue'}</p>
+                            <p className={`text-base font-black ${colorConfig.text}`}>${group.totalRevenue.toLocaleString()}</p>
+                          </div>
+                          <div className="w-px h-8 bg-slate-200 dark:bg-slate-700/60" />
+                          <div className="text-right">
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</p>
+                            <p className="text-base font-black text-emerald-600 dark:text-emerald-400">${group.totalProfit.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sales table for this month */}
+                      <div className="overflow-x-auto scrollbar-hide">
+                        <table className="w-full text-left min-w-[700px]">
+                          <thead>
+                            <tr className="bg-slate-50/50 dark:bg-slate-900/20 border-b border-slate-100 dark:border-slate-800/60">
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.date}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.model}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.customer}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Дата закупки' : 'Purchase Date'}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.purchasePrice}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.sellingPrice}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{state.language === 'ru' ? 'Прибыль' : 'Profit'}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.status}</th>
+                              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">{t.actions}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                            {group.sales.map(sale => {
+                              const device = state.devices.find(d => d.id === sale.deviceId);
+                              const profit = sale.salePrice - (sale.purchasePrice ?? device?.purchasePrice ?? 0);
+                              return (
+                                <tr key={sale.id} className={`hover:bg-slate-50/30 dark:hover:bg-slate-800/10 transition-all ${colorConfig.leftBorder}`}>
+                                  <td className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase">{formatDate(sale.date, state.language)}</td>
+                                  <td className="px-6 py-4">
+                                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100 tracking-tight">{device?.model || '?'}</p>
+                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tight">
+                                      {device?.storage} • IMEI: {device?.imei || '—'}
+                                    </p>
+                                    {device?.purchasedFrom && (
+                                      <p className="text-[9px] font-bold text-brand-600 dark:text-brand-400 mt-0.5">
+                                        {state.language === 'ru' ? `Поставщик: ${device.purchasedFrom}` : `Supplier: ${device.purchasedFrom}`}
+                                      </p>
+                                    )}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{sale.customerName || "—"}</p>
+                                    <p className="text-[9px] font-medium text-slate-400">{sale.customerPhone || "—"}</p>
+                                  </td>
+                                  <td className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase">
+                                    {device ? formatDate(device.purchaseDate, state.language) : '—'}
+                                  </td>
+                                  <td className="px-6 py-4 font-bold text-xs text-slate-400">
+                                    ${(sale.purchasePrice ?? device?.purchasePrice ?? 0).toLocaleString()}
+                                  </td>
+                                  <td className="px-6 py-4 font-bold text-base text-slate-950 dark:text-white">
+                                    ${sale.salePrice.toLocaleString()}
+                                  </td>
+                                  <td className={`px-6 py-4 font-black ${profit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                    ${profit.toLocaleString()}
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <span className={`px-2 py-1 rounded-md text-[8px] font-bold uppercase tracking-widest ${
+                                      sale.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20' : 'bg-rose-50 text-rose-600 dark:bg-rose-900/20'
+                                    }`}>
+                                      {sale.status === 'Completed' ? (sale.isInstallment ? 'In Debt' : 'Paid') : 'Returned'}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-right">
+                                    {sale.status === 'Completed' && (
+                                      <div className="flex justify-end items-center space-x-2">
+                                        <button onClick={() => {
+                                           if (device) {
+                                             setBatteryHealth(device.batteryHealth || 100);
+                                             setEditingDevice(device);
+                                           }
+                                         }}
+                                         className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-blue-500 transition-all active:scale-90"
+                                         title={state.language === 'ru' ? 'Редактировать' : 'Edit'}
+                                        >
+                                          <Edit size={14} />
+                                        </button>
+                                        <button onClick={() => returnSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90" title={state.language === 'ru' ? 'Возврат' : 'Return'}>
+                                          <RotateCcw size={14} />
+                                        </button>
+                                        <button onClick={() => cancelSale(sale.id)} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 transition-all active:scale-90" title={state.language === 'ru' ? 'Удалить' : 'Delete'}>
+                                          <X size={14} />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          );
+        })()}
 
         {activeTab === 'debtors' && (
           <div className="space-y-6 animate-in fade-in duration-500">
@@ -2082,6 +3056,8 @@ const App: React.FC = () => {
 
         {activeTab === 'settings' && (
           <div className="max-w-4xl space-y-6 animate-in fade-in duration-500 pb-20">
+
+
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Cash & Exchange Rate Card */}
                 <div className="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
@@ -2248,6 +3224,76 @@ const App: React.FC = () => {
                        </div>
                     </div>
                  </div>
+
+
+
+                  {/* Daily Auto-Backups Card */}
+                  <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
+                     <div className="flex items-center justify-between">
+                       <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2 flex items-center">
+                         <ShieldCheck className="mr-2 text-emerald-500 opacity-70" size={16} />
+                         {state.language === 'ru' ? 'Оффлайн Резервное Копирование' : 'Daily Offline Auto-Backups'}
+                       </h3>
+                       <span className="px-2 py-0.5 text-[8px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full font-bold uppercase tracking-wider">
+                         {state.language === 'ru' ? 'АВТОМАТИЧЕСКИ' : 'ENABLED'}
+                       </span>
+                     </div>
+                     <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                       {state.language === 'ru' 
+                         ? 'Каждый день при внесении изменений приложение автоматически сохраняет резервную оффлайн-копию вашей базы данных в память браузера (хранится до 14 последних дней бэкапов). Вы можете в любой момент восстановить данные за прошлый день.' 
+                         : 'The app automatically backs up your inventory, sales, and settings offline each day changes are detected (stores up to the last 14 days of backups).'}
+                     </p>
+                     
+                     <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2">
+                       {backupsList.length === 0 ? (
+                         <div className="p-4 bg-slate-50 dark:bg-slate-900/30 rounded-2xl border border-slate-100 dark:border-slate-800/60 text-center">
+                           <p className="text-[10px] text-slate-400">
+                             {state.language === 'ru' ? 'Резервные копии еще не созданы. Они появятся здесь автоматически.' : 'No daily backups recorded yet. They will appear here automatically.'}
+                           </p>
+                         </div>
+                       ) : (
+                         backupsList.map((date) => {
+                           const backupJSON = localStorage.getItem(`flagship_backup_${date}`);
+                           let infoText = "";
+                           if (backupJSON) {
+                             try {
+                               const data = JSON.parse(backupJSON);
+                               const dCount = data.devices?.length || 0;
+                               const sCount = data.sales?.length || 0;
+                               if (state.language === 'ru') {
+                                 infoText = `Устройств: ${dCount} • Продаж: ${sCount}`;
+                               } else {
+                                 infoText = `Devices: ${dCount} • Sales: ${sCount}`;
+                               }
+                             } catch(e) {}
+                           }
+                           
+                           return (
+                             <div 
+                               key={date} 
+                               className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100/60 dark:border-slate-800/40 hover:border-slate-200 transition-all"
+                             >
+                               <div className="flex items-center gap-3">
+                                 <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
+                                   <Calendar size={14} />
+                                 </div>
+                                 <div>
+                                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{date}</p>
+                                   <p className="text-[9px] text-slate-400 mt-0.5">{infoText || (state.language === 'ru' ? 'Резервная копия' : 'Offline Backup')}</p>
+                                 </div>
+                               </div>
+                               <button
+                                 onClick={() => restoreBackup(date)}
+                                 className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white text-[9px] font-black uppercase tracking-wider transition-all border border-emerald-500/20"
+                               >
+                                 {state.language === 'ru' ? 'Восстановить' : 'Restore'}
+                               </button>
+                             </div>
+                           );
+                         })
+                       )}
+                     </div>
+                  </div>
 
                  {/* Models Management Card */}
                 <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
@@ -2671,7 +3717,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
           <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-1 uppercase tracking-tight">{t.sell}</h2>
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-8 italic">{showSellModal.model} • IMEI {showSellModal.imei.slice(-4)}</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-8 italic">{showSellModal.model} • IMEI {(showSellModal.imei || '').slice(-4)}</p>
             
             <form onSubmit={sellDevice} className="space-y-6">
               <div className="p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl space-y-5 border border-slate-100 dark:border-slate-800/40">
@@ -2776,7 +3822,7 @@ const App: React.FC = () => {
       {/* EDIT MODAL */}
       {editingDevice && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-          <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5">
+          <div className="bg-white dark:bg-slate-800 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative border border-white/5 max-h-[90vh] overflow-y-auto scrollbar-hide">
             <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-8 flex items-center gap-3">
                <div className="p-2.5 bg-brand-50 dark:bg-brand-900/30 rounded-xl text-brand-600">
                   <Edit size={18} />
@@ -2838,6 +3884,33 @@ const App: React.FC = () => {
                     />
                   </div>
                 )}
+                {editingDevice.status === 'Sold' && (() => {
+                  const sale = state.sales.find(s => s.deviceId === editingDevice.id);
+                  if (!sale) return null;
+                  return (
+                    <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 mt-2 space-y-4">
+                      <h4 className="text-xs font-bold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+                        {state.language === 'ru' ? 'Информация о продаже' : 'Sale Information'}
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                         <InputWrapper label={state.language === 'ru' ? 'Имя клиента' : 'Customer Name'}>
+                            <input name="saleCustomerName" defaultValue={sale.customerName} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                         </InputWrapper>
+                         <InputWrapper label={state.language === 'ru' ? 'Телефон' : 'Phone'}>
+                            <input name="saleCustomerPhone" defaultValue={sale.customerPhone} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                         </InputWrapper>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                         <InputWrapper label={state.language === 'ru' ? 'Цена продажи ($)' : 'Sale Price ($)'}>
+                            <input name="salePrice" type="number" defaultValue={sale.salePrice} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-medium" />
+                         </InputWrapper>
+                         <InputWrapper label={state.language === 'ru' ? 'Дата продажи' : 'Sale Date'}>
+                            <input name="saleDate" type="date" defaultValue={sale.date ? sale.date.split('T')[0] : ''} className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-[11px] font-bold" />
+                         </InputWrapper>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="flex space-x-3 pt-4">

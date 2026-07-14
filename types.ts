@@ -70,4 +70,7 @@ export interface AppState {
     autoUpdate?: boolean;
   };
   geminiApiKey?: string;
+  colorTheme?: string;
+  themeStyle?: 'default' | 'glassmorphism';
+  lastDailyBackup?: string;
 }
