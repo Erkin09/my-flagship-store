@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "c65ef65c-3501-49d1-a328-25e55d7b8406",
+      "brand": "Samsung",
+      "model": "Galaxy S23 Ultra",
+      "storage": "512Gb",
+      "imei": "353992853172311",
+      "purchasePrice": 510,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-06-05",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T09:29:10.531Z"
+    },
+    {
       "id": "0335cc54-4235-4d65-9a39-73e171814654",
       "brand": "Samsung",
       "model": "Galaxy S10 5G",
@@ -1317,7 +1329,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:34:15.162Z"
+    "lastSync": "2026-07-14T08:35:06.770Z"
   },
   "currencySettings": {
     "autoUpdate": true,
