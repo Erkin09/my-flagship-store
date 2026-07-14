@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "c072a2d9-20e9-4a22-ac0a-fef380df227d",
+      "brand": "Samsung",
+      "model": "Galaxy S22 Ultra",
+      "storage": "256Gb",
+      "imei": "358725360823645",
+      "purchasePrice": 405,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-06-30",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T09:32:32.592Z"
+    },
+    {
       "id": "c65ef65c-3501-49d1-a328-25e55d7b8406",
       "brand": "Samsung",
       "model": "Galaxy S23 Ultra",
@@ -1310,8 +1322,8 @@
   "exchangeRate": 12149,
   "buyRate": 12124,
   "sellRate": 12174,
-  "bankRate": 12093,
-  "prevExchangeRate": 12242,
+  "bankRate": 12149,
+  "prevExchangeRate": 12149,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -1329,7 +1341,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:35:06.770Z"
+    "lastSync": "2026-07-14T09:29:19.555Z"
   },
   "currencySettings": {
     "autoUpdate": true,
