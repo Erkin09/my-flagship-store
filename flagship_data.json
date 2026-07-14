@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "e50e6bd0-050e-45ad-a276-a04847cf70ee",
+      "brand": "iPhone",
+      "model": "iPhone 13 Pro Max",
+      "storage": "128Gb",
+      "imei": "02714678",
+      "purchasePrice": 475,
+      "purchasedFrom": "MK",
+      "purchaseDate": "2026-06-30",
+      "batteryHealth": 91,
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T07:55:22.789Z"
+    },
+    {
       "id": "d596d417-368c-4ece-a133-3ce726668cc0",
       "brand": "iPhone",
       "model": "iPhone 13 Pro Max",
@@ -1205,10 +1218,10 @@
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-14",
   "cashBalance": 0,
-  "exchangeRate": 12242,
-  "buyRate": 12217,
-  "sellRate": 12267,
-  "bankRate": 12242,
+  "exchangeRate": 12149,
+  "buyRate": 12124,
+  "sellRate": 12174,
+  "bankRate": 12093,
   "prevExchangeRate": 12242,
   "customModels": {
     "iPhone": [],
@@ -1224,7 +1237,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T07:05:35.809Z"
+    "lastSync": "2026-07-14T07:10:15.980Z"
   },
   "currencySettings": {
     "autoUpdate": true,
