@@ -1289,7 +1289,9 @@
   "bankRate": 12093,
   "prevExchangeRate": 12242,
   "customModels": {
-    "iPhone": [],
+    "iPhone": [
+      "Macbook Neo"
+    ],
     "Samsung": [
       "Galaxy Note 20 Ultra"
     ]
@@ -1302,7 +1304,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:27:37.622Z"
+    "lastSync": "2026-07-14T08:29:36.714Z"
   },
   "currencySettings": {
     "autoUpdate": true,
