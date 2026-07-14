@@ -847,6 +847,20 @@
   ],
   "sales": [
     {
+      "id": "c16cec4e-76bf-45f1-9258-94a9d7472d55",
+      "customerName": "Kamola apa Gostinica",
+      "customerPhone": "943740017",
+      "salePrice": 108,
+      "date": "2026-07-14T09:45:43.298Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-08-13T09:45:43.298Z"
+      }
+    },
+    {
       "id": "17237048-9553-4899-8439-661893e67ddc",
       "customerName": "Turdibayeva Nurziyo",
       "customerPhone": "882882717",
@@ -1465,7 +1479,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T09:43:54.243Z"
+    "lastSync": "2026-07-14T09:45:04.487Z"
   },
   "currencySettings": {
     "autoUpdate": true,
