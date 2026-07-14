@@ -847,6 +847,20 @@
   ],
   "sales": [
     {
+      "id": "19cea254-df63-449d-bf37-08c2cdbf5322",
+      "customerName": "Muhammadali Doctor",
+      "customerPhone": "913316363",
+      "salePrice": 625,
+      "date": "2026-07-14T09:42:34.232Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-08-13T09:42:34.232Z"
+      }
+    },
+    {
       "id": "eeb9b9d0-3fa3-40b1-aad3-761e73ff7982",
       "customerName": "Aziz Bekmurodov",
       "customerPhone": "883052812",
@@ -1409,7 +1423,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T09:41:09.482Z"
+    "lastSync": "2026-07-14T09:41:53.823Z"
   },
   "currencySettings": {
     "autoUpdate": true,
