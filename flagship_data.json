@@ -458,19 +458,6 @@
       "dateAdded": "2026-03-18T05:54:20.495Z"
     },
     {
-      "id": "4e5bcc74-b159-4e38-88b4-114e9bcc09be",
-      "brand": "Samsung",
-      "model": "Galaxy S21",
-      "storage": "256Gb",
-      "imei": "351376410721368",
-      "purchasePrice": 210,
-      "purchasedFrom": "Abdulaziz",
-      "purchaseDate": "2026-01-07",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-03-09T12:11:13.675Z"
-    },
-    {
       "id": "f7b8ccd7-b8ad-42fc-af72-80aa89b7c264",
       "brand": "Samsung",
       "model": "Galaxy S22",
@@ -1330,7 +1317,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:32:21.129Z"
+    "lastSync": "2026-07-14T08:34:15.162Z"
   },
   "currencySettings": {
     "autoUpdate": true,
