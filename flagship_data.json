@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "ce899215-f52f-43b3-aa22-e4cb935b14cd",
+      "brand": "iPhone",
+      "model": "Macbook Neo",
+      "storage": "256Gb",
+      "imei": "0000",
+      "purchasePrice": 540,
+      "purchasedFrom": "Farid aka",
+      "purchaseDate": "2026-06-01",
+      "batteryHealth": 100,
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T08:30:45.668Z"
+    },
+    {
       "id": "bc91695b-592c-4e9e-abca-f78d236d38bc",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -1304,7 +1317,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:29:36.714Z"
+    "lastSync": "2026-07-14T08:30:06.836Z"
   },
   "currencySettings": {
     "autoUpdate": true,
