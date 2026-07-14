@@ -1,19 +1,6 @@
 {
   "devices": [
     {
-      "id": "4123f50e-d59b-4efe-81d5-a368a576015e",
-      "brand": "iPhone",
-      "model": "iPhone 14 Pro",
-      "storage": "128Gb",
-      "imei": "351553260970457",
-      "purchasePrice": 450,
-      "purchasedFrom": "Client",
-      "purchaseDate": "2026-03-01",
-      "batteryHealth": 90,
-      "status": "In Stock",
-      "dateAdded": "2026-03-24T05:58:49.455Z"
-    },
-    {
       "id": "8c3e021d-cba5-44b2-aa71-3f6a4ec9d042",
       "brand": "Samsung",
       "model": "Galaxy S25 Ultra",
