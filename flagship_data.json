@@ -1,32 +1,6 @@
 {
   "devices": [
     {
-      "id": "4d458f99-c03a-41dc-87cc-b12e743d8183",
-      "brand": "Samsung",
-      "model": "Galaxy S24 Ultra",
-      "storage": "256Gb",
-      "imei": "353437178767080",
-      "purchasePrice": 630,
-      "purchasedFrom": "Maruf varatar",
-      "purchaseDate": "2026-03-28",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-03-28T12:39:04.180Z"
-    },
-    {
-      "id": "3f645930-d318-4e93-8c80-98ad43e8a032",
-      "brand": "Samsung",
-      "model": "Galaxy S25 Ultra",
-      "storage": "256Gb",
-      "imei": "352545212644965",
-      "purchasePrice": 725,
-      "purchasedFrom": "Shezzi 5",
-      "purchaseDate": "2026-03-28",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-03-28T12:38:05.153Z"
-    },
-    {
       "id": "4123f50e-d59b-4efe-81d5-a368a576015e",
       "brand": "iPhone",
       "model": "iPhone 14 Pro",
@@ -38,19 +12,6 @@
       "batteryHealth": 90,
       "status": "In Stock",
       "dateAdded": "2026-03-24T05:58:49.455Z"
-    },
-    {
-      "id": "e7c16a8b-57c7-45a9-8214-0b43869bf1e9",
-      "brand": "iPhone",
-      "model": "iPhone 15 Pro Max",
-      "storage": "256Gb",
-      "imei": "356876526214153",
-      "purchasePrice": 650,
-      "purchasedFrom": "Feruz Usto",
-      "purchaseDate": "2026-03-22",
-      "batteryHealth": 85,
-      "status": "In Stock",
-      "dateAdded": "2026-03-23T08:36:56.402Z"
     },
     {
       "id": "8c3e021d-cba5-44b2-aa71-3f6a4ec9d042",
@@ -675,19 +636,6 @@
       "batteryHealth": 88,
       "status": "In Stock",
       "dateAdded": "2026-01-30T06:56:15.467Z"
-    },
-    {
-      "id": "1769755922189_b578d9d6432098",
-      "brand": "Samsung",
-      "model": "Galaxy S10 5G",
-      "storage": "256Gb",
-      "imei": "355374100597913",
-      "purchasePrice": 165,
-      "purchasedFrom": "Abdulaziz",
-      "purchaseDate": "2026-09-08",
-      "batteryHealth": 100,
-      "status": "In Stock",
-      "dateAdded": "2026-01-30T06:52:02.189Z"
     },
     {
       "id": "1769753535168_eef5fbe52f3ef",
@@ -1317,7 +1265,7 @@
   "language": "ru",
   "theme": "light",
   "themeStyle": "default",
-  "lastDailyBackup": "",
+  "lastDailyBackup": "2026-07-14",
   "cashBalance": 7735,
   "exchangeRate": 12242,
   "buyRate": 12217,
@@ -1335,7 +1283,8 @@
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
-    "autoSync": true
+    "autoSync": true,
+    "lastSync": "2026-07-14T06:23:17.599Z"
   },
   "currencySettings": {
     "autoUpdate": true,
