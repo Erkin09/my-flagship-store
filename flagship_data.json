@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "e31dea61-0765-42e3-86cd-29ae100a90df",
+      "brand": "Samsung",
+      "model": "Galaxy Note 20 Ultra",
+      "storage": "256Gb",
+      "imei": "355857115833075",
+      "purchasePrice": 270,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-07-12",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T06:55:19.763Z"
+    },
+    {
       "id": "a92eaba8-fffc-42e7-adb4-5782a79193f4",
       "brand": "Samsung",
       "model": "Galaxy S22 Ultra",
@@ -1138,7 +1150,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:54:05.916Z"
+    "lastSync": "2026-07-14T06:54:52.409Z"
   },
   "currencySettings": {
     "autoUpdate": true,
