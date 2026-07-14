@@ -847,6 +847,20 @@
   ],
   "sales": [
     {
+      "id": "17237048-9553-4899-8439-661893e67ddc",
+      "customerName": "Turdibayeva Nurziyo",
+      "customerPhone": "882882717",
+      "salePrice": 75,
+      "date": "2026-07-14T09:44:57.282Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 0,
+        "dueDate": "2026-08-13T09:44:57.282Z"
+      }
+    },
+    {
       "id": "aed147e0-78e1-4590-9624-5e5d4b4d7452",
       "customerName": "Ibrohim Ahmad",
       "customerPhone": "000",
@@ -1451,7 +1465,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T09:43:24.436Z"
+    "lastSync": "2026-07-14T09:43:54.243Z"
   },
   "currencySettings": {
     "autoUpdate": true,
