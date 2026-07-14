@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "0335cc54-4235-4d65-9a39-73e171814654",
+      "brand": "Samsung",
+      "model": "Galaxy S10 5G",
+      "storage": "256Gb",
+      "imei": "353516053354674",
+      "purchasePrice": 165,
+      "purchasedFrom": "Abdulaziz",
+      "purchaseDate": "2026-02-01",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T08:34:06.814Z"
+    },
+    {
       "id": "ce899215-f52f-43b3-aa22-e4cb935b14cd",
       "brand": "iPhone",
       "model": "Macbook Neo",
@@ -1318,7 +1330,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T08:30:52.815Z"
+    "lastSync": "2026-07-14T08:32:21.129Z"
   },
   "currencySettings": {
     "autoUpdate": true,
