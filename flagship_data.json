@@ -194,7 +194,7 @@
       "brand": "Samsung",
       "model": "Galaxy S23+",
       "storage": "256Gb",
-      "imei": "355468150675684",
+      "imei": "40309249",
       "purchasePrice": 335,
       "purchasedFrom": "KM",
       "purchaseDate": "2026-07-12",
@@ -1341,7 +1341,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T09:29:19.555Z"
+    "lastSync": "2026-07-14T09:32:39.466Z"
   },
   "currencySettings": {
     "autoUpdate": true,
