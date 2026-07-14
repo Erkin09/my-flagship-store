@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "96aea04a-60ab-402d-b99c-e44a2c03b46e",
+      "brand": "Samsung",
+      "model": "Galaxy S24 Ultra",
+      "storage": "256Gb",
+      "imei": "352066441596215",
+      "purchasePrice": 610,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-07-12",
+      "status": "In Stock",
+      "dateAdded": "2026-07-14T06:51:04.749Z"
+    },
+    {
       "id": "3709baad-e2dc-4341-a908-8dcdd5f23e7b",
       "brand": "iPhone",
       "model": "iPhone 14 Pro",
@@ -1076,7 +1088,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T06:46:45.651Z"
+    "lastSync": "2026-07-14T06:49:00.967Z"
   },
   "currencySettings": {
     "autoUpdate": true,
