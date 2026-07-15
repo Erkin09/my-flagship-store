@@ -469,7 +469,7 @@
       "purchasedFrom": "Abror",
       "purchaseDate": "2026-07-12",
       "batteryHealth": 95,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-14T06:45:38.197Z"
     },
     {
@@ -994,6 +994,17 @@
     }
   ],
   "sales": [
+    {
+      "id": "10d47f82-b9e6-40c1-b316-e1c478c98321",
+      "deviceId": "d70d81f5-5ad7-47d7-bcc9-fc64b6942751",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 560,
+      "purchasePrice": 485,
+      "date": "2026-07-15T08:52:46.861Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
     {
       "id": "c16cec4e-76bf-45f1-9258-94a9d7472d55",
       "customerName": "Kamola apa Gostinica",
@@ -1604,11 +1615,11 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-14",
-  "cashBalance": 41,
-  "exchangeRate": 12149,
-  "buyRate": 12124,
-  "sellRate": 12174,
-  "bankRate": 12149,
+  "cashBalance": 601,
+  "exchangeRate": 12144,
+  "buyRate": 12119,
+  "sellRate": 12169,
+  "bankRate": 12144,
   "prevExchangeRate": 12149,
   "customModels": {
     "iPhone": [
@@ -1627,7 +1638,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-14T13:41:06.448Z"
+    "lastSync": "2026-07-14T13:45:04.611Z"
   },
   "currencySettings": {
     "autoUpdate": true,
