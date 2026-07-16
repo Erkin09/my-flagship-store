@@ -232,7 +232,7 @@
       "purchasedFrom": "Farid aka",
       "purchaseDate": "2026-06-01",
       "batteryHealth": 100,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-14T08:30:45.668Z"
     },
     {
@@ -1021,6 +1021,22 @@
   ],
   "sales": [
     {
+      "id": "656f28dd-0531-4cc8-8754-694cf73591fa",
+      "deviceId": "ce899215-f52f-43b3-aa22-e4cb935b14cd",
+      "customerName": "yanga hamsiyasi",
+      "customerPhone": "000",
+      "salePrice": 650,
+      "purchasePrice": 540,
+      "date": "2026-07-16T07:34:47.524Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 784,
+        "dueDate": "2026-08-15T07:34:47.524Z"
+      }
+    },
+    {
       "id": "3a63d7d3-035c-4c23-ba46-935b9450292a",
       "customerName": "Madina",
       "customerPhone": "945832023",
@@ -1666,12 +1682,12 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-15",
-  "cashBalance": 2830,
-  "exchangeRate": 12144,
-  "buyRate": 12119,
-  "sellRate": 12169,
-  "bankRate": 12144,
-  "prevExchangeRate": 12149,
+  "cashBalance": 3614,
+  "exchangeRate": 12123,
+  "buyRate": 12098,
+  "sellRate": 12148,
+  "bankRate": 12123,
+  "prevExchangeRate": 12144,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -1689,7 +1705,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-15T09:10:20.640Z"
+    "lastSync": "2026-07-15T13:35:15.895Z"
   },
   "currencySettings": {
     "autoUpdate": true,
