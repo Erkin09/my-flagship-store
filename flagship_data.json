@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "329a8f64-14b8-4860-b8ad-3db7eaa020e1",
+      "brand": "Samsung",
+      "model": "Galaxy S23",
+      "storage": "256Gb",
+      "imei": "351357516174579",
+      "purchasePrice": 315,
+      "purchasedFrom": "Client sotganim",
+      "purchaseDate": "2026-07-16",
+      "status": "In Stock",
+      "dateAdded": "2026-07-16T09:18:12.562Z"
+    },
+    {
       "id": "9d45cbe8-7efe-4487-b609-0783f459c8dc",
       "brand": "iPhone",
       "model": "iPhone 12",
@@ -1721,7 +1733,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-16T07:34:54.570Z"
+    "lastSync": "2026-07-16T08:47:46.204Z"
   },
   "currencySettings": {
     "autoUpdate": true,
