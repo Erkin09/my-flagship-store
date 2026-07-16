@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "52540a86-73ae-45cf-ade0-a1c58a7b4f13",
+      "brand": "Samsung",
+      "model": "Galaxy S25 Ultra",
+      "storage": "256Gb",
+      "imei": "352857876158921",
+      "purchasePrice": 700,
+      "purchasedFrom": "Pana Ashirov",
+      "purchaseDate": "2026-07-16",
+      "status": "In Stock",
+      "dateAdded": "2026-07-16T10:29:35.795Z"
+    },
+    {
       "id": "329a8f64-14b8-4860-b8ad-3db7eaa020e1",
       "brand": "Samsung",
       "model": "Galaxy S23",
@@ -1733,7 +1745,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-16T08:47:46.204Z"
+    "lastSync": "2026-07-16T09:18:19.894Z"
   },
   "currencySettings": {
     "autoUpdate": true,
