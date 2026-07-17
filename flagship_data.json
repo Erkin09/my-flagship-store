@@ -945,8 +945,8 @@
       "storage": "128Gb",
       "imei": "355600721596839",
       "purchasePrice": 435,
-      "purchasedFrom": "",
-      "purchaseDate": "2026-01-30T07:03:48.642Z",
+      "purchasedFrom": "MK",
+      "purchaseDate": "2026-06-30",
       "batteryHealth": 91,
       "status": "Sold",
       "dateAdded": "2026-01-30T07:03:48.642Z"
@@ -1669,7 +1669,7 @@
       "customerPhone": "N/A",
       "salePrice": 535,
       "purchasePrice": 435,
-      "date": "2026-03-08T14:04:55.551Z",
+      "date": "2026-07-16T00:00:00.000Z",
       "isInstallment": false,
       "status": "Completed"
     },
@@ -1791,7 +1791,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-17T10:52:20.230Z"
+    "lastSync": "2026-07-17T10:52:41.220Z"
   },
   "currencySettings": {
     "autoUpdate": true,
