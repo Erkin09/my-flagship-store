@@ -506,7 +506,7 @@
       "purchasedFrom": "777",
       "purchaseDate": "2026-06-30",
       "batteryHealth": 83,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-14T06:48:53.855Z"
     },
     {
@@ -1057,6 +1057,17 @@
     }
   ],
   "sales": [
+    {
+      "id": "547892fc-2899-44d3-878f-d3e59fc7fe2f",
+      "deviceId": "3709baad-e2dc-4341-a908-8dcdd5f23e7b",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 600,
+      "purchasePrice": 530,
+      "date": "2026-07-17T10:52:34.749Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
     {
       "id": "e504b5c2-887a-4a7a-9480-914a6e7e197d",
       "deviceId": "72c17f7e-10e3-42f6-91ab-c0cd9f384536",
@@ -1757,7 +1768,7 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-17",
-  "cashBalance": 5062,
+  "cashBalance": 5662,
   "exchangeRate": 12141,
   "buyRate": 12116,
   "sellRate": 12166,
@@ -1780,7 +1791,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-17T05:35:17.368Z"
+    "lastSync": "2026-07-17T10:52:20.230Z"
   },
   "currencySettings": {
     "autoUpdate": true,
