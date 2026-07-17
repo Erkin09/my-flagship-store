@@ -10,7 +10,7 @@
       "purchasedFrom": "Abror",
       "purchaseDate": "2026-07-17",
       "batteryHealth": 85,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-17T15:16:34.937Z"
     },
     {
@@ -1071,6 +1071,17 @@
   ],
   "sales": [
     {
+      "id": "b7f6cf00-daaf-4250-9489-122bc653c288",
+      "deviceId": "cca1771f-bbf3-4f13-ab21-17a73e25b181",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 280,
+      "purchasePrice": 225,
+      "date": "2026-07-17T15:16:55.930Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
+    {
       "id": "fd0983e5-d172-4c03-9079-aebb828180df",
       "deviceId": "838df3de-bbc6-4868-a494-2930779e509d",
       "customerName": "Guest",
@@ -1792,7 +1803,7 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-17",
-  "cashBalance": 6142,
+  "cashBalance": 6422,
   "exchangeRate": 12141,
   "buyRate": 12116,
   "sellRate": 12166,
@@ -1815,7 +1826,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-17T10:54:17.815Z"
+    "lastSync": "2026-07-17T15:16:42.403Z"
   },
   "currencySettings": {
     "autoUpdate": true,
