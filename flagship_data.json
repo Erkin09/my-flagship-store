@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "e93d9aa5-2093-4413-838d-f38dd5d2ec38",
+      "brand": "Samsung",
+      "model": "Galaxy S21 Ultra",
+      "storage": "256Gb",
+      "imei": "355495960755547",
+      "purchasePrice": 305,
+      "purchasedFrom": "Ab",
+      "purchaseDate": "2026-07-20",
+      "status": "In Stock",
+      "dateAdded": "2026-07-20T08:28:22.524Z"
+    },
+    {
       "id": "ba81b652-a1c7-431a-96f7-dfcf8f0e65ec",
       "brand": "Samsung",
       "model": "Galaxy S24",
@@ -1975,7 +1987,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-20T08:23:47.490Z"
+    "lastSync": "2026-07-20T08:26:32.142Z"
   },
   "currencySettings": {
     "autoUpdate": true,
