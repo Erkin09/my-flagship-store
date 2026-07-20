@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "a91d9512-2213-42d0-a0c5-4f7b1286678d",
+      "brand": "iPhone",
+      "model": "iPhone 14 Pro",
+      "storage": "128Gb",
+      "imei": "358666976384988",
+      "purchasePrice": 530,
+      "purchasedFrom": "Ab",
+      "purchaseDate": "2026-07-20",
+      "batteryHealth": 89,
+      "status": "In Stock",
+      "dateAdded": "2026-07-20T08:07:14.321Z"
+    },
+    {
       "id": "50bf7946-d1a3-4e91-b565-284fc8ba1f68",
       "brand": "iPhone",
       "model": "iPhone 12 Pro",
@@ -1872,7 +1885,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-20T07:53:36.465Z"
+    "lastSync": "2026-07-20T07:55:27.368Z"
   },
   "currencySettings": {
     "autoUpdate": true,
