@@ -1,6 +1,19 @@
 {
   "devices": [
     {
+      "id": "50bf7946-d1a3-4e91-b565-284fc8ba1f68",
+      "brand": "iPhone",
+      "model": "iPhone 12 Pro",
+      "storage": "256Gb",
+      "imei": "351194964904003",
+      "purchasePrice": 325,
+      "purchasedFrom": "777",
+      "purchaseDate": "2026-05-15",
+      "batteryHealth": 95,
+      "status": "In Stock",
+      "dateAdded": "2026-07-20T07:55:20.339Z"
+    },
+    {
       "id": "cca1771f-bbf3-4f13-ab21-17a73e25b181",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -1835,7 +1848,7 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-19",
+  "lastDailyBackup": "2026-07-20",
   "cashBalance": 0,
   "exchangeRate": 11905,
   "buyRate": 11880,
@@ -1859,7 +1872,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-19T15:00:57.002Z"
+    "lastSync": "2026-07-20T07:53:36.465Z"
   },
   "currencySettings": {
     "autoUpdate": true,
