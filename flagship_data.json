@@ -1835,13 +1835,13 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-18",
-  "cashBalance": 7808,
-  "exchangeRate": 12103,
-  "buyRate": 12078,
-  "sellRate": 12128,
-  "bankRate": 12103,
-  "prevExchangeRate": 12098,
+  "lastDailyBackup": "2026-07-19",
+  "cashBalance": 0,
+  "exchangeRate": 11905,
+  "buyRate": 11880,
+  "sellRate": 11930,
+  "bankRate": 11905,
+  "prevExchangeRate": 12103,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -1859,7 +1859,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-18T14:13:04.915Z"
+    "lastSync": "2026-07-19T15:00:57.002Z"
   },
   "currencySettings": {
     "autoUpdate": true,
