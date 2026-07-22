@@ -191,19 +191,6 @@
       "dateAdded": "2026-07-16T09:18:12.562Z"
     },
     {
-      "id": "9d45cbe8-7efe-4487-b609-0783f459c8dc",
-      "brand": "iPhone",
-      "model": "iPhone 12",
-      "storage": "64Gb",
-      "imei": "356962146704383",
-      "purchasePrice": 130,
-      "purchasedFrom": "Client",
-      "purchaseDate": "2026-06-20",
-      "batteryHealth": 77,
-      "status": "In Stock",
-      "dateAdded": "2026-07-15T13:35:08.578Z"
-    },
-    {
       "id": "6f6c2d2e-4924-4d6e-960e-8e8272a5537a",
       "brand": "iPhone",
       "model": "iPhone 16 Pro Max",
@@ -1971,7 +1958,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-22T05:53:05.991Z"
+    "lastSync": "2026-07-22T05:53:17.053Z"
   },
   "currencySettings": {
     "autoUpdate": true,
