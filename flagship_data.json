@@ -836,11 +836,11 @@
       "brand": "iPhone",
       "model": "iPhone 13 Pro",
       "storage": "256Gb",
-      "imei": "352806843729355",
+      "imei": "547309",
       "purchasePrice": 445,
       "purchasedFrom": "Maxking",
       "purchaseDate": "2026-03-17",
-      "batteryHealth": 85,
+      "batteryHealth": 87,
       "status": "In Stock",
       "dateAdded": "2026-03-18T06:17:52.072Z"
     },
@@ -1997,7 +1997,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-22T05:40:35.547Z"
+    "lastSync": "2026-07-22T05:51:51.659Z"
   },
   "currencySettings": {
     "autoUpdate": true,
