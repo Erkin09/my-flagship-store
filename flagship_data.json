@@ -9,7 +9,7 @@
       "purchasePrice": 120,
       "purchasedFrom": "Clien ",
       "purchaseDate": "2026-07-22",
-      "batteryHealth": 100,
+      "batteryHealth": 77,
       "status": "In Stock",
       "dateAdded": "2026-07-22T06:22:09.197Z"
     },
@@ -1971,7 +1971,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-22T05:54:54.302Z"
+    "lastSync": "2026-07-22T06:22:16.606Z"
   },
   "currencySettings": {
     "autoUpdate": true,
