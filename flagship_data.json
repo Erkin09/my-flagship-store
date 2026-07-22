@@ -1948,7 +1948,7 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-22",
-  "cashBalance": 2450,
+  "cashBalance": 3200,
   "exchangeRate": 11931,
   "buyRate": 11906,
   "sellRate": 11956,
@@ -1971,7 +1971,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-22T06:22:16.606Z"
+    "lastSync": "2026-07-22T06:22:29.708Z"
   },
   "currencySettings": {
     "autoUpdate": true,
