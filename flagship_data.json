@@ -962,19 +962,6 @@
       "dateAdded": "2026-03-09T04:40:03.451Z"
     },
     {
-      "id": "d8a7e211-6d98-4bbb-8817-43ce66a303a3",
-      "brand": "iPhone",
-      "model": "iPhone 13 Pro Max",
-      "storage": "128Gb",
-      "imei": "358226369594451",
-      "purchasePrice": 465,
-      "purchasedFrom": "Maxking",
-      "purchaseDate": "2026-02-28",
-      "batteryHealth": 85,
-      "status": "In Stock",
-      "dateAdded": "2026-03-09T04:31:36.258Z"
-    },
-    {
       "id": "78a874d2-f94c-47bc-a15d-de772be11526",
       "brand": "iPhone",
       "model": "iPhone 14 Pro Max",
@@ -1988,11 +1975,11 @@
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-21",
   "cashBalance": 2450,
-  "exchangeRate": 11963,
-  "buyRate": 11938,
-  "sellRate": 11988,
-  "bankRate": 11963,
-  "prevExchangeRate": 11905,
+  "exchangeRate": 11931,
+  "buyRate": 11906,
+  "sellRate": 11956,
+  "bankRate": 11931,
+  "prevExchangeRate": 11963,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -2010,7 +1997,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-21T10:38:17.501Z"
+    "lastSync": "2026-07-21T10:41:07.230Z"
   },
   "currencySettings": {
     "autoUpdate": true,
