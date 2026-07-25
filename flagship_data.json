@@ -711,7 +711,7 @@
       "purchasedFrom": "Abror",
       "purchaseDate": "2026-07-12",
       "batteryHealth": 86,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-14T06:42:26.939Z"
     },
     {
@@ -1171,6 +1171,17 @@
     }
   ],
   "sales": [
+    {
+      "id": "dd167e21-d6c4-4a88-b844-a170ad20a29c",
+      "deviceId": "6dc0c04e-6826-426c-9e3c-37f4764c6ec8",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 460,
+      "purchasePrice": 425,
+      "date": "2026-07-25T04:30:34.130Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
     {
       "id": "c84d49e5-bdd1-4787-9d6b-b404a25d1e91",
       "deviceId": "cd6467c7-d229-4265-b369-249280f00d90",
@@ -1980,13 +1991,13 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-24",
-  "cashBalance": 4512,
-  "exchangeRate": 12115,
-  "buyRate": 12090,
-  "sellRate": 12140,
-  "bankRate": 12115,
-  "prevExchangeRate": 11931,
+  "lastDailyBackup": "2026-07-25",
+  "cashBalance": 4972,
+  "exchangeRate": 12103,
+  "buyRate": 12078,
+  "sellRate": 12128,
+  "bankRate": 12102,
+  "prevExchangeRate": 12115,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -2004,7 +2015,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-24T10:39:07.301Z"
+    "lastSync": "2026-07-25T04:29:34.203Z"
   },
   "currencySettings": {
     "autoUpdate": true,
