@@ -1980,7 +1980,7 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-22",
+  "lastDailyBackup": "2026-07-24",
   "cashBalance": 4512,
   "exchangeRate": 12115,
   "buyRate": 12090,
@@ -1997,13 +1997,14 @@
     ]
   },
   "aiChatHistory": [],
+  "aiStructuredData": null,
   "geminiApiKey": "",
   "colorTheme": "sky",
   "syncSettings": {
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-22T08:17:50.358Z"
+    "lastSync": "2026-07-24T10:39:07.301Z"
   },
   "currencySettings": {
     "autoUpdate": true,
