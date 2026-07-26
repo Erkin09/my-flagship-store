@@ -1176,9 +1176,9 @@
       "deviceId": "e50e6bd0-050e-45ad-a276-a04847cf70ee",
       "customerName": "Asqar aka",
       "customerPhone": "997770081",
-      "salePrice": 460,
+      "salePrice": 545,
       "purchasePrice": 475,
-      "date": "2026-07-26T06:01:05.407Z",
+      "date": "2026-07-26T00:00:00.000Z",
       "isInstallment": true,
       "status": "Completed",
       "installmentPlan": {
@@ -2029,7 +2029,7 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-25",
+  "lastDailyBackup": "2026-07-26",
   "cashBalance": 6226,
   "exchangeRate": 12107,
   "buyRate": 12082,
@@ -2053,7 +2053,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-25T06:54:56.639Z"
+    "lastSync": "2026-07-26T06:01:12.536Z"
   },
   "currencySettings": {
     "autoUpdate": true,
