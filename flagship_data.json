@@ -500,7 +500,7 @@
       "purchasedFrom": "MK",
       "purchaseDate": "2026-06-30",
       "batteryHealth": 91,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-14T07:55:22.789Z"
     },
     {
@@ -1171,6 +1171,22 @@
     }
   ],
   "sales": [
+    {
+      "id": "89dd4e0e-b652-4c95-bdeb-d2d6663694f1",
+      "deviceId": "e50e6bd0-050e-45ad-a276-a04847cf70ee",
+      "customerName": "Asqar aka",
+      "customerPhone": "997770081",
+      "salePrice": 460,
+      "purchasePrice": 475,
+      "date": "2026-07-26T06:01:05.407Z",
+      "isInstallment": true,
+      "status": "Completed",
+      "installmentPlan": {
+        "months": 1,
+        "paidAmount": 394,
+        "dueDate": "2026-08-25T06:01:05.407Z"
+      }
+    },
     {
       "id": "086e25ce-3452-4393-bae2-59d733cd02f1",
       "deviceId": "a91d9512-2213-42d0-a0c5-4f7b1286678d",
@@ -2014,11 +2030,11 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-25",
-  "cashBalance": 5832,
-  "exchangeRate": 12103,
-  "buyRate": 12078,
-  "sellRate": 12128,
-  "bankRate": 12103,
+  "cashBalance": 6226,
+  "exchangeRate": 12107,
+  "buyRate": 12082,
+  "sellRate": 12132,
+  "bankRate": 12107,
   "prevExchangeRate": 12103,
   "customModels": {
     "iPhone": [
@@ -2037,7 +2053,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-25T04:31:34.441Z"
+    "lastSync": "2026-07-25T06:54:56.639Z"
   },
   "currencySettings": {
     "autoUpdate": true,
