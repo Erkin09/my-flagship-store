@@ -2034,8 +2034,8 @@
   "exchangeRate": 12107,
   "buyRate": 12082,
   "sellRate": 12132,
-  "bankRate": 12107,
-  "prevExchangeRate": 12103,
+  "bankRate": 12102,
+  "prevExchangeRate": 12107,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -2053,7 +2053,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-26T06:01:12.536Z"
+    "lastSync": "2026-07-26T06:02:45.673Z"
   },
   "currencySettings": {
     "autoUpdate": true,
