@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "21b9023a-6f86-4360-a448-ea7581c0f69f",
+      "brand": "Samsung",
+      "model": "Galaxy S10",
+      "storage": "128Gb",
+      "imei": "354017113362152",
+      "purchasePrice": 123,
+      "purchasedFrom": "KM",
+      "purchaseDate": "2026-06-06",
+      "status": "In Stock",
+      "dateAdded": "2026-07-29T07:57:25.441Z"
+    },
+    {
       "id": "84764e8c-050c-4498-806f-8ba4e36e23db",
       "brand": "iPhone",
       "model": "iPhone 12",
@@ -2029,13 +2041,13 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-26",
+  "lastDailyBackup": "2026-07-28",
   "cashBalance": 6226,
-  "exchangeRate": 12107,
-  "buyRate": 12082,
-  "sellRate": 12132,
-  "bankRate": 12102,
-  "prevExchangeRate": 12107,
+  "exchangeRate": 11989,
+  "buyRate": 11964,
+  "sellRate": 12014,
+  "bankRate": 11989,
+  "prevExchangeRate": 11950,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -2053,7 +2065,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-26T06:02:45.673Z"
+    "lastSync": "2026-07-28T04:55:46.850Z"
   },
   "currencySettings": {
     "autoUpdate": true,
