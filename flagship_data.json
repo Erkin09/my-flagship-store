@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "ea739e45-f196-49b3-9a04-06a3650d2501",
+      "brand": "Samsung",
+      "model": "Galaxy S24 Ultra",
+      "storage": "512Gb",
+      "imei": "352288891587672",
+      "purchasePrice": 605,
+      "purchasedFrom": "MK",
+      "purchaseDate": "2026-07-29",
+      "status": "In Stock",
+      "dateAdded": "2026-07-29T08:09:49.617Z"
+    },
+    {
       "id": "eaddfb50-10a8-45e1-80cf-4361c1dbedbc",
       "brand": "iPhone",
       "model": "iPhone 16 Pro Max",
@@ -2117,7 +2129,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-29T08:04:28.185Z"
+    "lastSync": "2026-07-29T08:07:56.564Z"
   },
   "currencySettings": {
     "autoUpdate": true,
