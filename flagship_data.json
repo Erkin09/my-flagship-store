@@ -575,7 +575,7 @@
       "purchasedFrom": "Abror",
       "purchaseDate": "2026-05-05",
       "batteryHealth": 87,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-14T08:24:44.082Z"
     },
     {
@@ -1272,6 +1272,17 @@
     }
   ],
   "sales": [
+    {
+      "id": "6569f054-f45d-4f63-b76b-5618c55330a9",
+      "deviceId": "d092b41a-2250-4eee-a0c0-94c0aa41aeb9",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 440,
+      "purchasePrice": 340,
+      "date": "2026-07-29T10:10:06.351Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
     {
       "id": "89dd4e0e-b652-4c95-bdeb-d2d6663694f1",
       "deviceId": "e50e6bd0-050e-45ad-a276-a04847cf70ee",
@@ -2131,11 +2142,11 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-29",
-  "cashBalance": 6226,
+  "cashBalance": 6666,
   "exchangeRate": 11989,
   "buyRate": 11964,
   "sellRate": 12014,
-  "bankRate": 12050,
+  "bankRate": 11989,
   "prevExchangeRate": 11989,
   "customModels": {
     "iPhone": [
@@ -2154,7 +2165,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-29T08:12:09.417Z"
+    "lastSync": "2026-07-29T09:27:04.314Z"
   },
   "currencySettings": {
     "autoUpdate": true,
