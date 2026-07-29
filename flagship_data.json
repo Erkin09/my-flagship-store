@@ -1,6 +1,18 @@
 {
   "devices": [
     {
+      "id": "afa008df-4ec3-448f-b6de-4f053ae837fa",
+      "brand": "Samsung",
+      "model": "Galaxy S24 Ultra",
+      "storage": "256Gb",
+      "imei": "351552990508645",
+      "purchasePrice": 590,
+      "purchasedFrom": "MK",
+      "purchaseDate": "2026-07-29",
+      "status": "In Stock",
+      "dateAdded": "2026-07-29T08:11:50.389Z"
+    },
+    {
       "id": "ea739e45-f196-49b3-9a04-06a3650d2501",
       "brand": "Samsung",
       "model": "Galaxy S24 Ultra",
@@ -2129,7 +2141,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-29T08:07:56.564Z"
+    "lastSync": "2026-07-29T08:09:56.996Z"
   },
   "currencySettings": {
     "autoUpdate": true,
