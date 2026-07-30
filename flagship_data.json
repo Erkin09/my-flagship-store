@@ -19,7 +19,7 @@
       "model": "iPhone 13 Pro Max",
       "storage": "128Gb",
       "imei": "350360634498095",
-      "purchasePrice": 480,
+      "purchasePrice": 490,
       "purchasedFrom": "me",
       "purchaseDate": "2026-07-30",
       "batteryHealth": 89,
@@ -2224,7 +2224,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-30T12:44:21.462Z"
+    "lastSync": "2026-07-30T12:46:30.540Z"
   },
   "currencySettings": {
     "autoUpdate": true,
