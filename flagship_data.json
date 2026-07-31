@@ -355,7 +355,7 @@
       "purchasedFrom": "Client Nurotolik",
       "purchaseDate": "2026-07-05",
       "batteryHealth": 85,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-16T11:07:12.489Z"
     },
     {
@@ -1351,6 +1351,17 @@
   ],
   "sales": [
     {
+      "id": "1b7905b3-d2c1-4b88-be37-bd8d8fb27e56",
+      "deviceId": "6c91d0a7-efe4-4ba7-9a92-b4ad76e60a9a",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 666,
+      "purchasePrice": 600,
+      "date": "2026-07-31T04:58:44.484Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
+    {
       "id": "1d2c1252-af83-495d-b56d-7a94b6a4a2bb",
       "deviceId": "4b815a87-0248-45d5-afc3-5f38c3daaff2",
       "customerName": "Guest",
@@ -2253,11 +2264,11 @@
   "theme": "dark",
   "themeStyle": "default",
   "lastDailyBackup": "2026-07-30",
-  "cashBalance": 1125,
-  "exchangeRate": 12095,
-  "buyRate": 12070,
-  "sellRate": 12120,
-  "bankRate": 12035,
+  "cashBalance": 1791,
+  "exchangeRate": 11994,
+  "buyRate": 11969,
+  "sellRate": 12019,
+  "bankRate": 11994,
   "prevExchangeRate": 12095,
   "customModels": {
     "iPhone": [
@@ -2276,7 +2287,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-30T12:54:33.102Z"
+    "lastSync": "2026-07-30T13:10:51.939Z"
   },
   "currencySettings": {
     "autoUpdate": true,
