@@ -1357,7 +1357,7 @@
       "customerPhone": "N/A",
       "salePrice": 666,
       "purchasePrice": 600,
-      "date": "2026-07-31T04:58:44.484Z",
+      "date": "2026-07-15T00:00:00.000Z",
       "isInstallment": false,
       "status": "Completed"
     },
@@ -2263,7 +2263,7 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-30",
+  "lastDailyBackup": "2026-07-31",
   "cashBalance": 1791,
   "exchangeRate": 11994,
   "buyRate": 11969,
@@ -2287,7 +2287,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-30T13:10:51.939Z"
+    "lastSync": "2026-07-31T04:58:52.782Z"
   },
   "currencySettings": {
     "autoUpdate": true,
