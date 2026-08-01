@@ -125,7 +125,7 @@
       "purchasedFrom": "Client Nasiba opa",
       "purchaseDate": "2026-07-24",
       "batteryHealth": 89,
-      "status": "In Stock",
+      "status": "Sold",
       "dateAdded": "2026-07-29T08:07:47.428Z"
     },
     {
@@ -1351,6 +1351,17 @@
   ],
   "sales": [
     {
+      "id": "f83a769a-7dce-4ed2-8d5e-faa7cb7b8f73",
+      "deviceId": "eaddfb50-10a8-45e1-80cf-4361c1dbedbc",
+      "customerName": "Guest",
+      "customerPhone": "N/A",
+      "salePrice": 920,
+      "purchasePrice": 820,
+      "date": "2026-08-01T05:45:25.475Z",
+      "isInstallment": false,
+      "status": "Completed"
+    },
+    {
       "id": "8c3a970b-3014-42e9-88a3-ac757af5e8e0",
       "deviceId": "564eb780-83be-43c8-981d-d86d516564e3",
       "customerName": "Guest",
@@ -2274,8 +2285,8 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-07-31",
-  "cashBalance": 2271,
+  "lastDailyBackup": "2026-08-01",
+  "cashBalance": 3191,
   "exchangeRate": 11950,
   "buyRate": 11925,
   "sellRate": 11975,
@@ -2298,7 +2309,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-07-31T04:59:10.245Z"
+    "lastSync": "2026-08-01T05:44:33.948Z"
   },
   "currencySettings": {
     "autoUpdate": true,
