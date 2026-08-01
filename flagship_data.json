@@ -1357,7 +1357,7 @@
       "customerPhone": "N/A",
       "salePrice": 920,
       "purchasePrice": 820,
-      "date": "2026-08-01T05:45:25.475Z",
+      "date": "2026-07-31T00:00:00.000Z",
       "isInstallment": false,
       "status": "Completed"
     },
@@ -2309,7 +2309,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-08-01T05:45:32.321Z"
+    "lastSync": "2026-08-01T12:24:20.770Z"
   },
   "currencySettings": {
     "autoUpdate": true,
