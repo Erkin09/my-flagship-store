@@ -1728,7 +1728,7 @@
       "status": "Completed",
       "installmentPlan": {
         "months": 1,
-        "paidAmount": 0,
+        "paidAmount": 42,
         "dueDate": "2026-08-13T09:43:17.090Z"
       }
     },
@@ -2285,13 +2285,13 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-08-01",
-  "cashBalance": 3191,
-  "exchangeRate": 11950,
-  "buyRate": 11925,
-  "sellRate": 11975,
-  "bankRate": 11950,
-  "prevExchangeRate": 11994,
+  "lastDailyBackup": "2026-08-02",
+  "cashBalance": 3233,
+  "exchangeRate": 11949,
+  "buyRate": 11924,
+  "sellRate": 11974,
+  "bankRate": 11949,
+  "prevExchangeRate": 11950,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -2309,7 +2309,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-08-01T12:47:33.513Z"
+    "lastSync": "2026-08-01T12:47:43.673Z"
   },
   "currencySettings": {
     "autoUpdate": true,
