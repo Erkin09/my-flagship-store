@@ -1,6 +1,31 @@
 {
   "devices": [
     {
+      "id": "1b8dd2ae-fb11-45c6-820c-2dd4de2bf68a",
+      "brand": "iPhone",
+      "model": "iPhone 15 Pro Max",
+      "storage": "256Gb",
+      "imei": "356155664020288",
+      "purchasePrice": 730,
+      "purchasedFrom": "Client Asadbek",
+      "purchaseDate": "2026-08-02",
+      "batteryHealth": 90,
+      "status": "In Stock",
+      "dateAdded": "2026-08-02T12:52:30.797Z"
+    },
+    {
+      "id": "c9cea5fd-d657-4ca7-8a5c-a62839c0628a",
+      "brand": "Samsung",
+      "model": "Galaxy S22 Ultra",
+      "storage": "512Gb",
+      "imei": "352730630630891",
+      "purchasePrice": 375,
+      "purchasedFrom": "Client 13 pro oldi",
+      "purchaseDate": "2026-08-02",
+      "status": "In Stock",
+      "dateAdded": "2026-08-02T12:51:25.717Z"
+    },
+    {
       "id": "1d42aeb7-75e4-4194-8f0a-986a98b3194a",
       "brand": "iPhone",
       "model": "iPhone 11",
@@ -2296,13 +2321,13 @@
   "language": "ru",
   "theme": "dark",
   "themeStyle": "default",
-  "lastDailyBackup": "2026-08-02",
-  "cashBalance": 3370,
-  "exchangeRate": 11949,
-  "buyRate": 11924,
-  "sellRate": 11974,
-  "bankRate": 11949,
-  "prevExchangeRate": 11950,
+  "lastDailyBackup": "2026-08-03",
+  "cashBalance": 800,
+  "exchangeRate": 11862,
+  "buyRate": 11837,
+  "sellRate": 11887,
+  "bankRate": 11862,
+  "prevExchangeRate": 11949,
   "customModels": {
     "iPhone": [
       "Macbook Neo"
@@ -2320,7 +2345,7 @@
     "githubToken": "",
     "repoName": "Erkin09/my-flagship-store",
     "autoSync": true,
-    "lastSync": "2026-08-02T05:32:19.527Z"
+    "lastSync": "2026-08-02T06:06:00.701Z"
   },
   "currencySettings": {
     "autoUpdate": true,
